@@ -1,117 +1,3 @@
-"""
-===============================================================================
-CorrDiffDatasetBuilder.py
-===============================================================================
-
-Author:
-    Vinicius / OpenAI Refactor
-
-Description:
-    This module builds a complete Zarr-based dataset pipeline compatible with
-    NVIDIA CorrDiff / PhysicsNeMo training workflows.
-
-    The builder performs:
-
-    1. ERA5 loading from partitioned parquet datasets
-    2. Temporal filtering
-    3. Spatial interpolation of ERA5 variables into radar domain
-    4. Radar image decoding into reflectivity fields
-    5. Patch extraction
-    6. NaN masking
-    7. Train statistics computation
-    8. Dataset normalization metadata export
-    9. Zarr dataset generation optimized for ML training
-
-Dataset Structure:
-    datasets/corrdiff/
-    ├── train.zarr/
-    │   ├── input
-    │   ├── target
-    │   ├── mask
-    │   └── timestamps
-    │
-    ├── stats/
-    │   ├── input_mean.npy
-    │   ├── input_std.npy
-    │   ├── target_mean.npy
-    │   └── target_std.npy
-    │
-    └── metadata.json
-
-Zarr Arrays:
-    input:
-        Shape:
-            (N, C, H, W)
-
-        Example:
-            (500000, 8, 32, 32)
-
-        Meaning:
-            N = samples
-            C = ERA5 variables
-            H/W = patch size
-
-    target:
-        Shape:
-            (N, 1, H, W)
-
-        Meaning:
-            Radar reflectivity patches
-
-    mask:
-        Shape:
-            (N, 1, H, W)
-
-        Meaning:
-            Valid radar pixels
-
-    timestamps:
-        Shape:
-            (N,)
-
-        Meaning:
-            Unix timestamp for each patch
-
-Compatible With:
-    - CorrDiff Regression Training
-    - CorrDiff Diffusion Training
-    - PhysicsNeMo
-    - Multi-GPU DDP
-    - Torch DataLoader
-    - Distributed training
-
-Recommended Workflow:
-    Step 1:
-        Generate dataset
-
-    Step 2:
-        Compute statistics
-
-    Step 3:
-        Train regression model
-
-    Step 4:
-        Train diffusion model
-
-Requirements:
-    - zarr
-    - numcodecs
-    - pyarrow
-    - scipy
-    - pillow
-    - pandas
-    - numpy
-
-Example:
-    python3 -m src.spatiotemporal_builder.CorrdiffDatasetBuilder \
-        -b 2024-01-01 \
-        -e 2024-01-31 \
-        --era5_variables u,v,t,q \
-        --radar_res 2
-
-===============================================================================
-"""
-
 import argparse
 import json
 import logging
@@ -365,15 +251,42 @@ class RadarDataset:
 
     def precompute_pixel_map(self):
 
-        lat0, lon0 = self.pos_sumare
+        H = 654
+        W = 656
+
+        lon_min = self.lon_range[0]
+        lon_max = self.lon_range[1]
+
+        lat_min = self.lat_range[0]
+        lat_max = self.lat_range[1]
 
         self.px = (
-            (self.Lon - lon0) * -32.5 + lon0
-        ).astype(int)
+            (self.Lon - lon_min)
+            /
+            (lon_max - lon_min)
+            *
+            (W - 1)
+        ).astype(np.int32)
 
         self.py = (
-            (self.Lat - lat0) * 19.5 + lat0
-        ).astype(int)
+            (lat_max - self.Lat)
+            /
+            (lat_max - lat_min)
+            *
+            (H - 1)
+        ).astype(np.int32)
+
+        print(
+            "PX MIN/MAX:",
+            self.px.min(),
+            self.px.max()
+        )
+
+        print(
+            "PY MIN/MAX:",
+            self.py.min(),
+            self.py.max()
+        )
 
     def filepath(self, t):
 
@@ -437,6 +350,8 @@ class RadarDataset:
         img = np.array(
             Image.open(path).convert("RGB")
         )
+        
+        print("IMAGE SHAPE:", img.shape)
 
         reflect = self.rgb_to_reflectivity(img)
 
@@ -447,6 +362,23 @@ class RadarDataset:
 
         grid = reflect[py, px]
 
+        print(
+            "REFLECT MIN/MAX:",
+            np.nanmin(reflect),
+            np.nanmax(reflect)
+        )
+
+        print(
+            "GRID MIN/MAX:",
+            np.nanmin(grid),
+            np.nanmax(grid)
+        )
+
+        print(
+            "GRID MEAN:",
+            np.nanmean(grid)
+        )
+        
         np.save(
             cache,
             grid.astype(np.float32),
@@ -769,6 +701,12 @@ class CorrDiffDatasetBuilder:
 
             Y = self.radar.get_grid(t)
 
+            print(
+                "Y MIN/MAX:",
+                np.nanmin(Y),
+                np.nanmax(Y)
+            )
+            
             if Y is None:
                 continue
 
@@ -821,7 +759,8 @@ class CorrDiffDatasetBuilder:
                         yp,
                         nan=0.0,
                     )
-
+                    yp = np.log1p(yp)
+                    
                     yp = yp[None, ...]
                     mask = mask[None, ...]
 
