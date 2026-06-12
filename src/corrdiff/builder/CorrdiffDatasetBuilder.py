@@ -1,3 +1,103 @@
+"""
+CorrDiff Dataset Builder
+========================
+
+This module builds a CorrDiff-compatible training dataset from:
+
+1. ERA5 atmospheric reanalysis data (low-resolution predictors)
+2. Weather radar imagery (high-resolution precipitation targets)
+
+The resulting dataset is stored in Zarr format and can be used for:
+
+- Regression stage training
+- Diffusion stage training
+- Validation and inference pipelines
+
+Overview
+--------
+The dataset generation pipeline performs the following steps:
+
+1. Load ERA5 variables from Parquet files.
+2. Filter data by the requested time interval.
+3. Interpolate ERA5 fields onto the radar spatial grid.
+4. Convert radar PNG images into precipitation intensity fields.
+5. Extract overlapping patches from ERA5 and radar grids.
+6. Apply log1p transformation to precipitation targets.
+7. Store samples into a Zarr dataset.
+8. Compute normalization statistics.
+
+Generated Zarr Structure
+------------------------
+
+train.zarr
+│
+├── input        (N, C, H, W)
+├── target       (N, 1, H, W)
+├── mask         (N, 1, H, W)
+└── timestamps   (N)
+
+Where:
+
+- N = number of patches
+- C = number of ERA5 variables
+- H,W = patch size
+
+Input
+-----
+ERA5 atmospheric variables interpolated to radar grid.
+
+Examples:
+
+- u wind component
+- v wind component
+- temperature
+- humidity
+
+Target
+------
+Radar-derived precipitation field.
+
+Transformation applied:
+
+    target = log1p(precipitation)
+
+This transformation compresses the dynamic range and improves
+training stability.
+
+Mask
+----
+Binary validity mask indicating valid radar pixels.
+
+Statistics
+----------
+The builder computes:
+
+- input_mean.npy
+- input_std.npy
+- target_mean.npy
+- target_std.npy
+
+These statistics are later used by the
+ZarrCorrDiffDataset normalization pipeline.
+
+Usage
+-----
+
+python build_corrdiff_dataset.py \
+    -b 2024-01-01 \
+    -e 2024-01-31 \
+    --era5_variables u,v,t,q \
+    --radar_res 2
+
+Author
+------
+Vinicius Gonçalves dos Santos
+
+Project
+-------
+Radar precipitation downscaling using NVIDIA CorrDiff.
+"""
+
 import argparse
 import json
 import logging
@@ -24,7 +124,6 @@ from src.config.paths import (
 # LOGGER
 # =============================================================================
 
-
 def setup_logger():
 
     logger = logging.getLogger("corrdiff")
@@ -46,13 +145,41 @@ def setup_logger():
 
     return logger
 
-
-# =============================================================================
-# ERA5 DATASET
-# =============================================================================
-
-
 class ERA5Dataset:
+    """
+    ERA5 data loader and interpolator.
+
+    This class loads atmospheric variables stored in
+    Parquet format and prepares them for CorrDiff training.
+
+    Responsibilities
+    ----------------
+    - Load ERA5 data within a time range.
+    - Extract requested variables.
+    - Build latitude/longitude coordinates.
+    - Interpolate ERA5 fields to radar resolution.
+
+    Parameters
+    ----------
+    path : str or Path
+        Root directory containing ERA5 parquet files.
+
+    variables : list[str]
+        ERA5 variables to load.
+
+    start_date : str
+        Initial timestamp.
+
+    end_date : str
+        Final timestamp.
+
+    Notes
+    -----
+    ERA5 is originally available at coarse resolution.
+
+    CorrDiff requires ERA5 fields to be interpolated onto
+    the radar grid before patch extraction.
+    """
 
     def __init__(
         self,
@@ -168,13 +295,39 @@ class ERA5Dataset:
 
         return np.stack(grids, axis=0)
 
-
-# =============================================================================
-# RADAR DATASET
-# =============================================================================
-
-
 class RadarDataset:
+    """
+    Radar image processing and spatial remapping.
+
+    Converts PNG radar images into numerical precipitation fields.
+
+    Processing Pipeline
+    -------------------
+    PNG Image
+         ↓
+    RGB Colors
+         ↓
+    Reflectivity Values
+         ↓
+    Spatial Reprojection
+         ↓
+    Radar Grid
+
+    Features
+    --------
+    - Radar image caching
+    - RGB-to-reflectivity conversion
+    - Geographic remapping
+    - Fixed-resolution grid generation
+
+    Notes
+    -----
+    Radar values are obtained through color interpolation
+    using the official radar legend.
+
+    Cached files are stored as NumPy arrays to avoid
+    repeatedly decoding PNG images.
+    """
 
     def __init__(
         self,
@@ -276,18 +429,6 @@ class RadarDataset:
             (H - 1)
         ).astype(np.int32)
 
-        print(
-            "PX MIN/MAX:",
-            self.px.min(),
-            self.px.max()
-        )
-
-        print(
-            "PY MIN/MAX:",
-            self.py.min(),
-            self.py.max()
-        )
-
     def filepath(self, t):
 
         return self.radar_path / t.strftime(
@@ -351,8 +492,6 @@ class RadarDataset:
             Image.open(path).convert("RGB")
         )
         
-        print("IMAGE SHAPE:", img.shape)
-
         reflect = self.rgb_to_reflectivity(img)
 
         H, W = reflect.shape
@@ -362,19 +501,19 @@ class RadarDataset:
 
         grid = reflect[py, px]
 
-        print(
+        self.logger.info(
             "REFLECT MIN/MAX:",
             np.nanmin(reflect),
             np.nanmax(reflect)
         )
 
-        print(
+        self.logger.info(
             "GRID MIN/MAX:",
             np.nanmin(grid),
             np.nanmax(grid)
         )
 
-        print(
+        self.logger.info(
             "GRID MEAN:",
             np.nanmean(grid)
         )
@@ -393,13 +532,74 @@ class RadarDataset:
         )
 
 
-# =============================================================================
-# CORRDIFF DATASET BUILDER
-# =============================================================================
-
-
 class CorrDiffDatasetBuilder:
+    """
+    CorrDiff dataset generation engine.
 
+    Creates a training dataset suitable for both
+    regression and diffusion stages.
+
+    Workflow
+    --------
+
+    For each timestamp:
+
+        ERA5
+          ↓
+      Interpolation
+          ↓
+      Radar Grid
+          ↓
+      Patch Extraction
+          ↓
+      log1p(Target)
+          ↓
+      Zarr Storage
+
+    Stored Arrays
+    -------------
+
+    input:
+        ERA5 predictors.
+
+    target:
+        Radar precipitation.
+
+    mask:
+        Valid-pixel mask.
+
+    timestamps:
+        Unix timestamps.
+
+    Parameters
+    ----------
+    era5 : ERA5Dataset
+        ERA5 dataset object.
+
+    radar : RadarDataset
+        Radar dataset object.
+
+    output_dir : str
+        Output directory.
+
+    patch_size : int
+        Patch dimension.
+
+    stride : int
+        Sliding window stride.
+
+    chunk_size : int
+        Zarr chunk size.
+
+    Notes
+    -----
+    The target variable is transformed using:
+
+        target = log1p(target)
+
+    This matches the preprocessing expected by the
+    CorrDiff training pipeline.
+    """
     def __init__(
         self,
         era5,
@@ -671,7 +871,43 @@ class CorrDiffDatasetBuilder:
             )
 
     def build(self):
+        
+        """
+        Generate the complete CorrDiff dataset.
 
+        Steps
+        -----
+
+        1. Iterate through all timestamps.
+        2. Load ERA5 atmospheric variables.
+        3. Interpolate ERA5 to radar grid.
+        4. Load corresponding radar observation.
+        5. Extract overlapping patches.
+        6. Remove mostly invalid patches.
+        7. Apply log1p transformation.
+        8. Store into Zarr.
+        9. Compute normalization statistics.
+
+        Output
+        ------
+        Creates:
+
+        - train.zarr
+        - metadata.json
+        - stats/input_mean.npy
+        - stats/input_std.npy
+        - stats/target_mean.npy
+        - stats/target_std.npy
+
+        Notes
+        -----
+        Patch extraction uses a sliding window:
+
+            patch_size = 32
+            stride     = 16
+
+        resulting in overlapping training samples.
+        """
         times = sorted(
             self.era5.df["time"].unique()
         )
@@ -701,7 +937,7 @@ class CorrDiffDatasetBuilder:
 
             Y = self.radar.get_grid(t)
 
-            print(
+            self.logger.info(
                 "Y MIN/MAX:",
                 np.nanmin(Y),
                 np.nanmax(Y)
