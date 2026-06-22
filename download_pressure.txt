@@ -1,0 +1,2 @@
+nohup: ignoring input
+/home/sangonvi/miniconda3/envs/cor-dexl/bin/python: Error while finding module specification for 'src.scripts.etl_era5_pressure' (ModuleNotFoundError: No module named 'src.scripts')

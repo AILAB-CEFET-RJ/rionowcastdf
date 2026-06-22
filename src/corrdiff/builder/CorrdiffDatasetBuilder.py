@@ -297,36 +297,23 @@ class ERA5Dataset:
 
 class RadarDataset:
     """
-    Radar image processing and spatial remapping.
+    Radar dataset reader used by CorrDiffDatasetBuilder.
 
-    Converts PNG radar images into numerical precipitation fields.
-
-    Processing Pipeline
-    -------------------
-    PNG Image
-         ↓
-    RGB Colors
-         ↓
-    Reflectivity Values
-         ↓
-    Spatial Reprojection
-         ↓
-    Radar Grid
-
-    Features
-    --------
-    - Radar image caching
-    - RGB-to-reflectivity conversion
-    - Geographic remapping
-    - Fixed-resolution grid generation
+    Responsibilities
+    ----------------
+    - Read PNG radar images.
+    - Convert RGB colors to reflectivity values.
+    - Reproject radar image into a regular geographic grid.
+    - Cache processed grids as NumPy arrays.
+    - Generate all expected timestamps between start and end dates.
 
     Notes
     -----
-    Radar values are obtained through color interpolation
-    using the official radar legend.
+    The original radar data are PNG images generated every
+    `time_resolution_minutes` minutes.
 
-    Cached files are stored as NumPy arrays to avoid
-    repeatedly decoding PNG images.
+    Output grid values are stored in reflectivity space
+    (or rainfall proxy depending on the radar legend).
     """
 
     def __init__(
@@ -338,6 +325,7 @@ class RadarDataset:
         lon_range,
         start_date,
         end_date,
+        time_resolution_minutes=2,
     ):
 
         self.logger = setup_logger()
@@ -359,11 +347,16 @@ class RadarDataset:
         self.start = pd.to_datetime(start_date)
         self.end = pd.to_datetime(end_date)
 
+        self.time_resolution_minutes = (
+            time_resolution_minutes
+        )
+
         self.pos_sumare = (
             -22.955139,
             -43.248278,
         )
 
+        # Radar legend values
         self.legend_values = np.array(
             [50, 45, 40, 35, 30, 25, 20, 0]
         )
@@ -380,6 +373,52 @@ class RadarDataset:
                 (0, 0, 0),
             ]
         )
+
+    # ==========================================================
+    # TIMESTAMPS
+    # ==========================================================
+
+    def generate_timestamps(self):
+
+        """
+        Generate all expected timestamps between
+        start and end dates.
+
+        Returns
+        -------
+        pandas.DatetimeIndex
+        """
+
+        return pd.date_range(
+            start=self.start,
+            end=self.end,
+            freq=f"{self.time_resolution_minutes}min",
+        )
+
+    def available_timestamps(self):
+
+        """
+        Return only timestamps whose PNG files
+        actually exist on disk.
+        """
+
+        timestamps = []
+
+        for t in self.generate_timestamps():
+        
+            if self.filepath(t).exists():
+                timestamps.append(t)
+
+        self.logger.info(
+            f"Available radar timestamps: "
+            f"{len(timestamps)}"
+        )
+
+        return timestamps
+
+    # ==========================================================
+    # GRID CONSTRUCTION
+    # ==========================================================
 
     def build_grid(self):
 
@@ -402,7 +441,20 @@ class RadarDataset:
             self.lat,
         )
 
+        self.logger.info(
+            f"Grid shape: {self.Lat.shape}"
+        )
+
     def precompute_pixel_map(self):
+
+        """
+        Precompute mapping between
+        geographic grid coordinates and
+        radar image pixels.
+
+        This greatly accelerates repeated
+        extraction during dataset generation.
+        """
 
         H = 654
         W = 656
@@ -429,6 +481,20 @@ class RadarDataset:
             (H - 1)
         ).astype(np.int32)
 
+        self.logger.info(
+            f"PX range: "
+            f"{self.px.min()} - {self.px.max()}"
+        )
+
+        self.logger.info(
+            f"PY range: "
+            f"{self.py.min()} - {self.py.max()}"
+        )
+
+    # ==========================================================
+    # PATH HELPERS
+    # ==========================================================
+
     def filepath(self, t):
 
         return self.radar_path / t.strftime(
@@ -438,8 +504,12 @@ class RadarDataset:
     def cache_path(self, t):
 
         return self.cache_dir / (
-            f"{t.strftime('%Y%m%d_%H')}.npy"
+            f"{t.strftime('%Y%m%d_%H_%M')}.npy"
         )
+
+    # ==========================================================
+    # RGB -> REFLECTIVITY
+    # ==========================================================
 
     def rgb_to_reflectivity(self, rgb):
 
@@ -455,7 +525,10 @@ class RadarDataset:
             ).sum(axis=2)
         )
 
-        idx = np.argsort(dists, axis=1)[:, :2]
+        idx = np.argsort(
+            dists,
+            axis=1,
+        )[:, :2]
 
         c1 = self.legend_colors[idx[:, 0]]
         c2 = self.legend_colors[idx[:, 1]]
@@ -463,61 +536,86 @@ class RadarDataset:
         v1 = self.legend_values[idx[:, 0]]
         v2 = self.legend_values[idx[:, 1]]
 
-        dist = np.linalg.norm(c1 - c2, axis=1)
+        dist = np.linalg.norm(
+            c1 - c2,
+            axis=1,
+        )
 
-        t = np.divide(
-            np.linalg.norm(flat - c1, axis=1),
+        alpha = np.divide(
+            np.linalg.norm(
+                flat - c1,
+                axis=1,
+            ),
             dist,
             out=np.zeros_like(dist),
             where=dist != 0,
         )
 
-        val = v1 + t * (v2 - v1)
+        values = v1 + alpha * (v2 - v1)
 
-        return val.reshape(rgb.shape[:2])
+        return values.reshape(
+            rgb.shape[:2]
+        )
+
+    # ==========================================================
+    # PROCESS SINGLE TIMESTAMP
+    # ==========================================================
 
     def process_time(self, t):
+
+        t = pd.to_datetime(t)
 
         cache = self.cache_path(t)
 
         if cache.exists():
+
             return np.load(cache)
 
         path = self.filepath(t)
 
         if not path.exists():
+
+            self.logger.warning(
+                f"Radar file not found: {path}"
+            )
+
             return None
 
-        img = np.array(
-            Image.open(path).convert("RGB")
+        try:
+
+            img = np.array(
+                Image.open(path).convert("RGB")
+            )
+
+        except Exception as e:
+
+            self.logger.error(
+                f"Error reading image "
+                f"{path}: {e}"
+            )
+
+            return None
+
+        reflect = self.rgb_to_reflectivity(
+            img
         )
-        
-        reflect = self.rgb_to_reflectivity(img)
 
         H, W = reflect.shape
 
-        px = np.clip(self.px, 0, W - 1)
-        py = np.clip(self.py, 0, H - 1)
+        px = np.clip(
+            self.px,
+            0,
+            W - 1,
+        )
+
+        py = np.clip(
+            self.py,
+            0,
+            H - 1,
+        )
 
         grid = reflect[py, px]
 
-        self.logger.info(
-            "REFLECT MIN/MAX:",
-            np.nanmin(reflect),
-            np.nanmax(reflect)
-        )
-
-        self.logger.info(
-            "GRID MIN/MAX:",
-            np.nanmin(grid),
-            np.nanmax(grid)
-        )
-
-        self.logger.info(
-            "GRID MEAN:",
-            np.nanmean(grid)
-        )
-        
         np.save(
             cache,
             grid.astype(np.float32),
@@ -525,12 +623,13 @@ class RadarDataset:
 
         return grid
 
+    # ==========================================================
+    # PUBLIC API
+    # ==========================================================
+
     def get_grid(self, t):
 
-        return self.process_time(
-            pd.to_datetime(t)
-        )
-
+        return self.process_time(t)
 
 class CorrDiffDatasetBuilder:
     """
