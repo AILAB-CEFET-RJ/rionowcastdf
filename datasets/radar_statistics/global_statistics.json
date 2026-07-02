@@ -1,0 +1,8 @@
+{
+    "total_images": 2828520,
+    "failed_images": 0,
+    "valid_pixels": 16631697600,
+    "global_mean": 0.34240156412124634,
+    "global_std": 3.1939733028411865,
+    "global_max": 50.0
+}
