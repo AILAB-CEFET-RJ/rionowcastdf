@@ -144,7 +144,7 @@ def discover_cache_files(cache_dir: Path):
     files = sorted(cache_dir.rglob("*.npy"))
 
     logger.info(
-        "Radar cache files found: %,d",
+        "Radar cache files found: %d",
         len(files),
     )
 
@@ -156,21 +156,24 @@ def discover_cache_files(cache_dir: Path):
 # =============================================================================
 
 
-def filename_to_timestamp(path: Path):
-
+def filename_to_timestamp(cache_file):
     """
-    Converts
+    Converts cache filename to pandas.Timestamp.
 
-        20170131_1436.npy
+    Supported format:
 
-    into
+        YYYYMMDD_HH_MM.npy
 
-        pandas.Timestamp
+    Example:
+
+        20241231_23_58.npy
     """
+
+    stem = cache_file.stem
 
     return pd.to_datetime(
-        path.stem,
-        format="%Y%m%d_%H%M",
+        stem,
+        format="%Y%m%d_%H_%M",
     )
 
 
@@ -577,9 +580,8 @@ def process_cache():
     )
 
     logger.info(
-        "Total cache files: %,d",
-        len(cache_files),
-    )
+    f"Radar cache files found: {len(cache_files):,}"
+)
 
     accumulator = StatisticsAccumulator()
 
@@ -659,12 +661,12 @@ def process_cache():
     logger.info("Summary parquet completed.")
 
     logger.info(
-        "Images processed : %,d",
+        "Images processed : %d",
         accumulator.total_images,
     )
 
     logger.info(
-        "Images failed    : %,d",
+        "Images failed    : %d",
         accumulator.failed_images,
     )
 
@@ -1152,7 +1154,7 @@ def print_execution_report(
 
     logger.info(
 
-        "Images processed : %,d",
+        "Images processed : %d",
 
         global_statistics["total_images"],
 
@@ -1160,7 +1162,7 @@ def print_execution_report(
 
     logger.info(
 
-        "Failed images    : %,d",
+        "Failed images    : %d",
 
         global_statistics["failed_images"],
 
