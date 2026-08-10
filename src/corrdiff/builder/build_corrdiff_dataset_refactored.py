@@ -92,17 +92,18 @@ class ERA5Dataset:
     Monthly ERA5 reader that combines surface variables and pressure levels.
 
     Pressure data are read from one monthly Parquet partition containing a
-    pressure-level column. For a configuration such as::
+    pressure-level column. Surface defaults mirror the current ERA5 single-level
+    ETL. For a configuration such as::
 
-        surface_variables = ["t2m", "sp", "u10", "v10"]
-        pressure_variables = ["u", "v", "t", "q"]
+        surface_variables = ["cape", "cin", "tcwv", "tcc", "z", "tp", "kx", "totalx"]
+        pressure_variables = ["u", "v", "r", "q", "t", "w", "crwc"]
         pressure_levels = [850, 500]
 
     the returned tensor has channels in this order::
 
-        t2m, sp, u10, v10,
-        u_850, v_850, t_850, q_850,
-        u_500, v_500, t_500, q_500
+        cape, cin, tcwv, tcc, z, tp, kx, totalx,
+        u_850, v_850, r_850, q_850, t_850, w_850, crwc_850,
+        u_500, v_500, r_500, q_500, t_500, w_500, crwc_500
 
     The public method :meth:`get_tensor` returns an array with shape
     ``(C, H, W)`` interpolated onto the radar grid.
@@ -120,7 +121,17 @@ class ERA5Dataset:
     )
 
     VARIABLE_ALIASES: dict[str, tuple[str, ...]] = {
-        # Surface
+        # Current ERA5 single-level ETL
+        "cape": ("cape", "convective_available_potential_energy"),
+        "cin": ("cin", "convective_inhibition"),
+        "tcwv": ("tcwv", "total_column_water_vapour"),
+        "tcc": ("tcc", "total_cloud_cover"),
+        "z": ("z", "geopotential"),
+        "tp": ("tp", "total_precipitation"),
+        "kx": ("kx", "k_index"),
+        "totalx": ("totalx", "total_totals_index"),
+
+        # Optional/future single-level variables kept for compatibility
         "t2m": ("t2m", "2m_temperature", "2_metre_temperature"),
         "u10": (
             "u10",
@@ -134,8 +145,8 @@ class ERA5Dataset:
         ),
         "sp": ("sp", "surface_pressure"),
         "msl": ("msl", "mean_sea_level_pressure"),
-        "tp": ("tp", "total_precipitation"),
         "d2m": ("d2m", "2m_dewpoint_temperature", "2_metre_dewpoint_temperature"),
+
         # Pressure levels
         "u": ("u", "u_component_of_wind"),
         "v": ("v", "v_component_of_wind"),
@@ -144,7 +155,6 @@ class ERA5Dataset:
         "t": ("t", "temperature"),
         "w": ("w", "vertical_velocity"),
         "crwc": ("crwc", "specific_rain_water_content"),
-        "z": ("z", "geopotential"),
     }
 
     def __init__(
@@ -257,6 +267,58 @@ class ERA5Dataset:
             resolved[canonical] = actual
 
         return resolved
+
+    def _collapse_duplicate_rows(
+        self,
+        dataframe: pd.DataFrame,
+        key_columns: Sequence[str],
+        value_columns: Sequence[str],
+        dataset_name: str,
+    ) -> pd.DataFrame:
+        """Collapse duplicate coordinates only when values are non-conflicting.
+
+        ERA5 files may expose auxiliary dimensions such as ``expver`` or
+        ``number``. After those columns are intentionally discarded, more than
+        one row can remain for the same logical coordinate. We do not silently
+        average conflicting values. Duplicate groups are accepted only when
+        each requested variable has at most one distinct non-null value; in that
+        case ``groupby.first`` coalesces complementary NaNs safely.
+        """
+        duplicate_mask = dataframe.duplicated(list(key_columns), keep=False)
+        if not duplicate_mask.any():
+            return dataframe
+
+        duplicate_rows = dataframe.loc[duplicate_mask, [*key_columns, *value_columns]]
+        grouped = duplicate_rows.groupby(list(key_columns), dropna=False, sort=False)
+
+        conflicts: list[str] = []
+        for variable in value_columns:
+            distinct_counts = grouped[variable].nunique(dropna=True)
+            conflicting = distinct_counts[distinct_counts > 1]
+            if not conflicting.empty:
+                conflicts.append(f"{variable}: {len(conflicting)} groups")
+
+        if conflicts:
+            raise ValueError(
+                f"{dataset_name} contains conflicting duplicate coordinate rows "
+                f"after dropping auxiliary ERA5 dimensions (for example expver/number). "
+                f"Conflicts: {', '.join(conflicts)}"
+            )
+
+        duplicate_count = int(duplicate_mask.sum())
+        self.logger.warning(
+            "%s contains %d duplicate rows after removing auxiliary dimensions; "
+            "coalescing non-conflicting values by logical coordinate",
+            dataset_name,
+            duplicate_count,
+        )
+
+        return (
+            dataframe.groupby(list(key_columns), as_index=False, dropna=False, sort=False)[
+                list(value_columns)
+            ]
+            .first()
+        )
 
     @staticmethod
     def _month_key(timestamp: pd.Timestamp) -> str:
@@ -421,13 +483,20 @@ class ERA5Dataset:
         self._surface_variable_columns = self._resolve_variable_columns(
             dataframe.columns, self.surface_variables, "surface dataset"
         )
+        value_columns = list(self._surface_variable_columns.values())
         keep_columns = [
             "_time",
             "_latitude",
             "_longitude",
-            *self._surface_variable_columns.values(),
+            *value_columns,
         ]
-        dataframe = dataframe[keep_columns].sort_values(
+        dataframe = dataframe[keep_columns]
+        dataframe = self._collapse_duplicate_rows(
+            dataframe,
+            key_columns=("_time", "_latitude", "_longitude"),
+            value_columns=value_columns,
+            dataset_name="surface dataset",
+        ).sort_values(
             ["_time", "_latitude", "_longitude"], kind="mergesort"
         )
         self._surface_lat = np.sort(dataframe["_latitude"].unique())
@@ -489,14 +558,21 @@ class ERA5Dataset:
         self._pressure_variable_columns = self._resolve_variable_columns(
             dataframe.columns, self.pressure_variables, "pressure dataset"
         )
+        value_columns = list(self._pressure_variable_columns.values())
         keep_columns = [
             "_time",
             "_pressure_level",
             "_latitude",
             "_longitude",
-            *self._pressure_variable_columns.values(),
+            *value_columns,
         ]
-        dataframe = dataframe[keep_columns].sort_values(
+        dataframe = dataframe[keep_columns]
+        dataframe = self._collapse_duplicate_rows(
+            dataframe,
+            key_columns=("_time", "_pressure_level", "_latitude", "_longitude"),
+            value_columns=value_columns,
+            dataset_name="pressure dataset",
+        ).sort_values(
             ["_time", "_pressure_level", "_latitude", "_longitude"],
             kind="mergesort",
         )
@@ -1201,10 +1277,17 @@ def parameter_parser() -> argparse.Namespace:
         "--output_dir", type=Path, default=Path("datasets/corrdiff")
     )
     parser.add_argument(
-        "--surface_variables", default="t2m,sp,u10,v10"
+        "--surface_variables",
+        default="cape,cin,tcwv,tcc,z,tp,kx,totalx",
+        help=(
+            "Comma-separated ERA5 single-level variables. Default matches the "
+            "current etl_era5_single pipeline."
+        ),
     )
     parser.add_argument(
-        "--pressure_variables", default="u,v,r,q,t,w,crwc"
+        "--pressure_variables",
+        default="u,v,r,q,t,w,crwc",
+        help="Comma-separated ERA5 pressure-level variables",
     )
     parser.add_argument("--pressure_levels", default="850,500")
     parser.add_argument(
