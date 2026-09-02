@@ -1,0 +1,38 @@
+# CorrDiff dataset builder - runtime dependencies
+#
+# Recommended Python: >= 3.10
+# The builder uses Python 3.10+ syntax (for example: str | Path).
+#
+# Standard-library modules such as argparse, multiprocessing, pathlib,
+# logging, json, time, uuid, resource, concurrent.futures, etc. do not
+# need to be installed separately.
+#
+# The import `src.config.paths` belongs to the rionowcast project itself
+# and therefore is not a PyPI dependency.
+
+# Numerical arrays and statistics
+numpy>=1.24
+
+# ERA5 monthly tabular processing
+pandas>=2.0
+
+# Parquet backend used by pandas.read_parquet()
+pyarrow>=14.0
+
+# ERA5 -> radar-grid interpolation
+scipy>=1.10
+
+# Zarr v2 output used by the builder
+# Keep Zarr on major version 2 because the script explicitly creates a
+# Zarr v2 store and uses the v2 numcodecs compressor interface.
+zarr>=2.16,<3.0
+
+# Blosc compression for the Zarr arrays.
+# This upper bound keeps compatibility with the Zarr 2.x API used here.
+numcodecs>=0.11,<0.16
+
+# Radar PNG reading (from PIL import Image)
+Pillow>=10.0
+
+# Progress bars
+tqdm>=4.65
