@@ -38,13 +38,21 @@ Outputs
     patch_position_counts.parquet
     expected_patch_spatial_coverage.npy
     actual_patch_spatial_coverage.npy
+    radar_legend_mapping.parquet
+    radar_cache_sample_statistics.parquet       # when --radar-cache-dir is supplied
+    radar_target_mapping_validation.parquet     # when cache + patch coordinates exist
+    radar_target_semantics.json
     audit_warnings.json
     audit.log
 
-The audit intentionally keeps interpretation separate from measurement. In
-particular, if the builder reports ``target_transform=log1p``, the script records
-that fact but does not assume that the stored target can be interpreted directly
-as dBZ. Confirm the physical scale before using fixed reflectivity thresholds.
+The audit intentionally keeps interpretation separate from measurement. The
+current builder implementation converts radar PNG RGB colors into numerical
+values using the configured radar legend, stores those values as float32 NPY
+cache grids, and later stores ``log1p(clip(cache, 0, +inf))`` in the Zarr target.
+The builder calls the cache field ``reflectivity`` but does not declare a physical
+unit such as dBZ. This audit verifies the cache -> Zarr transformation directly
+when ``--radar-cache-dir`` is provided, while keeping the physical-unit question
+explicitly unresolved until the original radar product legend is documented.
 """
 
 from __future__ import annotations
@@ -74,11 +82,32 @@ except ImportError:  # pragma: no cover
         return iterable
 
 
-AUDIT_VERSION = "phase0-audit-v1"
+AUDIT_VERSION = "phase0-audit-v2-radar-semantics"
 REQUIRED_ARRAYS = ("input", "target", "mask", "timestamps")
 OPTIONAL_ARRAYS = ("patch_row", "patch_col")
 QUANTILE_NAMES = ("p01", "p05", "p25", "p50", "p75", "p95", "p99")
 QUANTILE_VALUES = (0.01, 0.05, 0.25, 0.50, 0.75, 0.95, 0.99)
+
+# Radar semantics copied from the cache-generation implementation audited for
+# this dataset builder. These constants are not a claim about the physical unit;
+# the builder names them reflectivity values but does not declare "dBZ".
+BUILDER_RADAR_LEGEND_VALUES = np.asarray(
+    [50, 45, 40, 35, 30, 25, 20, 0], dtype=np.float32
+)
+BUILDER_RADAR_LEGEND_COLORS = np.asarray(
+    [
+        (197, 0, 197),
+        (227, 6, 5),
+        (255, 112, 0),
+        (195, 230, 0),
+        (4, 85, 4),
+        (19, 122, 19),
+        (0, 167, 12),
+        (0, 0, 0),
+    ],
+    dtype=np.float32,
+)
+TARGET_MAPPING_ATOL = 2e-6
 
 
 def parse_args() -> argparse.Namespace:
@@ -123,6 +152,35 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=20260913,
         help="Random seed used only for quantile sampling.",
+    )
+    parser.add_argument(
+        "--radar-cache-dir",
+        type=Path,
+        default=None,
+        help=(
+            "Optional directory containing YYYYMMDD_HH_MM.npy radar cache files. "
+            "When supplied, Phase 0 verifies the PNG-legend cache semantics and "
+            "the exact cache -> Zarr target mapping. You may also set the "
+            "CORRDIFF_RADAR_CACHE_DIR environment variable."
+        ),
+    )
+    parser.add_argument(
+        "--radar-cache-file-sample",
+        type=int,
+        default=128,
+        help=(
+            "Number of distinct dataset timestamps whose radar cache grids are "
+            "sampled for cache-value statistics."
+        ),
+    )
+    parser.add_argument(
+        "--radar-target-validation-samples",
+        type=int,
+        default=256,
+        help=(
+            "Number of Zarr samples compared directly against their source radar "
+            "cache patch to validate mask, clip and log1p behavior."
+        ),
     )
     parser.add_argument(
         "--quick",
@@ -444,6 +502,418 @@ def safe_fraction(numerator: int | float, denominator: int | float) -> float | N
     return float(numerator) / float(denominator)
 
 
+def radar_legend_dataframe() -> pd.DataFrame:
+    """Return the RGB -> numerical-value legend embedded in the builder."""
+    return pd.DataFrame(
+        {
+            "legend_index": np.arange(len(BUILDER_RADAR_LEGEND_VALUES), dtype=np.int16),
+            "value": BUILDER_RADAR_LEGEND_VALUES.astype(np.float32),
+            "r": BUILDER_RADAR_LEGEND_COLORS[:, 0].astype(np.int16),
+            "g": BUILDER_RADAR_LEGEND_COLORS[:, 1].astype(np.int16),
+            "b": BUILDER_RADAR_LEGEND_COLORS[:, 2].astype(np.int16),
+        }
+    )
+
+
+def cache_path_for_timestamp(cache_dir: Path, timestamp: pd.Timestamp) -> Path:
+    return cache_dir / f"{timestamp:%Y%m%d_%H_%M}.npy"
+
+
+def decode_one_timestamp(raw_value: Any, unit: str) -> pd.Timestamp:
+    if unit == "datetime64":
+        return normalize_timestamp(raw_value)
+    return pd.Timestamp(pd.to_datetime(int(raw_value), unit=unit, utc=True)).tz_convert(None)
+
+
+def _finite_quantiles(values: np.ndarray) -> dict[str, float | None]:
+    values = np.asarray(values, dtype=np.float64)
+    values = values[np.isfinite(values)]
+    if values.size == 0:
+        return {name: None for name in QUANTILE_NAMES}
+    qs = np.quantile(values, QUANTILE_VALUES)
+    return {name: float(value) for name, value in zip(QUANTILE_NAMES, qs)}
+
+
+def audit_radar_cache_and_target_mapping(
+    *,
+    cache_dir: Path | None,
+    arrays: dict[str, Any],
+    timestamp_raw: np.ndarray,
+    timestamp_unit: str,
+    unique_timestamps: pd.DatetimeIndex,
+    patch_rows: np.ndarray | None,
+    patch_cols: np.ndarray | None,
+    patch_size: int,
+    radar_grid_shape: tuple[int, int] | None,
+    file_sample_count: int,
+    target_validation_samples: int,
+    seed: int,
+    output_dir: Path,
+    warn: Any,
+    note: Any,
+    logger: logging.Logger,
+) -> dict[str, Any]:
+    """Audit builder radar semantics and, when possible, verify cache -> target."""
+
+    legend_df = radar_legend_dataframe()
+    legend_df.to_parquet(output_dir / "radar_legend_mapping.parquet", index=False)
+
+    semantics: dict[str, Any] = {
+        "builder_semantics": {
+            "source_format": "PNG converted to RGB",
+            "rgb_to_numeric_method": (
+                "two nearest configured legend colors in RGB Euclidean distance, "
+                "followed by linear interpolation between their numerical legend values"
+            ),
+            "legend_values": BUILDER_RADAR_LEGEND_VALUES.tolist(),
+            "legend_colors_rgb": BUILDER_RADAR_LEGEND_COLORS.astype(int).tolist(),
+            "cache_array_dtype": "float32",
+            "cache_spatial_mapping": (
+                "precomputed geographic-grid coordinates are converted to integer source-image "
+                "pixel indices; the numerical field is sampled as reflectivity[py, px]"
+            ),
+            "zarr_target_transform": "nan_to_num(nan/+-inf -> 0) -> clip(min=0) -> log1p -> float32",
+            "zarr_mask_definition": "isfinite(raw cache patch), before clip/log1p",
+            "inverse_of_log1p_stage": "expm1(target) recovers the clipped non-negative cache value, not negative raw cache values",
+            "physical_field_name_in_builder": "reflectivity",
+            "physical_unit_declared_in_builder": None,
+            "dbz_confirmed_by_builder_alone": False,
+        },
+        "cache_validation": {
+            "status": "SKIPPED",
+            "reason": "radar cache directory not supplied",
+        },
+        "target_mapping_validation": {
+            "status": "SKIPPED",
+            "reason": "radar cache directory not supplied",
+        },
+    }
+
+    if cache_dir is None:
+        note(
+            "radar_cache_not_checked",
+            "Radar cache directory was not supplied. Builder semantics are documented, but direct cache -> Zarr verification was skipped.",
+        )
+        write_json(output_dir / "radar_target_semantics.json", semantics)
+        return semantics
+
+    cache_dir = cache_dir.expanduser().resolve()
+    semantics["cache_dir"] = str(cache_dir)
+    if not cache_dir.is_dir():
+        warn("radar_cache_dir_missing", f"Radar cache directory does not exist: {cache_dir}")
+        semantics["cache_validation"] = {
+            "status": "FAILED",
+            "reason": "radar cache directory does not exist",
+        }
+        semantics["target_mapping_validation"] = {
+            "status": "FAILED",
+            "reason": "radar cache directory does not exist",
+        }
+        write_json(output_dir / "radar_target_semantics.json", semantics)
+        return semantics
+
+    rng = np.random.default_rng(seed)
+
+    # --------------------------------------------------------------
+    # Cache-grid sample audit using distinct timestamps represented in Zarr.
+    # This avoids enumerating a potentially multi-million-file 2-minute cache.
+    # --------------------------------------------------------------
+    cache_rows: list[dict[str, Any]] = []
+    aggregate_finite_chunks: list[np.ndarray] = []
+    file_sample_count = max(0, int(file_sample_count))
+    n_unique = len(unique_timestamps)
+    if file_sample_count > 0 and n_unique > 0:
+        chosen = rng.choice(n_unique, size=min(file_sample_count, n_unique), replace=False)
+        chosen_timestamps = unique_timestamps[np.sort(chosen)]
+    else:
+        chosen_timestamps = pd.DatetimeIndex([])
+
+    sampled_negative = 0
+    sampled_above_legend = 0
+    sampled_below_legend = 0
+    sampled_nonfinite = 0
+    sampled_total = 0
+    found_files = 0
+    missing_files = 0
+    shape_mismatch_files = 0
+    legend_min = float(np.min(BUILDER_RADAR_LEGEND_VALUES))
+    legend_max = float(np.max(BUILDER_RADAR_LEGEND_VALUES))
+
+    for timestamp in chosen_timestamps:
+        cache_file = cache_path_for_timestamp(cache_dir, timestamp)
+        if not cache_file.exists():
+            missing_files += 1
+            cache_rows.append(
+                {
+                    "timestamp": timestamp,
+                    "cache_file": str(cache_file),
+                    "exists": False,
+                }
+            )
+            continue
+        try:
+            grid = np.load(cache_file, allow_pickle=False)
+        except Exception as error:
+            cache_rows.append(
+                {
+                    "timestamp": timestamp,
+                    "cache_file": str(cache_file),
+                    "exists": True,
+                    "read_error": repr(error),
+                }
+            )
+            continue
+
+        found_files += 1
+        grid = np.asarray(grid)
+        finite = np.isfinite(grid)
+        finite_values = grid[finite].astype(np.float64, copy=False)
+        sampled_total += int(grid.size)
+        sampled_nonfinite += int((~finite).sum())
+        if finite_values.size:
+            sampled_negative += int((finite_values < 0).sum())
+            sampled_above_legend += int((finite_values > legend_max + 1e-6).sum())
+            sampled_below_legend += int((finite_values < legend_min - 1e-6).sum())
+            aggregate_finite_chunks.append(finite_values)
+        if radar_grid_shape is not None and tuple(grid.shape) != tuple(radar_grid_shape):
+            shape_mismatch_files += 1
+
+        q = _finite_quantiles(finite_values)
+        cache_rows.append(
+            {
+                "timestamp": timestamp,
+                "cache_file": str(cache_file),
+                "exists": True,
+                "shape": str(tuple(int(v) for v in grid.shape)),
+                "dtype": str(grid.dtype),
+                "total_count": int(grid.size),
+                "finite_count": int(finite.sum()),
+                "finite_ratio": safe_fraction(int(finite.sum()), int(grid.size)),
+                "negative_count": int((finite_values < 0).sum()) if finite_values.size else 0,
+                "below_legend_min_count": int((finite_values < legend_min - 1e-6).sum()) if finite_values.size else 0,
+                "above_legend_max_count": int((finite_values > legend_max + 1e-6).sum()) if finite_values.size else 0,
+                "min": float(np.min(finite_values)) if finite_values.size else np.nan,
+                "max": float(np.max(finite_values)) if finite_values.size else np.nan,
+                "mean": float(np.mean(finite_values)) if finite_values.size else np.nan,
+                "std": float(np.std(finite_values)) if finite_values.size else np.nan,
+                **q,
+            }
+        )
+
+    cache_df = pd.DataFrame(cache_rows)
+    cache_df.to_parquet(output_dir / "radar_cache_sample_statistics.parquet", index=False)
+
+    aggregate_values = (
+        np.concatenate(aggregate_finite_chunks) if aggregate_finite_chunks else np.asarray([], dtype=np.float64)
+    )
+    aggregate_q = _finite_quantiles(aggregate_values)
+    cache_validation = {
+        "status": "PASS" if found_files > 0 else "WARN",
+        "sampling_basis": "distinct timestamps present in Zarr; no full cache-directory enumeration",
+        "requested_files": int(len(chosen_timestamps)),
+        "found_files": int(found_files),
+        "missing_files": int(missing_files),
+        "shape_mismatch_files": int(shape_mismatch_files),
+        "sampled_pixel_count": int(sampled_total),
+        "sampled_nonfinite_count": int(sampled_nonfinite),
+        "sampled_finite_ratio": safe_fraction(sampled_total - sampled_nonfinite, sampled_total),
+        "sampled_negative_value_count": int(sampled_negative),
+        "sampled_below_legend_min_count": int(sampled_below_legend),
+        "sampled_above_legend_max_count": int(sampled_above_legend),
+        "sampled_min": float(np.min(aggregate_values)) if aggregate_values.size else None,
+        "sampled_max": float(np.max(aggregate_values)) if aggregate_values.size else None,
+        "sampled_mean": float(np.mean(aggregate_values)) if aggregate_values.size else None,
+        "sampled_std": float(np.std(aggregate_values)) if aggregate_values.size else None,
+        **{f"sampled_{k}": v for k, v in aggregate_q.items()},
+    }
+    semantics["cache_validation"] = cache_validation
+
+    if shape_mismatch_files > 0:
+        warn(
+            "radar_cache_shape_mismatch",
+            f"Found {shape_mismatch_files} sampled radar cache files whose shape differs from metadata radar_grid_shape={radar_grid_shape}.",
+        )
+    if sampled_negative > 0:
+        note(
+            "radar_cache_negative_values",
+            f"Found {sampled_negative} negative values in sampled radar cache pixels. The builder clips them to zero before log1p, so their original magnitude is not recoverable from target.",
+        )
+    if sampled_below_legend > 0 or sampled_above_legend > 0:
+        warn(
+            "radar_cache_values_outside_legend_range",
+            (
+                f"Sampled cache contains {sampled_below_legend} values below {legend_min} and "
+                f"{sampled_above_legend} values above {legend_max}. The RGB interpolation code does not explicitly clamp alpha to [0,1], so investigate source-image colors."
+            ),
+        )
+
+    # --------------------------------------------------------------
+    # Direct cache -> Zarr patch validation.
+    # --------------------------------------------------------------
+    validation_rows: list[dict[str, Any]] = []
+    n_samples = int(arrays["target"].shape[0])
+    if patch_rows is None or patch_cols is None:
+        semantics["target_mapping_validation"] = {
+            "status": "SKIPPED",
+            "reason": "patch_row/patch_col are absent",
+        }
+        note(
+            "radar_target_mapping_not_checked",
+            "Direct cache -> Zarr target validation requires patch_row and patch_col arrays.",
+        )
+    elif target_validation_samples <= 0 or n_samples == 0:
+        semantics["target_mapping_validation"] = {
+            "status": "SKIPPED",
+            "reason": "validation sample count is zero or dataset is empty",
+        }
+    else:
+        target_validation_samples = min(int(target_validation_samples), n_samples)
+        # Oversample candidate indices so missing cache files do not immediately reduce coverage.
+        candidate_count = min(n_samples, max(target_validation_samples * 4, target_validation_samples))
+        candidate_indices = rng.choice(n_samples, size=candidate_count, replace=False)
+        compared = 0
+        missing_cache_for_sample = 0
+
+        for sample_index in candidate_indices:
+            if compared >= target_validation_samples:
+                break
+            timestamp = decode_one_timestamp(timestamp_raw[int(sample_index)], timestamp_unit)
+            cache_file = cache_path_for_timestamp(cache_dir, timestamp)
+            if not cache_file.exists():
+                missing_cache_for_sample += 1
+                continue
+            try:
+                cache_grid = np.load(cache_file, allow_pickle=False)
+            except Exception:
+                continue
+
+            row = int(patch_rows[int(sample_index)])
+            col = int(patch_cols[int(sample_index)])
+            raw_patch = np.asarray(
+                cache_grid[row : row + patch_size, col : col + patch_size],
+                dtype=np.float32,
+            )
+            stored_target = np.asarray(arrays["target"][int(sample_index), 0], dtype=np.float32)
+            stored_mask = np.asarray(arrays["mask"][int(sample_index), 0], dtype=np.float32)
+            if raw_patch.shape != stored_target.shape:
+                validation_rows.append(
+                    {
+                        "sample_index": int(sample_index),
+                        "timestamp": timestamp,
+                        "patch_row": row,
+                        "patch_col": col,
+                        "cache_file": str(cache_file),
+                        "shape_match": False,
+                        "raw_patch_shape": str(raw_patch.shape),
+                        "stored_target_shape": str(stored_target.shape),
+                    }
+                )
+                compared += 1
+                continue
+
+            expected_mask = np.isfinite(raw_patch).astype(np.float32)
+            filled = np.nan_to_num(raw_patch, nan=0.0, posinf=0.0, neginf=0.0)
+            clipped = np.clip(filled, 0.0, None).astype(np.float32, copy=False)
+            expected_target = np.log1p(clipped).astype(np.float32, copy=False)
+            inverse_target = np.expm1(stored_target).astype(np.float32, copy=False)
+
+            target_abs_diff = np.abs(stored_target.astype(np.float64) - expected_target.astype(np.float64))
+            inverse_abs_diff = np.abs(inverse_target.astype(np.float64) - clipped.astype(np.float64))
+            mask_mismatch = int((~np.isclose(stored_mask, expected_mask, atol=0.0, rtol=0.0)).sum())
+            finite_raw = raw_patch[np.isfinite(raw_patch)]
+
+            validation_rows.append(
+                {
+                    "sample_index": int(sample_index),
+                    "timestamp": timestamp,
+                    "patch_row": row,
+                    "patch_col": col,
+                    "cache_file": str(cache_file),
+                    "shape_match": True,
+                    "raw_cache_min": float(np.min(finite_raw)) if finite_raw.size else np.nan,
+                    "raw_cache_max": float(np.max(finite_raw)) if finite_raw.size else np.nan,
+                    "raw_cache_negative_count": int((finite_raw < 0).sum()) if finite_raw.size else 0,
+                    "raw_cache_nonfinite_count": int((~np.isfinite(raw_patch)).sum()),
+                    "stored_target_min": float(np.min(stored_target)),
+                    "stored_target_max": float(np.max(stored_target)),
+                    "max_abs_diff_stored_vs_expected_log1p": float(np.max(target_abs_diff)),
+                    "mean_abs_diff_stored_vs_expected_log1p": float(np.mean(target_abs_diff)),
+                    "max_abs_diff_expm1_vs_clipped_cache": float(np.max(inverse_abs_diff)),
+                    "mean_abs_diff_expm1_vs_clipped_cache": float(np.mean(inverse_abs_diff)),
+                    "mask_mismatch_count": mask_mismatch,
+                    "mapping_matches_within_tolerance": bool(
+                        np.max(target_abs_diff) <= TARGET_MAPPING_ATOL and mask_mismatch == 0
+                    ),
+                }
+            )
+            compared += 1
+
+        validation_df = pd.DataFrame(validation_rows)
+        validation_df.to_parquet(
+            output_dir / "radar_target_mapping_validation.parquet", index=False
+        )
+        valid_shape_df = (
+            validation_df.loc[validation_df.get("shape_match", False) == True]
+            if not validation_df.empty and "shape_match" in validation_df.columns
+            else pd.DataFrame()
+        )
+        if valid_shape_df.empty:
+            mapping_summary = {
+                "status": "WARN",
+                "requested_samples": int(target_validation_samples),
+                "compared_samples": int(compared),
+                "missing_cache_candidates": int(missing_cache_for_sample),
+                "reason": "no shape-compatible cache/Zarr samples were compared",
+            }
+        else:
+            max_target_diff = float(valid_shape_df["max_abs_diff_stored_vs_expected_log1p"].max())
+            max_inverse_diff = float(valid_shape_df["max_abs_diff_expm1_vs_clipped_cache"].max())
+            total_mask_mismatches = int(valid_shape_df["mask_mismatch_count"].sum())
+            all_match = bool(valid_shape_df["mapping_matches_within_tolerance"].all())
+            negative_source_values = int(valid_shape_df["raw_cache_negative_count"].sum())
+            mapping_summary = {
+                "status": "PASS" if all_match else "FAIL",
+                "requested_samples": int(target_validation_samples),
+                "compared_samples": int(compared),
+                "shape_compatible_samples": int(len(valid_shape_df)),
+                "missing_cache_candidates": int(missing_cache_for_sample),
+                "absolute_tolerance": TARGET_MAPPING_ATOL,
+                "max_abs_diff_stored_vs_expected_log1p": max_target_diff,
+                "max_abs_diff_expm1_vs_clipped_cache": max_inverse_diff,
+                "total_mask_mismatch_count": total_mask_mismatches,
+                "source_negative_values_seen_in_compared_patches": negative_source_values,
+                "all_compared_samples_match_builder_transform": all_match,
+            }
+            if not all_match:
+                warn(
+                    "radar_target_mapping_mismatch",
+                    (
+                        "Direct cache -> Zarr validation did not reproduce every target/mask within "
+                        f"tolerance {TARGET_MAPPING_ATOL}. See radar_target_mapping_validation.parquet."
+                    ),
+                )
+            else:
+                note(
+                    "radar_target_mapping_verified",
+                    (
+                        f"Directly reproduced cache -> Zarr target/mask for {len(valid_shape_df)} sampled patches: "
+                        "isfinite mask + nan_to_num + clip(min=0) + log1p."
+                    ),
+                )
+            if negative_source_values > 0:
+                note(
+                    "radar_negative_values_irreversible_after_clip",
+                    (
+                        f"Compared cache patches contained {negative_source_values} negative finite source values. "
+                        "They map to target=0 after clipping, so expm1(target) cannot reconstruct their original magnitude."
+                    ),
+                )
+        semantics["target_mapping_validation"] = mapping_summary
+
+    write_json(output_dir / "radar_target_semantics.json", semantics)
+    return semantics
+
+
 def run_audit(args: argparse.Namespace) -> int:
     started_perf = time.perf_counter()
     started_utc = datetime.now(timezone.utc)
@@ -455,6 +925,11 @@ def run_audit(args: argparse.Namespace) -> int:
         else dataset_dir / "train.zarr"
     )
     output_dir = args.output_dir.expanduser().resolve()
+    radar_cache_arg = args.radar_cache_dir
+    if radar_cache_arg is None:
+        env_cache = os.environ.get("CORRDIFF_RADAR_CACHE_DIR")
+        radar_cache_arg = Path(env_cache) if env_cache else None
+    radar_cache_dir = radar_cache_arg.expanduser().resolve() if radar_cache_arg is not None else None
 
     if output_dir.exists() and any(output_dir.iterdir()) and not args.overwrite:
         raise FileExistsError(
@@ -467,6 +942,7 @@ def run_audit(args: argparse.Namespace) -> int:
     logger.info("Dataset directory: %s", dataset_dir)
     logger.info("Zarr path       : %s", zarr_path)
     logger.info("Output directory: %s", output_dir)
+    logger.info("Radar cache     : %s", radar_cache_dir if radar_cache_dir is not None else "not supplied")
     logger.info("Mode            : %s", "quick" if args.quick else "full")
 
     if not zarr_path.exists():
@@ -563,7 +1039,11 @@ def run_audit(args: argparse.Namespace) -> int:
     if target_transform == "log1p":
         note(
             "target_transform_log1p",
-            "Stored target uses log1p according to builder metadata. Confirm the source radar physical scale before interpreting target values as dBZ.",
+            (
+                "Stored target uses log1p. In the audited builder, the source cache is created from PNG RGB colors "
+                "mapped to numerical radar-legend values and saved as float32; the builder itself does not declare "
+                "the physical unit as dBZ. Direct cache -> target validation is performed when --radar-cache-dir is supplied."
+            ),
         )
 
     # ------------------------------------------------------------------
@@ -703,6 +1183,8 @@ def run_audit(args: argparse.Namespace) -> int:
     expected_positions = expected_patch_positions(radar_grid_shape, patch_size, stride)
     patch_position_df = pd.DataFrame(columns=["patch_row", "patch_col", "samples"])
     actual_positions: list[tuple[int, int]] = []
+    patch_rows: np.ndarray | None = None
+    patch_cols: np.ndarray | None = None
 
     if "patch_row" in arrays and "patch_col" in arrays:
         logger.info("Reading patch positions...")
@@ -755,6 +1237,29 @@ def run_audit(args: argparse.Namespace) -> int:
             actual_map = build_coverage_map(radar_grid_shape, patch_size, actual_positions)
             np.save(output_dir / "actual_patch_spatial_coverage.npy", actual_map)
             actual_spatial_coverage_ratio = float((actual_map > 0).mean())
+
+    # ------------------------------------------------------------------
+    # Radar-cache semantics and direct cache -> Zarr target validation.
+    # ------------------------------------------------------------------
+    logger.info("Auditing radar cache semantics and target transformation...")
+    radar_semantics = audit_radar_cache_and_target_mapping(
+        cache_dir=radar_cache_dir,
+        arrays=arrays,
+        timestamp_raw=timestamp_raw,
+        timestamp_unit=timestamp_unit,
+        unique_timestamps=unique_dt,
+        patch_rows=patch_rows,
+        patch_cols=patch_cols,
+        patch_size=patch_size,
+        radar_grid_shape=radar_grid_shape,
+        file_sample_count=args.radar_cache_file_sample,
+        target_validation_samples=args.radar_target_validation_samples,
+        seed=args.seed + 1009,
+        output_dir=output_dir,
+        warn=warn,
+        note=note,
+        logger=logger,
+    )
 
     # ------------------------------------------------------------------
     # Numerical scan.
@@ -989,6 +1494,7 @@ def run_audit(args: argparse.Namespace) -> int:
             "zarr_path": zarr_path,
             "metadata_path": metadata_path,
             "normalization_path": normalization_path,
+            "radar_cache_dir": radar_cache_dir,
             "output_dir": output_dir,
         },
         "dataset": {
@@ -1038,6 +1544,7 @@ def run_audit(args: argparse.Namespace) -> int:
         },
         "mask": mask_metrics,
         "target_integrity": target_integrity,
+        "radar_target_semantics": radar_semantics,
         "builder_counters": counters,
         "warnings_count": len(warnings),
         "notes_count": len(notes),
@@ -1069,6 +1576,10 @@ def main() -> int:
         raise ValueError("--batch-samples must be > 0")
     if args.quantile_sample_values < 0:
         raise ValueError("--quantile-sample-values must be >= 0")
+    if args.radar_cache_file_sample < 0:
+        raise ValueError("--radar-cache-file-sample must be >= 0")
+    if args.radar_target_validation_samples < 0:
+        raise ValueError("--radar-target-validation-samples must be >= 0")
     return run_audit(args)
 
 
