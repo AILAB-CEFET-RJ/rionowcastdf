@@ -1,0 +1,17 @@
+{
+  "warnings": [],
+  "notes": [
+    {
+      "code": "target_transform_log1p",
+      "message": "Stored target uses log1p according to builder metadata. Confirm the source radar physical scale before interpreting target values as dBZ."
+    },
+    {
+      "code": "temporal_gaps_present",
+      "message": "Dataset contains 28364 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters."
+    },
+    {
+      "code": "patch_geometry_uncovered_edges",
+      "message": "Patch geometry covers 87.07% of the 70x84 radar grid. This follows directly from patch_size/stride and should be considered when reconstructing full fields."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "warnings": [],
+  "notes": [
+    {
+      "code": "target_transform_log1p",
+      "message": "Stored target uses log1p. In the audited builder, the source cache is created from PNG RGB colors mapped to numerical radar-legend values and saved as float32; the builder itself does not declare the physical unit as dBZ. Direct cache -> target validation is performed when --radar-cache-dir is supplied."
+    },
+    {
+      "code": "temporal_gaps_present",
+      "message": "Dataset contains 28364 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters."
+    },
+    {
+      "code": "patch_geometry_uncovered_edges",
+      "message": "Patch geometry covers 87.07% of the 70x84 radar grid. This follows directly from patch_size/stride and should be considered when reconstructing full fields."
+    },
+    {
+      "code": "radar_target_mapping_verified",
+      "message": "Directly reproduced cache -> Zarr target/mask for 256 sampled patches: isfinite mask + nan_to_num + clip(min=0) + log1p."
+    }
+  ]
+}

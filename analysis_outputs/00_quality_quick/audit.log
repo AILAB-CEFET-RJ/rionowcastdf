@@ -1,0 +1,23 @@
+2026-09-13 14:45:23 | INFO | CorrDiff Phase 0 audit phase0-audit-v1
+2026-09-13 14:45:23 | INFO | Dataset directory: /home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024
+2026-09-13 14:45:23 | INFO | Zarr path       : /home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/train.zarr
+2026-09-13 14:45:23 | INFO | Output directory: /home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality_quick
+2026-09-13 14:45:23 | INFO | Mode            : quick
+2026-09-13 14:45:23 | INFO | target_transform_log1p: Stored target uses log1p according to builder metadata. Confirm the source radar physical scale before interpreting target values as dBZ.
+2026-09-13 14:45:23 | INFO | Reading timestamp index...
+2026-09-13 14:45:28 | INFO | temporal_gaps_present: Dataset contains 28364 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters.
+2026-09-13 14:45:28 | INFO | Reading patch positions...
+2026-09-13 14:45:36 | INFO | patch_geometry_uncovered_edges: Patch geometry covers 87.07% of the 70x84 radar grid. This follows directly from patch_size/stride and should be considered when reconstructing full fields.
+2026-09-13 14:45:36 | INFO | Quick mode: skipping full pixel scan.
+2026-09-13 14:45:36 | INFO | ========================================================================
+2026-09-13 14:45:36 | INFO | PHASE 0 AUDIT COMPLETED
+2026-09-13 14:45:36 | INFO | Samples                  : 1132464
+2026-09-13 14:45:36 | INFO | Unique timestamps        : 94372
+2026-09-13 14:45:36 | INFO | Expected timestamps      : 122736
+2026-09-13 14:45:36 | INFO | Temporal coverage        : 76.89%
+2026-09-13 14:45:36 | INFO | Channels                 : 12
+2026-09-13 14:45:36 | INFO | Warnings                 : 0
+2026-09-13 14:45:36 | INFO | Notes                    : 3
+2026-09-13 14:45:36 | INFO | Output                    : /home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality_quick
+2026-09-13 14:45:36 | INFO | Elapsed                   : 13.11 s
+2026-09-13 14:45:36 | INFO | ========================================================================

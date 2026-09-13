@@ -1,0 +1,105 @@
+{
+  "builder_semantics": {
+    "source_format": "PNG converted to RGB",
+    "rgb_to_numeric_method": "two nearest configured legend colors in RGB Euclidean distance, followed by linear interpolation between their numerical legend values",
+    "legend_values": [
+      50.0,
+      45.0,
+      40.0,
+      35.0,
+      30.0,
+      25.0,
+      20.0,
+      0.0
+    ],
+    "legend_colors_rgb": [
+      [
+        197,
+        0,
+        197
+      ],
+      [
+        227,
+        6,
+        5
+      ],
+      [
+        255,
+        112,
+        0
+      ],
+      [
+        195,
+        230,
+        0
+      ],
+      [
+        4,
+        85,
+        4
+      ],
+      [
+        19,
+        122,
+        19
+      ],
+      [
+        0,
+        167,
+        12
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "cache_array_dtype": "float32",
+    "cache_spatial_mapping": "precomputed geographic-grid coordinates are converted to integer source-image pixel indices; the numerical field is sampled as reflectivity[py, px]",
+    "zarr_target_transform": "nan_to_num(nan/+-inf -> 0) -> clip(min=0) -> log1p -> float32",
+    "zarr_mask_definition": "isfinite(raw cache patch), before clip/log1p",
+    "inverse_of_log1p_stage": "expm1(target) recovers the clipped non-negative cache value, not negative raw cache values",
+    "physical_field_name_in_builder": "reflectivity",
+    "physical_unit_declared_in_builder": null,
+    "dbz_confirmed_by_builder_alone": false
+  },
+  "cache_validation": {
+    "status": "PASS",
+    "sampling_basis": "distinct timestamps present in Zarr; no full cache-directory enumeration",
+    "requested_files": 128,
+    "found_files": 128,
+    "missing_files": 0,
+    "shape_mismatch_files": 0,
+    "sampled_pixel_count": 752640,
+    "sampled_nonfinite_count": 0,
+    "sampled_finite_ratio": 1.0,
+    "sampled_negative_value_count": 0,
+    "sampled_below_legend_min_count": 0,
+    "sampled_above_legend_max_count": 0,
+    "sampled_min": 0.0,
+    "sampled_max": 45.0,
+    "sampled_mean": 0.28898619038478923,
+    "sampled_std": 2.7483163500599743,
+    "sampled_p01": 0.0,
+    "sampled_p05": 0.0,
+    "sampled_p25": 0.0,
+    "sampled_p50": 0.0,
+    "sampled_p75": 0.0,
+    "sampled_p95": 0.0,
+    "sampled_p99": 20.0
+  },
+  "target_mapping_validation": {
+    "status": "PASS",
+    "requested_samples": 256,
+    "compared_samples": 256,
+    "shape_compatible_samples": 256,
+    "missing_cache_candidates": 0,
+    "absolute_tolerance": 2e-06,
+    "max_abs_diff_stored_vs_expected_log1p": 0.0,
+    "max_abs_diff_expm1_vs_clipped_cache": 7.62939453125e-06,
+    "total_mask_mismatch_count": 0,
+    "source_negative_values_seen_in_compared_patches": 0,
+    "all_compared_samples_match_builder_transform": true
+  },
+  "cache_dir": "/home/vsantos/repositories/rionowcastdf/data/radar_cache"
+}
