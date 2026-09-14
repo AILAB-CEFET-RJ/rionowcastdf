@@ -35,6 +35,9 @@ Outputs
     yearly_coverage.parquet
     monthly_coverage.parquet
     hourly_coverage.parquet
+    year_month_coverage.parquet
+    month_hour_coverage.parquet
+    year_hour_coverage.parquet
     patch_position_counts.parquet
     expected_patch_spatial_coverage.npy
     actual_patch_spatial_coverage.npy
@@ -42,6 +45,11 @@ Outputs
     radar_cache_sample_statistics.parquet       # when --radar-cache-dir is supplied
     radar_target_mapping_validation.parquet     # when cache + patch coordinates exist
     radar_target_semantics.json
+    target_event_thresholds.parquet
+    target_event_rates_global.parquet
+    target_event_rates_yearly.parquet
+    target_event_rates_monthly.parquet
+    target_event_rates_hourly.parquet
     audit_warnings.json
     audit.log
 
@@ -53,6 +61,12 @@ The builder calls the cache field ``reflectivity`` but does not declare a physic
 unit such as dBZ. This audit verifies the cache -> Zarr transformation directly
 when ``--radar-cache-dir`` is provided, while keeping the physical-unit question
 explicitly unresolved until the original radar product legend is documented.
+
+Version 3 also adds missingness heatmap tables (year x month, month x hour,
+year x hour) and target-imbalance diagnostics for the configured radar-legend
+thresholds. Event rates are computed only over valid-mask pixels and are explicitly
+reported as patch-pixel weighted because overlapping patches duplicate central
+spatial pixels. Patch-level event-presence rates are reported alongside pixel rates.
 """
 
 from __future__ import annotations
@@ -82,7 +96,7 @@ except ImportError:  # pragma: no cover
         return iterable
 
 
-AUDIT_VERSION = "phase0-audit-v2-radar-semantics"
+AUDIT_VERSION = "phase0-audit-v3-coverage-events"
 REQUIRED_ARRAYS = ("input", "target", "mask", "timestamps")
 OPTIONAL_ARRAYS = ("patch_row", "patch_col")
 QUANTILE_NAMES = ("p01", "p05", "p25", "p50", "p75", "p95", "p99")
@@ -108,6 +122,20 @@ BUILDER_RADAR_LEGEND_COLORS = np.asarray(
     dtype=np.float32,
 )
 TARGET_MAPPING_ATOL = 2e-6
+
+# Diagnostic thresholds in the radar-legend numeric domain.  The physical unit is
+# intentionally not asserted here.  The stored target is log1p(clipped cache), so
+# thresholds >= 20 are compared in stored-target space via log1p(threshold).
+TARGET_EVENT_THRESHOLDS = (
+    ("gt_0", 0.0, "> 0"),
+    ("ge_20", 20.0, ">= 20"),
+    ("ge_25", 25.0, ">= 25"),
+    ("ge_30", 30.0, ">= 30"),
+    ("ge_35", 35.0, ">= 35"),
+    ("ge_40", 40.0, ">= 40"),
+    ("ge_45", 45.0, ">= 45"),
+    ("ge_50", 50.0, ">= 50"),
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -261,6 +289,79 @@ def decode_unix_timestamps(values: np.ndarray) -> tuple[pd.DatetimeIndex, str]:
 
     decoded = pd.to_datetime(values.astype(np.int64), unit=unit, utc=True)
     return pd.DatetimeIndex(decoded).tz_convert(None), unit
+
+
+def decode_timestamps_with_unit(values: np.ndarray, unit: str) -> pd.DatetimeIndex:
+    """Decode a timestamp batch using the unit detected from the full timestamp array."""
+    values = np.asarray(values)
+    if values.size == 0:
+        return pd.DatetimeIndex([])
+    if unit == "datetime64" or np.issubdtype(values.dtype, np.datetime64):
+        return pd.DatetimeIndex(values)
+    if unit not in {"s", "ms", "us", "ns"}:
+        decoded, _ = decode_unix_timestamps(values)
+        return decoded
+    decoded = pd.to_datetime(values.astype(np.int64), unit=unit, utc=True)
+    return pd.DatetimeIndex(decoded).tz_convert(None)
+
+
+def _update_event_group_store(
+    store: dict[tuple[int, str], dict[str, int]],
+    group_values: np.ndarray,
+    threshold_label: str,
+    valid_pixels_per_patch: np.ndarray,
+    event_pixels_per_patch: np.ndarray,
+    patch_has_event: np.ndarray,
+) -> None:
+    """Accumulate target-event counts for one categorical grouping."""
+    group_values = np.asarray(group_values)
+    for group_value in np.unique(group_values):
+        selector = group_values == group_value
+        key = (int(group_value), threshold_label)
+        bucket = store.setdefault(
+            key,
+            {
+                "patch_count": 0,
+                "valid_pixel_count": 0,
+                "event_pixel_count": 0,
+                "event_patch_count": 0,
+            },
+        )
+        bucket["patch_count"] += int(selector.sum())
+        bucket["valid_pixel_count"] += int(valid_pixels_per_patch[selector].sum())
+        bucket["event_pixel_count"] += int(event_pixels_per_patch[selector].sum())
+        bucket["event_patch_count"] += int(patch_has_event[selector].sum())
+
+
+def _event_rows_from_store(
+    store: dict[tuple[int, str], dict[str, int]],
+    group_column: str,
+    threshold_lookup: dict[str, tuple[float, str, float]],
+) -> list[dict[str, Any]]:
+    """Convert event aggregation dictionary to tidy output rows."""
+    rows: list[dict[str, Any]] = []
+    for (group_value, threshold_label), counts in sorted(store.items()):
+        legend_value, condition, target_threshold = threshold_lookup[threshold_label]
+        valid_pixels = int(counts["valid_pixel_count"])
+        patch_count = int(counts["patch_count"])
+        event_pixels = int(counts["event_pixel_count"])
+        event_patches = int(counts["event_patch_count"])
+        rows.append(
+            {
+                group_column: int(group_value),
+                "threshold": threshold_label,
+                "condition": condition,
+                "legend_value_threshold": float(legend_value),
+                "stored_target_threshold": float(target_threshold),
+                "patch_count": patch_count,
+                "valid_pixel_count": valid_pixels,
+                "event_pixel_count": event_pixels,
+                "event_pixel_ratio": safe_fraction(event_pixels, valid_pixels),
+                "event_patch_count": event_patches,
+                "event_patch_ratio": safe_fraction(event_patches, patch_count),
+            }
+        )
+    return rows
 
 
 def iter_slices(total: int, batch_size: int) -> Iterable[slice]:
@@ -1155,6 +1256,56 @@ def run_audit(args: argparse.Namespace) -> int:
     )
     hourly.to_parquet(output_dir / "hourly_coverage.parquet", index=False)
 
+    # Heatmap-ready coverage tables.  year_month intentionally mirrors the
+    # year/month granularity of monthly_coverage.parquet but is written under an
+    # explicit name so the notebook/report can treat all heatmap sources uniformly.
+    yearly_monthly = monthly.copy()
+    yearly_monthly.to_parquet(output_dir / "year_month_coverage.parquet", index=False)
+
+    month_hour = (
+        temporal.groupby(["month", "hour_utc"], as_index=False)
+        .agg(
+            expected_timestamps=("timestamp", "size"),
+            available_timestamps=("available", "sum"),
+            samples=("samples", "sum"),
+        )
+        .sort_values(["month", "hour_utc"])
+    )
+    month_hour["missing_timestamps"] = (
+        month_hour["expected_timestamps"] - month_hour["available_timestamps"]
+    )
+    month_hour["coverage_ratio"] = (
+        month_hour["available_timestamps"] / month_hour["expected_timestamps"]
+    )
+    month_hour["mean_patches_per_available_timestamp"] = np.where(
+        month_hour["available_timestamps"] > 0,
+        month_hour["samples"] / month_hour["available_timestamps"],
+        np.nan,
+    )
+    month_hour.to_parquet(output_dir / "month_hour_coverage.parquet", index=False)
+
+    year_hour = (
+        temporal.groupby(["year", "hour_utc"], as_index=False)
+        .agg(
+            expected_timestamps=("timestamp", "size"),
+            available_timestamps=("available", "sum"),
+            samples=("samples", "sum"),
+        )
+        .sort_values(["year", "hour_utc"])
+    )
+    year_hour["missing_timestamps"] = (
+        year_hour["expected_timestamps"] - year_hour["available_timestamps"]
+    )
+    year_hour["coverage_ratio"] = (
+        year_hour["available_timestamps"] / year_hour["expected_timestamps"]
+    )
+    year_hour["mean_patches_per_available_timestamp"] = np.where(
+        year_hour["available_timestamps"] > 0,
+        year_hour["samples"] / year_hour["available_timestamps"],
+        np.nan,
+    )
+    year_hour.to_parquet(output_dir / "year_hour_coverage.parquet", index=False)
+
     expected_timestamps = int(len(expected_index)) if len(expected_index) else None
     available_timestamps = int(len(unique_dt))
     temporal_coverage_ratio = (
@@ -1268,6 +1419,41 @@ def run_audit(args: argparse.Namespace) -> int:
     missing_rows: list[dict[str, Any]] = []
     mask_metrics: dict[str, Any] = {}
     target_integrity: dict[str, Any] = {}
+    target_event_summary: dict[str, Any] = {
+        "computed": False,
+        "weighting": "valid patch pixels; overlapping patches duplicate central spatial pixels",
+    }
+
+    threshold_rows = []
+    threshold_lookup: dict[str, tuple[float, str, float]] = {}
+    for threshold_label, legend_value, condition in TARGET_EVENT_THRESHOLDS:
+        target_threshold = 0.0 if threshold_label == "gt_0" else float(np.log1p(legend_value))
+        threshold_lookup[threshold_label] = (legend_value, condition, target_threshold)
+        threshold_rows.append(
+            {
+                "threshold": threshold_label,
+                "condition": condition,
+                "legend_value_threshold": float(legend_value),
+                "stored_target_threshold": target_threshold,
+                "physical_unit": "not declared by builder",
+            }
+        )
+    pd.DataFrame(threshold_rows).to_parquet(
+        output_dir / "target_event_thresholds.parquet", index=False
+    )
+
+    event_global = {
+        label: {
+            "patch_count": 0,
+            "valid_pixel_count": 0,
+            "event_pixel_count": 0,
+            "event_patch_count": 0,
+        }
+        for label, _, _ in TARGET_EVENT_THRESHOLDS
+    }
+    event_year: dict[tuple[int, str], dict[str, int]] = {}
+    event_month: dict[tuple[int, str], dict[str, int]] = {}
+    event_hour: dict[tuple[int, str], dict[str, int]] = {}
 
     rng = np.random.default_rng(args.seed)
     if not args.quick:
@@ -1327,6 +1513,62 @@ def run_audit(args: argparse.Namespace) -> int:
             target_all_posinf += int(np.isposinf(y).sum())
             target_all_neginf += int(np.isneginf(y).sum())
 
+            # Target-event imbalance diagnostics.  These counts are conditioned on
+            # mask validity.  Pixel ratios are patch-pixel weighted because the
+            # dataset intentionally contains overlapping spatial patches.  We also
+            # report the fraction of training patches containing at least one event.
+            batch_timestamps = decode_timestamps_with_unit(
+                timestamp_raw[sample_slice], timestamp_unit
+            )
+            batch_years = np.asarray(batch_timestamps.year, dtype=np.int16)
+            batch_months = np.asarray(batch_timestamps.month, dtype=np.int8)
+            batch_hours = np.asarray(batch_timestamps.hour, dtype=np.int8)
+            batch_size_actual = int(y.shape[0])
+            valid_pixels_per_patch = valid_m.reshape(batch_size_actual, -1).sum(axis=1, dtype=np.int64)
+
+            for threshold_label, legend_value, _condition in TARGET_EVENT_THRESHOLDS:
+                if threshold_label == "gt_0":
+                    event_mask = valid_m & np.isfinite(y) & (y > 0.0)
+                else:
+                    stored_threshold = np.float32(np.log1p(legend_value))
+                    event_mask = valid_m & np.isfinite(y) & (y >= stored_threshold)
+
+                event_pixels_per_patch = event_mask.reshape(batch_size_actual, -1).sum(
+                    axis=1, dtype=np.int64
+                )
+                patch_has_event = event_pixels_per_patch > 0
+
+                global_bucket = event_global[threshold_label]
+                global_bucket["patch_count"] += batch_size_actual
+                global_bucket["valid_pixel_count"] += int(valid_pixels_per_patch.sum())
+                global_bucket["event_pixel_count"] += int(event_pixels_per_patch.sum())
+                global_bucket["event_patch_count"] += int(patch_has_event.sum())
+
+                _update_event_group_store(
+                    event_year,
+                    batch_years,
+                    threshold_label,
+                    valid_pixels_per_patch,
+                    event_pixels_per_patch,
+                    patch_has_event,
+                )
+                _update_event_group_store(
+                    event_month,
+                    batch_months,
+                    threshold_label,
+                    valid_pixels_per_patch,
+                    event_pixels_per_patch,
+                    patch_has_event,
+                )
+                _update_event_group_store(
+                    event_hour,
+                    batch_hours,
+                    threshold_label,
+                    valid_pixels_per_patch,
+                    event_pixels_per_patch,
+                    patch_has_event,
+                )
+
         channel_rows.extend(input_acc.to_rows("input", args.quantile_sample_values, rng))
         target_rows = target_acc.to_rows("target", args.quantile_sample_values, rng)
         channel_rows.extend(target_rows)
@@ -1363,6 +1605,75 @@ def run_audit(args: argparse.Namespace) -> int:
             "posinf_count_all_stored_target_pixels": target_all_posinf,
             "neginf_count_all_stored_target_pixels": target_all_neginf,
         }
+
+        global_event_rows: list[dict[str, Any]] = []
+        for threshold_label, counts in event_global.items():
+            legend_value, condition, target_threshold = threshold_lookup[threshold_label]
+            valid_pixels = int(counts["valid_pixel_count"])
+            patch_count = int(counts["patch_count"])
+            event_pixels = int(counts["event_pixel_count"])
+            event_patches = int(counts["event_patch_count"])
+            global_event_rows.append(
+                {
+                    "threshold": threshold_label,
+                    "condition": condition,
+                    "legend_value_threshold": float(legend_value),
+                    "stored_target_threshold": float(target_threshold),
+                    "patch_count": patch_count,
+                    "valid_pixel_count": valid_pixels,
+                    "event_pixel_count": event_pixels,
+                    "event_pixel_ratio": safe_fraction(event_pixels, valid_pixels),
+                    "event_patch_count": event_patches,
+                    "event_patch_ratio": safe_fraction(event_patches, patch_count),
+                }
+            )
+
+        global_event_df = pd.DataFrame(global_event_rows).sort_values(
+            "legend_value_threshold"
+        )
+        yearly_event_df = pd.DataFrame(
+            _event_rows_from_store(event_year, "year", threshold_lookup)
+        )
+        monthly_event_df = pd.DataFrame(
+            _event_rows_from_store(event_month, "month", threshold_lookup)
+        )
+        hourly_event_df = pd.DataFrame(
+            _event_rows_from_store(event_hour, "hour_utc", threshold_lookup)
+        )
+
+        global_event_df.to_parquet(
+            output_dir / "target_event_rates_global.parquet", index=False
+        )
+        yearly_event_df.to_parquet(
+            output_dir / "target_event_rates_yearly.parquet", index=False
+        )
+        monthly_event_df.to_parquet(
+            output_dir / "target_event_rates_monthly.parquet", index=False
+        )
+        hourly_event_df.to_parquet(
+            output_dir / "target_event_rates_hourly.parquet", index=False
+        )
+
+        target_event_summary = {
+            "computed": True,
+            "physical_unit": "not declared by builder",
+            "thresholds": threshold_rows,
+            "weighting": (
+                "event_pixel_ratio is computed over valid mask pixels in stored patches; "
+                "overlap means central spatial pixels are represented multiple times. "
+                "event_patch_ratio is the fraction of training patches with at least one "
+                "valid pixel satisfying the threshold."
+            ),
+            "global": global_event_rows,
+        }
+        note(
+            "target_event_rates_patch_weighted",
+            (
+                "Target threshold rates were computed over valid pixels in the stored patch dataset. "
+                "Because patches overlap, pixel rates are training-distribution diagnostics rather than "
+                "de-duplicated full-field climatological frequencies."
+            ),
+        )
 
         missing_rows.append(
             {
@@ -1430,6 +1741,10 @@ def run_audit(args: argparse.Namespace) -> int:
             )
     else:
         logger.info("Quick mode: skipping full pixel scan.")
+        note(
+            "target_event_rates_not_computed_quick_mode",
+            "Target event-threshold rates require the full scan and are not produced in --quick mode.",
+        )
         if normalization_path.exists():
             normalization = np.load(normalization_path)
             means = np.asarray(normalization.get("input_mean", []), dtype=np.float64)
@@ -1544,6 +1859,12 @@ def run_audit(args: argparse.Namespace) -> int:
         },
         "mask": mask_metrics,
         "target_integrity": target_integrity,
+        "target_event_diagnostics": target_event_summary,
+        "coverage_heatmap_outputs": {
+            "year_month": "year_month_coverage.parquet",
+            "month_hour": "month_hour_coverage.parquet",
+            "year_hour": "year_hour_coverage.parquet",
+        },
         "radar_target_semantics": radar_semantics,
         "builder_counters": counters,
         "warnings_count": len(warnings),
@@ -1562,6 +1883,7 @@ def run_audit(args: argparse.Namespace) -> int:
         logger.info("Expected timestamps      : %d", expected_timestamps)
         logger.info("Temporal coverage        : %.2f%%", 100.0 * (temporal_coverage_ratio or 0.0))
     logger.info("Channels                 : %d", len(channels))
+    logger.info("Target event diagnostics : %s", "computed" if target_event_summary.get("computed") else "not computed")
     logger.info("Warnings                 : %d", len(warnings))
     logger.info("Notes                    : %d", len(notes))
     logger.info("Output                    : %s", output_dir)
