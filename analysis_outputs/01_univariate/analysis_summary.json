@@ -1,0 +1,95 @@
+{
+  "phase": 1,
+  "version": "phase1-univariate-v1",
+  "dataset": {
+    "zarr_path": "datasets/corrdiff_2011_2024/train.zarr",
+    "num_patches": 1132464,
+    "channels": [
+      "tcwv",
+      "t2m",
+      "u10",
+      "v10",
+      "t_850",
+      "r_850",
+      "u_850",
+      "v_850",
+      "t_500",
+      "r_500",
+      "u_500",
+      "v_500"
+    ],
+    "input_shape": [
+      1132464,
+      12,
+      32,
+      32
+    ],
+    "target_shape": [
+      1132464,
+      1,
+      32,
+      32
+    ],
+    "mask_shape": [
+      1132464,
+      1,
+      32,
+      32
+    ],
+    "target_transform": "log1p"
+  },
+  "sampling": {
+    "strategy": "systematic",
+    "seed": 20260914,
+    "zarr_chunk_first_dimension": 256,
+    "block_size": 256,
+    "selected_block_count": 128,
+    "sampled_patch_count": 32768,
+    "requested_sample_patches": 32768,
+    "reservoir_values_per_channel_limit": 300000,
+    "representativeness_vs_phase0": {
+      "phase0_reference_available": true,
+      "max_abs_sample_mean_difference_in_phase0_std": 0.12753118684734657,
+      "max_sample_std_relative_difference": 0.08665198246020459
+    }
+  },
+  "radar_target": {
+    "stored_domain": "log1p after invalid fill and clip(min=0)",
+    "reconstructed_domain": "expm1(stored target), i.e. post-clip radar-legend numeric value",
+    "physical_unit": "not declared by builder; do not label dBZ until source documentation confirms it",
+    "target_sparsity": {
+      "event_pixel_ratio_gt_0": 0.014789910333242381,
+      "event_patch_ratio_gt_0": 0.29761387558456603,
+      "dry_valid_pixel_ratio": 0.9852100896667576,
+      "dry_patch_ratio": 0.7023861244154339,
+      "source": "phase0 exact full scan"
+    }
+  },
+  "relative_humidity_quality": {
+    "r_850": {
+      "below_0_ratio": 0.0,
+      "above_100_ratio": 0.015180498361587524,
+      "outside_0_100_ratio": 0.015180498361587524
+    },
+    "r_500": {
+      "below_0_ratio": 2.682209014892578e-06,
+      "above_100_ratio": 0.010754525661468506,
+      "outside_0_100_ratio": 0.010757207870483398
+    }
+  },
+  "warnings": [
+    {
+      "code": "sample_mean_shift_vs_phase0",
+      "detail": "At least one sampled channel mean differs from the Phase 0 exact mean by more than 0.10 standard deviations (max=0.1275)."
+    },
+    {
+      "code": "r_850_outside_0_100",
+      "detail": "Sampled r_850 contains 1.518050% of values outside [0,100]. Values were measured, not clipped."
+    },
+    {
+      "code": "r_500_outside_0_100",
+      "detail": "Sampled r_500 contains 1.075721% of values outside [0,100]. Values were measured, not clipped."
+    }
+  ],
+  "runtime_seconds": 19.873084027087316
+}

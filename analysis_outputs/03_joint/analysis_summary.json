@@ -1,0 +1,18 @@
+{
+  "phase_version": "phase3-joint-v1",
+  "dataset_dir": "datasets/corrdiff_2011_2024",
+  "dataset_shape": [
+    1132464,
+    12,
+    32,
+    32
+  ],
+  "sampled_blocks": 64,
+  "retained_pixel_observations": 300000,
+  "predictor_count": 20,
+  "raw_predictor_count": 12,
+  "derived_predictor_count": 8,
+  "radar_domain": "expm1(stored_target): post-clip numerical radar-legend values; physical unit not assumed",
+  "positive_event_rate_in_sample": 0.01525,
+  "note": "Associations are descriptive and represent overlapping training patches."
+}

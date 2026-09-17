@@ -1,14 +1,14 @@
 {
-  "audit_version": "phase0-audit-v2-radar-semantics",
+  "audit_version": "phase0-audit-v3-coverage-events",
   "audit_mode": "full",
-  "audit_started_utc": "2026-09-13T20:53:20.086810+00:00",
-  "audit_finished_utc": "2026-09-13T21:04:36.042243+00:00",
-  "elapsed_seconds": 675.955439775018,
+  "audit_started_utc": "2026-09-14T14:52:38.334768+00:00",
+  "audit_finished_utc": "2026-09-14T15:02:53.530482+00:00",
+  "elapsed_seconds": 615.1957217198797,
   "system": {
     "hostname": "librae",
     "platform": "Linux-5.15.0-107-generic-x86_64-with-glibc2.35",
-    "python": "3.14.7 | packaged by Anaconda, Inc. | (main, Aug 14 2026, 10:21:40) [GCC 14.3.0]",
-    "pid": 490356
+    "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+    "pid": 629578
   },
   "paths": {
     "dataset_dir": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024",
@@ -248,6 +248,172 @@
     "posinf_count_all_stored_target_pixels": 0,
     "neginf_count_all_stored_target_pixels": 0
   },
+  "target_event_diagnostics": {
+    "computed": true,
+    "physical_unit": "not declared by builder",
+    "thresholds": [
+      {
+        "threshold": "gt_0",
+        "condition": "> 0",
+        "legend_value_threshold": 0.0,
+        "stored_target_threshold": 0.0,
+        "physical_unit": "not declared by builder"
+      },
+      {
+        "threshold": "ge_20",
+        "condition": ">= 20",
+        "legend_value_threshold": 20.0,
+        "stored_target_threshold": 3.044522437723423,
+        "physical_unit": "not declared by builder"
+      },
+      {
+        "threshold": "ge_25",
+        "condition": ">= 25",
+        "legend_value_threshold": 25.0,
+        "stored_target_threshold": 3.258096538021482,
+        "physical_unit": "not declared by builder"
+      },
+      {
+        "threshold": "ge_30",
+        "condition": ">= 30",
+        "legend_value_threshold": 30.0,
+        "stored_target_threshold": 3.4339872044851463,
+        "physical_unit": "not declared by builder"
+      },
+      {
+        "threshold": "ge_35",
+        "condition": ">= 35",
+        "legend_value_threshold": 35.0,
+        "stored_target_threshold": 3.58351893845611,
+        "physical_unit": "not declared by builder"
+      },
+      {
+        "threshold": "ge_40",
+        "condition": ">= 40",
+        "legend_value_threshold": 40.0,
+        "stored_target_threshold": 3.713572066704308,
+        "physical_unit": "not declared by builder"
+      },
+      {
+        "threshold": "ge_45",
+        "condition": ">= 45",
+        "legend_value_threshold": 45.0,
+        "stored_target_threshold": 3.828641396489095,
+        "physical_unit": "not declared by builder"
+      },
+      {
+        "threshold": "ge_50",
+        "condition": ">= 50",
+        "legend_value_threshold": 50.0,
+        "stored_target_threshold": 3.9318256327243257,
+        "physical_unit": "not declared by builder"
+      }
+    ],
+    "weighting": "event_pixel_ratio is computed over valid mask pixels in stored patches; overlap means central spatial pixels are represented multiple times. event_patch_ratio is the fraction of training patches with at least one valid pixel satisfying the threshold.",
+    "global": [
+      {
+        "threshold": "gt_0",
+        "condition": "> 0",
+        "legend_value_threshold": 0.0,
+        "stored_target_threshold": 0.0,
+        "patch_count": 1132464,
+        "valid_pixel_count": 1159643136,
+        "event_pixel_count": 17151018,
+        "event_pixel_ratio": 0.014789910333242381,
+        "event_patch_count": 337037,
+        "event_patch_ratio": 0.29761387558456603
+      },
+      {
+        "threshold": "ge_20",
+        "condition": ">= 20",
+        "legend_value_threshold": 20.0,
+        "stored_target_threshold": 3.044522437723423,
+        "patch_count": 1132464,
+        "valid_pixel_count": 1159643136,
+        "event_pixel_count": 16948396,
+        "event_pixel_ratio": 0.014615182441781813,
+        "event_patch_count": 335600,
+        "event_patch_ratio": 0.29634496107602537
+      },
+      {
+        "threshold": "ge_25",
+        "condition": ">= 25",
+        "legend_value_threshold": 25.0,
+        "stored_target_threshold": 3.258096538021482,
+        "patch_count": 1132464,
+        "valid_pixel_count": 1159643136,
+        "event_pixel_count": 10243179,
+        "event_pixel_ratio": 0.008833044134018829,
+        "event_patch_count": 246208,
+        "event_patch_ratio": 0.21740911852385594
+      },
+      {
+        "threshold": "ge_30",
+        "condition": ">= 30",
+        "legend_value_threshold": 30.0,
+        "stored_target_threshold": 3.4339872044851463,
+        "patch_count": 1132464,
+        "valid_pixel_count": 1159643136,
+        "event_pixel_count": 6034052,
+        "event_pixel_ratio": 0.005203369737360305,
+        "event_patch_count": 181992,
+        "event_patch_ratio": 0.16070444623405247
+      },
+      {
+        "threshold": "ge_35",
+        "condition": ">= 35",
+        "legend_value_threshold": 35.0,
+        "stored_target_threshold": 3.58351893845611,
+        "patch_count": 1132464,
+        "valid_pixel_count": 1159643136,
+        "event_pixel_count": 4060897,
+        "event_pixel_ratio": 0.0035018505900077175,
+        "event_patch_count": 138765,
+        "event_patch_ratio": 0.12253369643538338
+      },
+      {
+        "threshold": "ge_40",
+        "condition": ">= 40",
+        "legend_value_threshold": 40.0,
+        "stored_target_threshold": 3.713572066704308,
+        "patch_count": 1132464,
+        "valid_pixel_count": 1159643136,
+        "event_pixel_count": 1603595,
+        "event_pixel_ratio": 0.0013828348999946134,
+        "event_patch_count": 86592,
+        "event_patch_ratio": 0.0764633577756114
+      },
+      {
+        "threshold": "ge_45",
+        "condition": ">= 45",
+        "legend_value_threshold": 45.0,
+        "stored_target_threshold": 3.828641396489095,
+        "patch_count": 1132464,
+        "valid_pixel_count": 1159643136,
+        "event_pixel_count": 866991,
+        "event_pixel_ratio": 0.0007476360382647926,
+        "event_patch_count": 32214,
+        "event_patch_ratio": 0.028445937354300004
+      },
+      {
+        "threshold": "ge_50",
+        "condition": ">= 50",
+        "legend_value_threshold": 50.0,
+        "stored_target_threshold": 3.9318256327243257,
+        "patch_count": 1132464,
+        "valid_pixel_count": 1159643136,
+        "event_pixel_count": 173,
+        "event_pixel_ratio": 1.4918382615253112e-07,
+        "event_patch_count": 81,
+        "event_patch_ratio": 7.152545246471411e-05
+      }
+    ]
+  },
+  "coverage_heatmap_outputs": {
+    "year_month": "year_month_coverage.parquet",
+    "month_hour": "month_hour_coverage.parquet",
+    "year_hour": "year_hour_coverage.parquet"
+  },
   "radar_target_semantics": {
     "builder_semantics": {
       "source_format": "PNG converted to RGB",
@@ -365,6 +531,6 @@
     "patches_written": 1132464
   },
   "warnings_count": 0,
-  "notes_count": 4,
+  "notes_count": 5,
   "status": "PASS"
 }

@@ -1,0 +1,40 @@
+{
+  "phase_version": "phase2-derived-v1",
+  "dataset_dir": "datasets/corrdiff_2011_2024",
+  "dataset_shape": [
+    1132464,
+    12,
+    32,
+    32
+  ],
+  "channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "derived_variables": [
+    "wind_speed_10",
+    "wind_speed_850",
+    "wind_speed_500",
+    "delta_t_500_850",
+    "delta_t_850_surface",
+    "delta_r_500_850",
+    "bulk_wind_diff_10_850",
+    "bulk_wind_diff_850_500"
+  ],
+  "sample_patches_requested": 32768,
+  "sampling_source": "phase1_sampling_blocks",
+  "sampled_blocks": 128,
+  "sampled_patches": 32768,
+  "reservoir_values_per_variable": 300000,
+  "note": "Bulk wind differences are vector-wind differences in m/s, not height-normalized shear rates."
+}

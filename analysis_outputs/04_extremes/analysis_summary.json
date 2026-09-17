@@ -1,0 +1,13 @@
+{
+  "phase_version": "phase4-extremes-v1",
+  "sample_source": "phase3_relationship_samples",
+  "observations": 300000,
+  "predictor_count": 20,
+  "positive_radar_rate": 0.01525,
+  "threshold_count": 13,
+  "degenerate_event_definitions": [
+    "fixed_ge_50"
+  ],
+  "radar_domain": "post-log1p inverse using expm1; numerical radar-legend units, not assumed dBZ",
+  "interpretation_note": "Global P90/P95 can equal zero in a highly sparse target; positive-only quantiles are included to characterize event intensity separately."
+}

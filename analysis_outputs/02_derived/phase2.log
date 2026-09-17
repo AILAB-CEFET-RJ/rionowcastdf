@@ -1,0 +1,3 @@
+2026-09-15 20:57:40 | INFO | Dataset shape: (1132464, 12, 32, 32)
+2026-09-15 20:57:40 | INFO | Sampling 128 blocks of 256 patches (phase1_sampling_blocks)
+2026-09-15 20:57:45 | INFO | Phase 2 complete: analysis_outputs/02_derived
