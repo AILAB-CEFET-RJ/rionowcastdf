@@ -1,19 +1,14 @@
-# CorrDiff — Fase 2: Variáveis derivadas
+# CorrDiff — Fase 2 v2: variáveis derivadas
 
-A Fase 2 constrói diagnósticos meteorológicos a partir dos 12 canais ERA5 já auditados nas Fases 0 e 1. O dataset original não é alterado.
+Esta versão corrige a correlação entre as variáveis derivadas.
 
-## Variáveis derivadas
+## Correção
 
-- `wind_speed_10 = sqrt(u10² + v10²)`
-- `wind_speed_850 = sqrt(u_850² + v_850²)`
-- `wind_speed_500 = sqrt(u_500² + v_500²)`
-- `delta_t_500_850 = t_500 - t_850`
-- `delta_t_850_surface = t_850 - t2m`
-- `delta_r_500_850 = r_500 - r_850`
-- `bulk_wind_diff_10_850 = sqrt((u_850-u10)² + (v_850-v10)²)`
-- `bulk_wind_diff_850_500 = sqrt((u_500-u_850)² + (v_500-v_850)²)`
+Na versão anterior, cada variável mantinha um reservoir aleatório independente. A correlação era calculada juntando esses arrays por posição, embora cada posição pudesse representar pixels diferentes.
 
-As duas diferenças vetoriais de vento são proxies de cisalhamento em m/s. Como não são normalizadas pela distância vertical, não devem ser interpretadas como taxas de cisalhamento em s⁻¹.
+Na v2 existe um **reservoir multivariado alinhado**: quando um pixel é selecionado, todas as 8 variáveis derivadas daquele mesmo pixel são armazenadas juntas. `derived_correlations.parquet` passa a ser válido.
+
+As estatísticas univariadas da Fase 2 anterior não estavam afetadas por esse problema.
 
 ## Execução
 
@@ -24,31 +19,22 @@ python scripts/02_compute_derived_variables.py \
   --output-dir analysis_outputs/02_derived \
   --sample-patches 32768 \
   --reservoir-values 300000 \
-  --hist-bins 120 \
   --overwrite
 ```
 
-Depois abra:
+## Principais saídas
+
+- `derived_summary.parquet`
+- `derived_quantiles.parquet`
+- `derived_histograms.parquet`
+- `derived_correlations.parquet` — Pearson + Spearman em pixels alinhados
+- `derived_samples.npz` — reservoir alinhado
+- `analysis_summary.json`
+
+O `analysis_summary.json` deve mostrar:
 
 ```text
-notebooks/02_derived_variables.ipynb
+correlation_alignment_verified: true
 ```
 
-## Saídas
-
-```text
-analysis_outputs/02_derived/
-├── analysis_summary.json
-├── formula_catalog.parquet
-├── sampling_blocks.parquet
-├── derived_summary.parquet
-├── derived_quantiles.parquet
-├── derived_histograms.parquet
-├── derived_correlations.parquet
-├── derived_samples.npz
-└── phase2.log
-```
-
-## Dependências
-
-Além do ambiente das fases anteriores: `scipy`, `pyarrow`, `zarr`, `numpy`, `pandas`, `matplotlib`.
+e informar `aligned_reservoir_rows`.

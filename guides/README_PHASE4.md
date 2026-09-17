@@ -1,62 +1,56 @@
-# CorrDiff — Fase 4: Eventos intensos e extremos
+# CorrDiff — Fase 4 v2: extremos com amostragem estratificada
 
-A Fase 4 procura identificar quais condições ERA5 e diagnósticos derivados diferenciam eventos mais intensos de radar.
+A versão anterior reutilizava os 300 mil pixels da Fase 3. Essa amostra representou razoavelmente a ocorrência de radar, mas sub-representou fortemente os limiares mais intensos.
 
-## Definições de evento
+A v2 corrige isso lendo o Zarr diretamente e mantendo reservoirs independentes para estratos disjuntos de intensidade:
 
-São construídas três famílias:
+```text
+0
+(0,20)
+[20,25)
+[25,30)
+[30,35)
+[35,40)
+[40,45)
+[45,50)
+>=50
+```
 
-- limiares fixos: `>=20`, `>=25`, `>=30`, `>=35`, `>=40`, `>=45`, `>=50`;
-- quantis globais: `>P90`, `>P95`, `>P99` considerando todos os pixels válidos;
-- quantis positivos: `>P90+`, `>P95+`, `>P99+` calculados somente onde `radar > 0`.
+Cada observação retida recebe um **peso inverso da fração de amostragem do estrato**. Assim, médias, quantis, SMD e curvas por decil são calculados de forma ponderada, reconstruindo a distribuição dos blocos Zarr amostrados.
 
-A família positiva é importante porque a distribuição do radar é muito esparsa e os quantis globais P90/P95 podem coincidir com zero.
-
-## Análises
-
-- prevalência por definição de evento;
-- estatísticas dos preditores em evento versus não-evento;
-- diferença média e mediana;
-- diferença média padronizada;
-- probabilidade do evento por decil do preditor;
-- comparação entre limiares fixos e quantílicos.
+Para os limiares fixos, o script também usa `analysis_outputs/00_quality/target_event_rates_global.parquet` como referência exata do dataset completo quando disponível.
 
 ## Execução recomendada
-
-A Fase 4 reutiliza `relationship_samples.npz` da Fase 3 quando disponível:
 
 ```bash
 python scripts/04_compute_extreme_statistics.py \
   --dataset-dir datasets/corrdiff_2011_2024 \
-  --phase3-dir analysis_outputs/03_joint \
+  --phase0-dir analysis_outputs/00_quality \
   --output-dir analysis_outputs/04_extremes \
-  --deciles 10 \
+  --sample-patches 65536 \
+  --stratum-size 20000 \
   --overwrite
 ```
 
-Caso a Fase 3 não exista, o script faz uma amostragem direta do Zarr.
+Se houver memória/tempo disponível, aumente `--sample-patches` para 131072.
 
-Depois abra:
+## Saídas principais
 
-```text
-notebooks/04_extreme_event_conditions.ipynb
-```
+- `stratum_sampling.parquet` — população observada, amostra e peso por estrato
+- `event_prevalence.parquet` — prevalência ponderada e referência exata da Fase 0
+- `conditional_predictor_stats.parquet` — estatísticas evento/não-evento ponderadas
+- `effect_sizes.parquet` — SMD ponderado
+- `event_rate_by_predictor_decile.parquet` — curvas condicionais ponderadas
+- `extreme_samples.npz` — amostra estratificada local com pesos
+- `analysis_summary.json`
 
-## Saídas
+## Verificações importantes
 
-```text
-analysis_outputs/04_extremes/
-├── analysis_summary.json
-├── predictor_catalog.parquet
-├── threshold_definitions.parquet
-├── event_prevalence.parquet
-├── conditional_predictor_stats.parquet
-├── effect_sizes.parquet
-├── event_rate_by_predictor_decile.parquet
-├── extreme_samples.npz
-└── phase4.log
-```
+Depois da execução, observe:
 
-## Observação sobre unidade do radar
+- `max_abs_fixed_threshold_rate_diff_vs_phase0`
+- `stratum_sampling.parquet`
+- `effective_n_event` em `effect_sizes.parquet`
+- eventos `>=40` e `>=45`
 
-Os limiares são denominados **unidades da legenda do radar**. Não use `dBZ` nos gráficos ou texto científico até a unidade física ser confirmada na documentação da fonte do produto.
+O `event_rate` dos limiares fixos usa a Fase 0 exata quando essa referência está disponível.

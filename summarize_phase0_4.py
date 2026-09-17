@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CorrDiff — Consolidador das Fases 0 a 4
+CorrDiff — Consolidador das Fases 0 a 4 (compatível com Fase 2 v2 e Fase 4 v2)
 =======================================
 
 Lê SOMENTE os artefatos agregados produzidos pelas fases de análise:
@@ -528,11 +528,16 @@ def summarize_phase2(lines: list[str], root: Path) -> None:
         return
 
     if summary:
-        subsection(lines, "Amostragem")
+        subsection(lines, "Amostragem e validade metodológica")
+        kv(lines, "Versão", summary.get("phase_version"))
         kv(lines, "Patches amostrados", fmt(summary.get("sampled_patches")))
         kv(lines, "Blocos amostrados", fmt(summary.get("sampled_blocks")))
         kv(lines, "Estratégia/fonte", summary.get("sampling_source"))
         kv(lines, "Variáveis derivadas", ", ".join(summary.get("derived_variables", [])))
+        if "correlation_alignment_verified" in summary:
+            kv(lines, "Correlação com pixels alinhados", summary.get("correlation_alignment_verified"))
+            kv(lines, "Linhas no reservoir alinhado", fmt(summary.get("aligned_reservoir_rows")))
+            kv(lines, "Nota de correlação", summary.get("correlation_note"))
         kv(lines, "Observação metodológica", summary.get("note"))
 
     if not formulas.empty:
@@ -554,6 +559,7 @@ def summarize_phase2(lines: list[str], root: Path) -> None:
                     "max",
                     "skewness_reservoir",
                     "excess_kurtosis_reservoir",
+                    "aligned_reservoir_count",
                 ],
             ),
         )
@@ -561,33 +567,24 @@ def summarize_phase2(lines: list[str], root: Path) -> None:
     if not corr.empty and {"var_a", "var_b", "pearson_r"}.issubset(corr.columns):
         unique = corr[corr["var_a"] < corr["var_b"]].copy()
         unique["abs_r"] = unique["pearson_r"].abs()
-        subsection(lines, "Maiores correlações entre variáveis derivadas")
+        subsection(lines, "Maiores correlações entre variáveis derivadas — Pearson")
         add(
             lines,
             table_text(
-                unique.sort_values("abs_r", ascending=False).head(10),
-                ["var_a", "var_b", "pearson_r"],
+                unique.sort_values("abs_r", ascending=False).head(12),
+                ["var_a", "var_b", "pearson_r", "spearman_rho", "n_aligned"],
             ),
         )
-
-
-def ranked_metric(
-    df: pd.DataFrame,
-    metric: str,
-    top_k: int,
-    absolute: bool = True,
-) -> pd.DataFrame:
-    if df.empty or metric not in df.columns:
-        return pd.DataFrame()
-    out = df.copy()
-    out = out[pd.to_numeric(out[metric], errors="coerce").notna()]
-    if out.empty:
-        return out
-    if absolute:
-        out["__sort"] = pd.to_numeric(out[metric], errors="coerce").abs()
-    else:
-        out["__sort"] = pd.to_numeric(out[metric], errors="coerce")
-    return out.sort_values("__sort", ascending=False).head(top_k).drop(columns="__sort")
+        if "spearman_rho" in unique.columns:
+            unique["abs_rho"] = unique["spearman_rho"].abs()
+            subsection(lines, "Maiores correlações entre variáveis derivadas — Spearman")
+            add(
+                lines,
+                table_text(
+                    unique.sort_values("abs_rho", ascending=False).head(12),
+                    ["var_a", "var_b", "spearman_rho", "pearson_r", "n_aligned"],
+                ),
+            )
 
 
 def summarize_phase3(lines: list[str], root: Path, top_k: int) -> None:
@@ -727,21 +724,70 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
     effects = load_parquet(root / "effect_sizes.parquet")
     cond = load_parquet(root / "conditional_predictor_stats.parquet")
     deciles = load_parquet(root / "event_rate_by_predictor_decile.parquet")
+    strata = load_parquet(root / "stratum_sampling.parquet")
 
     if not summary and prevalence.empty:
         add(lines, f"[AUSENTE] resultados da Fase 4 em {root}")
         return
 
     if summary:
-        subsection(lines, "Configuração e amostra")
+        subsection(lines, "Configuração, amostragem e pesos")
+        kv(lines, "Versão", summary.get("phase_version"))
         kv(lines, "Fonte da amostra", summary.get("sample_source"))
-        kv(lines, "Observações", fmt(summary.get("observations")))
+        kv(lines, "Blocos amostrados", fmt(summary.get("sampled_blocks")))
+        kv(lines, "Patches amostrados", fmt(summary.get("sampled_patches")))
+        kv(
+            lines,
+            "Pixels válidos vistos nos blocos",
+            fmt(summary.get("valid_population_pixels_seen_in_sampled_blocks")),
+        )
+        kv(
+            lines,
+            "Linhas retidas na amostra estratificada",
+            fmt(summary.get("retained_stratified_sample_rows", summary.get("observations"))),
+        )
         kv(lines, "Preditores", fmt(summary.get("predictor_count")))
-        kv(lines, "Taxa de radar > 0", pct(summary.get("positive_radar_rate")))
+        kv(
+            lines,
+            "Taxa radar > 0 ponderada",
+            pct(summary.get("positive_radar_rate_weighted_sampled_blocks", summary.get("positive_radar_rate"))),
+        )
+        if "positive_radar_rate_unweighted_retained_sample" in summary:
+            kv(
+                lines,
+                "Taxa radar > 0 NÃO ponderada na amostra",
+                pct(summary.get("positive_radar_rate_unweighted_retained_sample")),
+            )
         kv(lines, "Definições de evento", fmt(summary.get("threshold_count")))
         kv(lines, "Eventos degenerados", summary.get("degenerate_event_definitions"))
+        kv(lines, "Referência exata Fase 0 disponível", summary.get("phase0_reference_available"))
+        if "max_abs_fixed_threshold_rate_diff_vs_phase0" in summary:
+            kv(
+                lines,
+                "Máx. |taxa ponderada - taxa exata Fase 0|",
+                fmt(summary.get("max_abs_fixed_threshold_rate_diff_vs_phase0")),
+            )
+        kv(lines, "Método de ponderação", summary.get("weighting_method"))
         kv(lines, "Domínio radar", summary.get("radar_domain"))
         kv(lines, "Nota", summary.get("interpretation_note"))
+
+    if not strata.empty:
+        subsection(lines, "Amostragem por estrato de intensidade")
+        add(
+            lines,
+            table_text(
+                strata,
+                [
+                    "stratum",
+                    "lower",
+                    "upper",
+                    "population_count_in_sampled_blocks",
+                    "sample_count",
+                    "sampling_fraction",
+                    "inverse_sampling_weight",
+                ],
+            ),
+        )
 
     if not prevalence.empty:
         subsection(lines, "Prevalência das definições de evento")
@@ -754,6 +800,12 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                     "family",
                     "threshold",
                     "operator",
+                    "sample_event_count_unweighted",
+                    "effective_sample_size_event",
+                    "weighted_event_rate_sampled_blocks",
+                    "reference_event_rate_phase0",
+                    "event_rate",
+                    "event_rate_source",
                     "event_count",
                     "event_rate",
                     "non_event_count",
@@ -763,7 +815,11 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
 
     if not effects.empty and "standardized_mean_difference" in effects.columns:
         subsection(lines, "Preditores que mais diferenciam evento × não-evento")
-        event_order = prevalence["event_id"].tolist() if "event_id" in prevalence.columns else effects["event_id"].drop_duplicates().tolist()
+        event_order = (
+            prevalence["event_id"].tolist()
+            if "event_id" in prevalence.columns
+            else effects["event_id"].drop_duplicates().tolist()
+        )
         for event_id in event_order:
             e = effects[effects["event_id"] == event_id].copy()
             if e.empty:
@@ -783,11 +839,14 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                         "non_event_mean",
                         "mean_difference",
                         "standardized_mean_difference",
+                        "n_event_sample",
+                        "effective_n_event",
+                        "n_event",
                     ],
                 ),
             )
 
-        subsection(lines, "Resumo máximo por preditor ao longo de todas as definições de evento")
+        subsection(lines, "Resumo máximo por preditor ao longo das definições de evento")
         e = effects.copy()
         e["abs_smd"] = e["standardized_mean_difference"].abs()
         idx = e.groupby("predictor")["abs_smd"].idxmax()
@@ -804,6 +863,7 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                     "event_mean",
                     "non_event_mean",
                     "standardized_mean_difference",
+                    "effective_n_event",
                 ],
             ),
         )
@@ -824,6 +884,7 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                     "rate_decile_1": first.get("event_rate", math.nan),
                     "rate_decile_last": last.get("event_rate", math.nan),
                     "delta_last_minus_first": last.get("event_rate", math.nan) - first.get("event_rate", math.nan),
+                    "weighted": last.get("weighted", None),
                 }
             )
         if rows:
@@ -833,13 +894,21 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                 lines,
                 table_text(
                     dd.sort_values("abs_delta", ascending=False).head(max(20, top_k * 2)),
-                    ["event_id", "predictor", "rate_decile_1", "rate_decile_last", "delta_last_minus_first"],
+                    [
+                        "event_id",
+                        "predictor",
+                        "rate_decile_1",
+                        "rate_decile_last",
+                        "delta_last_minus_first",
+                        "weighted",
+                    ],
                 ),
             )
 
     if not cond.empty:
-        # Compact consistency check: show event/non-event medians for fixed >=40
-        focus = cond[cond["event_id"].isin(["fixed_ge_30", "fixed_ge_40", "fixed_ge_45"])]
+        focus = cond[
+            cond["event_id"].isin(["fixed_ge_30", "fixed_ge_40", "fixed_ge_45"])
+        ]
         if not focus.empty:
             subsection(lines, "Medianas condicionais — eventos fixos mais intensos")
             pivot = focus.pivot_table(
