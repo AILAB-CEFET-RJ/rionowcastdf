@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CorrDiff — Consolidador das Fases 0 a 4 (compatível com Fase 2 v2 e Fase 4 v2)
+CorrDiff — Consolidador das Fases 0 a 4 (compatível com Fase 2 v2 e Fase 4 v2/v3)
 =======================================
 
 Lê SOMENTE os artefatos agregados produzidos pelas fases de análise:
@@ -587,6 +587,33 @@ def summarize_phase2(lines: list[str], root: Path) -> None:
             )
 
 
+
+def ranked_metric(
+    df: pd.DataFrame,
+    metric: str,
+    top_k: int,
+    absolute: bool = True,
+) -> pd.DataFrame:
+    """Return the top-k rows ranked by a numeric metric."""
+    if df.empty or metric not in df.columns:
+        return pd.DataFrame()
+
+    out = df.copy()
+    values = pd.to_numeric(out[metric], errors="coerce")
+    out = out[values.notna()].copy()
+    if out.empty:
+        return out
+
+    values = pd.to_numeric(out[metric], errors="coerce")
+    out["__sort"] = values.abs() if absolute else values
+
+    return (
+        out.sort_values("__sort", ascending=False)
+        .head(top_k)
+        .drop(columns="__sort")
+    )
+
+
 def summarize_phase3(lines: list[str], root: Path, top_k: int) -> None:
     section(lines, "FASE 3 — RELAÇÕES ERA5 × RADAR")
 
@@ -725,48 +752,50 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
     cond = load_parquet(root / "conditional_predictor_stats.parquet")
     deciles = load_parquet(root / "event_rate_by_predictor_decile.parquet")
     strata = load_parquet(root / "stratum_sampling.parquet")
+    input_blocks = load_parquet(root / "input_blocks_read.parquet")
 
     if not summary and prevalence.empty:
         add(lines, f"[AUSENTE] resultados da Fase 4 em {root}")
         return
 
+    phase_version = str(summary.get("phase_version", "")) if summary else ""
+    is_v3 = "v3-global" in phase_version or "global-stratified" in phase_version
+
     if summary:
         subsection(lines, "Configuração, amostragem e pesos")
         kv(lines, "Versão", summary.get("phase_version"))
         kv(lines, "Fonte da amostra", summary.get("sample_source"))
-        kv(lines, "Blocos amostrados", fmt(summary.get("sampled_blocks")))
-        kv(lines, "Patches amostrados", fmt(summary.get("sampled_patches")))
-        kv(
-            lines,
-            "Pixels válidos vistos nos blocos",
-            fmt(summary.get("valid_population_pixels_seen_in_sampled_blocks")),
-        )
-        kv(
-            lines,
-            "Linhas retidas na amostra estratificada",
-            fmt(summary.get("retained_stratified_sample_rows", summary.get("observations"))),
-        )
-        kv(lines, "Preditores", fmt(summary.get("predictor_count")))
-        kv(
-            lines,
-            "Taxa radar > 0 ponderada",
-            pct(summary.get("positive_radar_rate_weighted_sampled_blocks", summary.get("positive_radar_rate"))),
-        )
-        if "positive_radar_rate_unweighted_retained_sample" in summary:
-            kv(
-                lines,
-                "Taxa radar > 0 NÃO ponderada na amostra",
-                pct(summary.get("positive_radar_rate_unweighted_retained_sample")),
-            )
-        kv(lines, "Definições de evento", fmt(summary.get("threshold_count")))
-        kv(lines, "Eventos degenerados", summary.get("degenerate_event_definitions"))
-        kv(lines, "Referência exata Fase 0 disponível", summary.get("phase0_reference_available"))
-        if "max_abs_fixed_threshold_rate_diff_vs_phase0" in summary:
-            kv(
-                lines,
-                "Máx. |taxa ponderada - taxa exata Fase 0|",
-                fmt(summary.get("max_abs_fixed_threshold_rate_diff_vs_phase0")),
-            )
+
+        if is_v3:
+            kv(lines, "Escopo PASSO A", summary.get("pass_a_scope"))
+            kv(lines, "Blocos target/mask varridos", fmt(summary.get("pass_a_blocks_scanned")))
+            kv(lines, "Patches globais varridos", fmt(summary.get("global_patches_scanned")))
+            kv(lines, "Pixels válidos globais", fmt(summary.get("global_valid_pixels_scanned")))
+            kv(lines, "Pixels positivos globais exatos", fmt(summary.get("exact_global_positive_pixel_count")))
+            kv(lines, "Taxa positiva global exata", pct(summary.get("exact_global_positive_pixel_rate")))
+            kv(lines, "Linhas retidas no reservoir global", fmt(summary.get("retained_global_stratified_sample_rows")))
+            kv(lines, "Chunks input lidos no PASSO B", fmt(summary.get("pass_b_unique_input_blocks_read")))
+            kv(lines, "Total de chunks input", fmt(summary.get("pass_b_total_input_blocks")))
+            kv(lines, "Fração de chunks input lidos", pct(summary.get("pass_b_input_block_fraction_read")))
+            kv(lines, "Preditores", fmt(summary.get("predictor_count")))
+            kv(lines, "Definições de evento", fmt(summary.get("threshold_count")))
+            kv(lines, "Referência exata Fase 0 disponível", summary.get("phase0_reference_available"))
+            kv(lines, "Máx. |taxa exata v3 - Fase 0|", fmt(summary.get("max_abs_fixed_threshold_rate_diff_v3_vs_phase0")))
+        else:
+            kv(lines, "Blocos amostrados", fmt(summary.get("sampled_blocks")))
+            kv(lines, "Patches amostrados", fmt(summary.get("sampled_patches")))
+            kv(lines, "Pixels válidos vistos nos blocos", fmt(summary.get("valid_population_pixels_seen_in_sampled_blocks")))
+            kv(lines, "Linhas retidas na amostra estratificada", fmt(summary.get("retained_stratified_sample_rows", summary.get("observations"))))
+            kv(lines, "Preditores", fmt(summary.get("predictor_count")))
+            kv(lines, "Taxa radar > 0 ponderada", pct(summary.get("positive_radar_rate_weighted_sampled_blocks", summary.get("positive_radar_rate"))))
+            if "positive_radar_rate_unweighted_retained_sample" in summary:
+                kv(lines, "Taxa radar > 0 NÃO ponderada na amostra", pct(summary.get("positive_radar_rate_unweighted_retained_sample")))
+            kv(lines, "Definições de evento", fmt(summary.get("threshold_count")))
+            kv(lines, "Eventos degenerados", summary.get("degenerate_event_definitions"))
+            kv(lines, "Referência exata Fase 0 disponível", summary.get("phase0_reference_available"))
+            if "max_abs_fixed_threshold_rate_diff_vs_phase0" in summary:
+                kv(lines, "Máx. |taxa ponderada - taxa exata Fase 0|", fmt(summary.get("max_abs_fixed_threshold_rate_diff_vs_phase0")))
+
         kv(lines, "Método de ponderação", summary.get("weighting_method"))
         kv(lines, "Domínio radar", summary.get("radar_domain"))
         kv(lines, "Nota", summary.get("interpretation_note"))
@@ -779,15 +808,26 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                 strata,
                 [
                     "stratum",
-                    "lower",
-                    "upper",
-                    "population_count_in_sampled_blocks",
+                    "global_population_count",
+                    "global_population_ratio",
                     "sample_count",
+                    "sampling_fraction_global",
+                    "inverse_sampling_weight_global",
+                    "population_count_in_sampled_blocks",
                     "sampling_fraction",
                     "inverse_sampling_weight",
                 ],
             ),
         )
+
+    if is_v3 and not input_blocks.empty:
+        subsection(lines, "PASSO B — cobertura dos chunks de input")
+        kv(lines, "Chunks lidos", fmt(len(input_blocks)))
+        if "selected_pixels" in input_blocks.columns:
+            kv(lines, "Pixels selecionados recuperados", fmt(input_blocks["selected_pixels"].sum()))
+        if "selected_pixels" in input_blocks.columns and len(input_blocks):
+            kv(lines, "Mediana de pixels selecionados/chunk", fmt(input_blocks["selected_pixels"].median()))
+            kv(lines, "Máximo de pixels selecionados/chunk", fmt(input_blocks["selected_pixels"].max()))
 
     if not prevalence.empty:
         subsection(lines, "Prevalência das definições de evento")
@@ -802,16 +842,38 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                     "operator",
                     "sample_event_count_unweighted",
                     "effective_sample_size_event",
-                    "weighted_event_rate_sampled_blocks",
+                    "weighted_event_rate_global_estimate",
+                    "exact_global_event_count_v3",
+                    "exact_global_event_rate_v3",
                     "reference_event_rate_phase0",
+                    "abs_rate_diff_v3_vs_phase0",
+                    "weighted_event_rate_sampled_blocks",
                     "event_rate",
                     "event_rate_source",
-                    "event_count",
-                    "event_rate",
-                    "non_event_count",
                 ],
             ),
         )
+
+        if is_v3 and {"family", "exact_global_event_rate_v3", "reference_event_rate_phase0"}.issubset(prevalence.columns):
+            fixed = prevalence[prevalence["family"] == "fixed"].copy()
+            if not fixed.empty:
+                subsection(lines, "Validação exata Fase 4 v3 × Fase 0")
+                add(
+                    lines,
+                    table_text(
+                        fixed,
+                        [
+                            "event_id",
+                            "threshold",
+                            "exact_global_event_count_v3",
+                            "exact_global_event_rate_v3",
+                            "reference_event_rate_phase0",
+                            "abs_rate_diff_v3_vs_phase0",
+                            "sample_event_count_unweighted",
+                            "effective_sample_size_event",
+                        ],
+                    ),
+                )
 
     if not effects.empty and "standardized_mean_difference" in effects.columns:
         subsection(lines, "Preditores que mais diferenciam evento × não-evento")
@@ -841,7 +903,7 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                         "standardized_mean_difference",
                         "n_event_sample",
                         "effective_n_event",
-                        "n_event",
+                        "weight_scope",
                     ],
                 ),
             )
@@ -885,6 +947,7 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                     "rate_decile_last": last.get("event_rate", math.nan),
                     "delta_last_minus_first": last.get("event_rate", math.nan) - first.get("event_rate", math.nan),
                     "weighted": last.get("weighted", None),
+                    "weight_scope": last.get("weight_scope", None),
                 }
             )
         if rows:
@@ -901,6 +964,7 @@ def summarize_phase4(lines: list[str], root: Path, top_k: int) -> None:
                         "rate_decile_last",
                         "delta_last_minus_first",
                         "weighted",
+                        "weight_scope",
                     ],
                 ),
             )
