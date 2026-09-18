@@ -1,30 +1,44 @@
 #!/usr/bin/env python3
-"""CorrDiff Phase 4 v2 — stratified analysis of intense radar events.
+"""
+CorrDiff — Fase 4 v3
+Eventos intensos/extremos com amostragem estratificada GLOBAL
+==============================================================
 
-Why v2?
--------
-The original Phase 4 reused the 300k pixel sample from Phase 3. That sample
-represented radar occurrence reasonably well, but substantially
-underrepresented the intensity tail (>=25, >=30, >=40, >=45).
-
-v2 reads the CorrDiff Zarr directly and creates a STRATIFIED pixel reservoir
-over disjoint radar-intensity strata. Each stratum is sampled independently,
-and inverse sampling weights are used so event/non-event statistics reconstruct
-the population represented by the sampled Zarr blocks.
-
-The fixed-threshold prevalence from Phase 0 is also loaded when available and
-stored as an external exact reference for the full patch-weighted dataset.
-
-Important
+Motivação
 ---------
-- Radar values are numerical legend values after expm1(stored_target).
-- The builder does not declare their physical unit; the script does not label
-  them dBZ.
-- Patch overlap remains present. Statistics describe the training distribution.
-- Weighted conditional statistics are descriptive, not causal.
+A v2 corrigiu o desbalanceamento dentro de uma subamostra de blocos, mas os
+blocos selecionados ainda podiam sub-representar episódios intensos. A v3
+remove essa limitação:
 
-Default disjoint strata
------------------------
+PASSO A
+    Varre TODO o target + mask do train.zarr.
+    Conta exatamente os estratos globais e mantém um reservoir GLOBAL de
+    endereços de pixels para cada estrato de intensidade.
+
+PASSO B
+    Agrupa os endereços selecionados por chunk/bloco do input.
+    Lê apenas os chunks do ERA5 necessários para recuperar os 20 preditores
+    nos pixels selecionados.
+
+Os pesos passam a ser globais:
+
+    peso_estrato = N_global_estrato / n_reservoir_estrato
+
+Assim, as estatísticas ponderadas representam a distribuição em patches do
+dataset inteiro, não apenas uma subamostra temporal de blocos.
+
+IMPORTANTE
+----------
+- "Global" aqui significa a distribuição armazenada em patches, com overlap.
+  Não é climatologia espacial de pixels físicos deduplicados.
+- O radar é tratado como "valor numérico da legenda" após expm1(target).
+  A unidade física não é assumida como dBZ.
+- effective_n_event corrige apenas a desigualdade dos pesos. Não corrige
+  dependência espacial, overlap de patches nem autocorrelação temporal.
+- >=50 continua sendo ultra-raro; interprete separadamente.
+
+Estratos disjuntos
+------------------
 zero
 (0, 20)
 [20, 25)
@@ -35,20 +49,21 @@ zero
 [45, 50)
 >= 50
 
-Outputs
--------
-<output_dir>/
-  analysis_summary.json
-  predictor_catalog.parquet
-  sampling_blocks.parquet
-  stratum_sampling.parquet
-  threshold_definitions.parquet
-  event_prevalence.parquet
-  conditional_predictor_stats.parquet
-  effect_sizes.parquet
-  event_rate_by_predictor_decile.parquet
-  extreme_samples.npz
-  phase4.log
+Saídas
+------
+analysis_outputs/04_extremes/
+├── analysis_summary.json
+├── predictor_catalog.parquet
+├── global_scan_blocks.parquet
+├── stratum_sampling.parquet
+├── input_blocks_read.parquet
+├── threshold_definitions.parquet
+├── event_prevalence.parquet
+├── conditional_predictor_stats.parquet
+├── effect_sizes.parquet
+├── event_rate_by_predictor_decile.parquet
+├── extreme_samples.npz
+└── phase4.log
 """
 
 from __future__ import annotations
@@ -67,64 +82,109 @@ import numpy as np
 import pandas as pd
 import zarr
 
-PHASE_VERSION = "phase4-extremes-v2-stratified-weighted"
+
+PHASE_VERSION = "phase4-extremes-v3-global-stratified-weighted"
 
 RAW_CHANNELS = [
     "tcwv", "t2m", "u10", "v10",
     "t_850", "r_850", "u_850", "v_850",
     "t_500", "r_500", "u_500", "v_500",
 ]
+
 DERIVED_NAMES = [
-    "wind_speed_10", "wind_speed_850", "wind_speed_500",
-    "delta_t_500_850", "delta_t_850_surface", "delta_r_500_850",
-    "bulk_wind_diff_10_850", "bulk_wind_diff_850_500",
+    "wind_speed_10",
+    "wind_speed_850",
+    "wind_speed_500",
+    "delta_t_500_850",
+    "delta_t_850_surface",
+    "delta_r_500_850",
+    "bulk_wind_diff_10_850",
+    "bulk_wind_diff_850_500",
 ]
+
 ALL_PREDICTORS = RAW_CHANNELS + DERIVED_NAMES
 
 UNITS = {
-    "tcwv": "kg m^-2", "t2m": "K", "u10": "m s^-1", "v10": "m s^-1",
-    "t_850": "K", "r_850": "%", "u_850": "m s^-1", "v_850": "m s^-1",
-    "t_500": "K", "r_500": "%", "u_500": "m s^-1", "v_500": "m s^-1",
-    "wind_speed_10": "m s^-1", "wind_speed_850": "m s^-1",
-    "wind_speed_500": "m s^-1", "delta_t_500_850": "K",
-    "delta_t_850_surface": "K", "delta_r_500_850": "percentage points",
+    "tcwv": "kg m^-2",
+    "t2m": "K",
+    "u10": "m s^-1",
+    "v10": "m s^-1",
+    "t_850": "K",
+    "r_850": "%",
+    "u_850": "m s^-1",
+    "v_850": "m s^-1",
+    "t_500": "K",
+    "r_500": "%",
+    "u_500": "m s^-1",
+    "v_500": "m s^-1",
+    "wind_speed_10": "m s^-1",
+    "wind_speed_850": "m s^-1",
+    "wind_speed_500": "m s^-1",
+    "delta_t_500_850": "K",
+    "delta_t_850_surface": "K",
+    "delta_r_500_850": "percentage points",
     "bulk_wind_diff_10_850": "m s^-1",
     "bulk_wind_diff_850_500": "m s^-1",
 }
 
 STRATA = [
-    ("zero", None, 0.0, True, True),
-    ("gt0_lt20", 0.0, 20.0, False, False),
-    ("ge20_lt25", 20.0, 25.0, True, False),
-    ("ge25_lt30", 25.0, 30.0, True, False),
-    ("ge30_lt35", 30.0, 35.0, True, False),
-    ("ge35_lt40", 35.0, 40.0, True, False),
-    ("ge40_lt45", 40.0, 45.0, True, False),
-    ("ge45_lt50", 45.0, 50.0, True, False),
-    ("ge50", 50.0, None, True, True),
+    "zero",
+    "gt0_lt20",
+    "ge20_lt25",
+    "ge25_lt30",
+    "ge30_lt35",
+    "ge35_lt40",
+    "ge40_lt45",
+    "ge45_lt50",
+    "ge50",
 ]
+
+FIXED_THRESHOLDS = [20, 25, 30, 35, 40, 45, 50]
 
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="CorrDiff Phase 4 v2: stratified weighted extreme-event analysis"
+        description=(
+            "CorrDiff Fase 4 v3: full target/mask scan + global stratified "
+            "reservoir + weighted extreme-event analysis."
+        )
     )
     p.add_argument("--dataset-dir", type=Path, required=True)
-    p.add_argument("--phase0-dir", type=Path,
-                   default=Path("analysis_outputs/00_quality"))
-    p.add_argument("--output-dir", type=Path,
-                   default=Path("analysis_outputs/04_extremes"))
     p.add_argument(
-        "--sample-patches", type=int, default=65536,
-        help="Patches distributed systematically through the full Zarr.",
+        "--phase0-dir",
+        type=Path,
+        default=Path("analysis_outputs/00_quality"),
     )
-    p.add_argument("--block-size", type=int, default=0)
     p.add_argument(
-        "--stratum-size", type=int, default=20000,
-        help="Maximum retained pixels per disjoint intensity stratum.",
+        "--output-dir",
+        type=Path,
+        default=Path("analysis_outputs/04_extremes"),
+    )
+    p.add_argument(
+        "--scan-block-size",
+        type=int,
+        default=0,
+        help=(
+            "Patches por bloco no PASSO A. 0 usa o primeiro chunk do target."
+        ),
+    )
+    p.add_argument(
+        "--stratum-size",
+        type=int,
+        default=20000,
+        help="Capacidade do reservoir global para cada estrato não-zero.",
+    )
+    p.add_argument(
+        "--zero-stratum-size",
+        type=int,
+        default=20000,
+        help=(
+            "Capacidade do reservoir global do estrato zero. Reduza para "
+            "diminuir I/O no PASSO B se necessário."
+        ),
     )
     p.add_argument("--deciles", type=int, default=10)
-    p.add_argument("--seed", type=int, default=20260917)
+    p.add_argument("--seed", type=int, default=20260918)
     p.add_argument("--overwrite", action="store_true")
     return p.parse_args()
 
@@ -140,15 +200,19 @@ def prepare_output(path: Path, overwrite: bool) -> None:
 
 
 def setup_logger(out: Path) -> logging.Logger:
-    logger = logging.getLogger("corrdiff.phase4.v2")
+    logger = logging.getLogger("corrdiff.phase4.v3")
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
+
     fmt = logging.Formatter(
-        "%(asctime)s | %(levelname)s | %(message)s", "%Y-%m-%d %H:%M:%S"
+        "%(asctime)s | %(levelname)s | %(message)s",
+        "%Y-%m-%d %H:%M:%S",
     )
+
     sh = logging.StreamHandler(sys.stdout)
     sh.setFormatter(fmt)
     logger.addHandler(sh)
+
     fh = logging.FileHandler(out / "phase4.log", encoding="utf-8")
     fh.setFormatter(fmt)
     logger.addHandler(fh)
@@ -160,65 +224,6 @@ def open_group(path: Path) -> Any:
         return zarr.open_group(str(path), mode="r")
     except Exception:
         return zarr.open(str(path), mode="r")
-
-
-def derive_from_x(
-    x: np.ndarray, index: dict[str, int]
-) -> dict[str, np.ndarray]:
-    def c(name: str) -> np.ndarray:
-        return x[:, index[name], :, :].astype(np.float32, copy=False)
-
-    u10, v10, t2m = c("u10"), c("v10"), c("t2m")
-    t850, r850, u850, v850 = c("t_850"), c("r_850"), c("u_850"), c("v_850")
-    t500, r500, u500, v500 = c("t_500"), c("r_500"), c("u_500"), c("v_500")
-
-    return {
-        "wind_speed_10": np.hypot(u10, v10),
-        "wind_speed_850": np.hypot(u850, v850),
-        "wind_speed_500": np.hypot(u500, v500),
-        "delta_t_500_850": t500 - t850,
-        "delta_t_850_surface": t850 - t2m,
-        "delta_r_500_850": r500 - r850,
-        "bulk_wind_diff_10_850": np.hypot(u850 - u10, v850 - v10),
-        "bulk_wind_diff_850_500": np.hypot(u500 - u850, v500 - v850),
-    }
-
-
-def select_blocks(
-    n: int,
-    block_size: int,
-    sample_patches: int,
-    rng: np.random.Generator,
-) -> np.ndarray:
-    total_blocks = math.ceil(n / block_size)
-    needed = min(total_blocks, max(1, math.ceil(sample_patches / block_size)))
-    if needed == total_blocks:
-        return np.arange(total_blocks, dtype=np.int64)
-
-    width = total_blocks / needed
-    ids = np.floor(
-        (np.arange(needed) + rng.random(needed)) * width
-    ).astype(np.int64)
-    ids = np.unique(
-        np.clip(ids, 0, total_blocks - 1)
-    )
-    if ids.size < needed:
-        remaining = np.setdiff1d(
-            np.arange(total_blocks, dtype=np.int64),
-            ids,
-            assume_unique=True,
-        )
-        ids = np.sort(
-            np.concatenate([
-                ids,
-                rng.choice(
-                    remaining,
-                    needed - ids.size,
-                    replace=False,
-                ),
-            ])
-        )
-    return ids
 
 
 def stratum_mask(y: np.ndarray, name: str) -> np.ndarray:
@@ -244,34 +249,35 @@ def stratum_mask(y: np.ndarray, name: str) -> np.ndarray:
 
 
 @dataclass
-class Reservoir:
+class AddressReservoir:
+    """Uniform reservoir over a stream, updated in vectorized batches."""
+
     capacity: int
-    n_features: int
     rng: np.random.Generator
     total_seen: int = 0
-    X: np.ndarray | None = None
-    Y: np.ndarray | None = None
+    addresses: np.ndarray | None = None
+    radar: np.ndarray | None = None
 
     def update(
         self,
-        candidate_ids: np.ndarray,
-        flat_fields: list[np.ndarray],
-        flat_y: np.ndarray,
+        candidate_addresses: np.ndarray,
+        candidate_radar: np.ndarray,
     ) -> None:
-        m = int(candidate_ids.size)
+        m = int(candidate_addresses.size)
         if m == 0:
             return
 
-        old_total = self.total_seen
+        old_total = int(self.total_seen)
         new_total = old_total + m
-        target_size = min(self.capacity, new_total)
+        target_size = min(int(self.capacity), new_total)
 
         if old_total == 0:
             k_new = target_size
             old_keep = np.empty(0, dtype=np.int64)
         else:
-            # Number selected from new batch in a uniform sample of target_size
-            # from old_total + m population items.
+            # Exact batch reservoir update:
+            # among target_size samples from old_total + m stream elements,
+            # the number coming from this new batch is hypergeometric.
             k_new = int(
                 self.rng.hypergeometric(
                     ngood=m,
@@ -280,11 +286,13 @@ class Reservoir:
                 )
             )
             old_needed = target_size - k_new
-            old_size = 0 if self.X is None else len(self.X)
+            old_size = (
+                0 if self.addresses is None else int(self.addresses.size)
+            )
             if old_needed > old_size:
-                # This should not occur when the prior reservoir is valid.
                 old_needed = old_size
                 k_new = target_size - old_needed
+
             old_keep = (
                 self.rng.choice(
                     old_size,
@@ -296,29 +304,56 @@ class Reservoir:
             )
 
         if k_new > 0:
-            chosen_ids = self.rng.choice(
-                candidate_ids,
+            chosen = self.rng.choice(
+                m,
                 size=k_new,
                 replace=False,
             )
-            new_X = np.column_stack([
-                field[chosen_ids] for field in flat_fields
-            ]).astype(np.float32, copy=False)
-            new_Y = flat_y[chosen_ids].astype(np.float32, copy=False)
+            new_addr = candidate_addresses[chosen].astype(
+                np.int64, copy=False
+            )
+            new_radar = candidate_radar[chosen].astype(
+                np.float32, copy=False
+            )
         else:
-            new_X = np.empty((0, self.n_features), dtype=np.float32)
-            new_Y = np.empty(0, dtype=np.float32)
+            new_addr = np.empty(0, dtype=np.int64)
+            new_radar = np.empty(0, dtype=np.float32)
 
-        if self.X is not None and old_keep.size:
-            old_X = self.X[old_keep]
-            old_Y = self.Y[old_keep]
-            self.X = np.concatenate([old_X, new_X], axis=0)
-            self.Y = np.concatenate([old_Y, new_Y], axis=0)
+        if self.addresses is not None and old_keep.size:
+            self.addresses = np.concatenate(
+                [self.addresses[old_keep], new_addr]
+            )
+            self.radar = np.concatenate(
+                [self.radar[old_keep], new_radar]
+            )
         else:
-            self.X = new_X
-            self.Y = new_Y
+            self.addresses = new_addr
+            self.radar = new_radar
 
         self.total_seen = new_total
+
+
+def derive_selected(
+    raw: dict[str, np.ndarray],
+) -> dict[str, np.ndarray]:
+    u10, v10 = raw["u10"], raw["v10"]
+    u850, v850 = raw["u_850"], raw["v_850"]
+    u500, v500 = raw["u_500"], raw["v_500"]
+
+    return {
+        "wind_speed_10": np.hypot(u10, v10),
+        "wind_speed_850": np.hypot(u850, v850),
+        "wind_speed_500": np.hypot(u500, v500),
+        "delta_t_500_850": raw["t_500"] - raw["t_850"],
+        "delta_t_850_surface": raw["t_850"] - raw["t2m"],
+        "delta_r_500_850": raw["r_500"] - raw["r_850"],
+        "bulk_wind_diff_10_850": np.hypot(
+            u850 - u10, v850 - v10
+        ),
+        "bulk_wind_diff_850_500": np.hypot(
+            u500 - u850, v500 - v850
+        ),
+    }
 
 
 def weighted_mean(x: np.ndarray, w: np.ndarray) -> float:
@@ -332,20 +367,25 @@ def weighted_var(x: np.ndarray, w: np.ndarray) -> float:
     mask = np.isfinite(x) & np.isfinite(w) & (w > 0)
     if np.sum(mask) < 2:
         return float("nan")
+
     xx = x[mask].astype(np.float64)
     ww = w[mask].astype(np.float64)
     mu = np.average(xx, weights=ww)
-    sw = ww.sum()
-    sw2 = np.square(ww).sum()
+
+    sw = float(ww.sum())
+    sw2 = float(np.square(ww).sum())
     denom = sw - sw2 / sw
     if denom <= 0:
         return float("nan")
+
     return float(np.sum(ww * np.square(xx - mu)) / denom)
 
 
 def weighted_std(x: np.ndarray, w: np.ndarray) -> float:
-    v = weighted_var(x, w)
-    return math.sqrt(v) if np.isfinite(v) and v >= 0 else float("nan")
+    value = weighted_var(x, w)
+    if not np.isfinite(value) or value < 0:
+        return float("nan")
+    return math.sqrt(value)
 
 
 def weighted_quantile(
@@ -355,21 +395,24 @@ def weighted_quantile(
 ) -> np.ndarray:
     q = np.atleast_1d(np.asarray(quantiles, dtype=np.float64))
     mask = (
-        np.isfinite(values) &
-        np.isfinite(weights) &
-        (weights > 0)
+        np.isfinite(values)
+        & np.isfinite(weights)
+        & (weights > 0)
     )
+
     if not np.any(mask):
         return np.full(q.shape, np.nan, dtype=np.float64)
 
     v = values[mask].astype(np.float64)
     w = weights[mask].astype(np.float64)
+
     order = np.argsort(v)
     v = v[order]
     w = w[order]
+
     cumulative = np.cumsum(w)
     total = cumulative[-1]
-    targets = np.clip(q, 0, 1) * total
+    targets = np.clip(q, 0.0, 1.0) * total
     idx = np.searchsorted(cumulative, targets, side="left")
     idx = np.clip(idx, 0, len(v) - 1)
     return v[idx]
@@ -379,8 +422,9 @@ def effective_sample_size(w: np.ndarray) -> float:
     w = w[np.isfinite(w) & (w > 0)].astype(np.float64)
     if w.size == 0:
         return 0.0
-    s1 = w.sum()
-    s2 = np.square(w).sum()
+
+    s1 = float(w.sum())
+    s2 = float(np.square(w).sum())
     return float((s1 * s1) / s2) if s2 > 0 else 0.0
 
 
@@ -394,8 +438,10 @@ def weighted_smd(
     mb = weighted_mean(non_x, non_w)
     va = weighted_var(event_x, event_w)
     vb = weighted_var(non_x, non_w)
+
     if not all(np.isfinite(v) for v in [ma, mb, va, vb]):
         return float("nan")
+
     pooled = math.sqrt(max((va + vb) / 2.0, 0.0))
     return float((ma - mb) / pooled) if pooled > 0 else float("nan")
 
@@ -404,12 +450,43 @@ def load_phase0_reference(path: Path) -> dict[str, float]:
     file = path / "target_event_rates_global.parquet"
     if not file.exists():
         return {}
+
     df = pd.read_parquet(file)
     out: dict[str, float] = {}
-    if "threshold" in df.columns and "event_pixel_ratio" in df.columns:
+
+    if {"threshold", "event_pixel_ratio"}.issubset(df.columns):
         for _, row in df.iterrows():
-            out[str(row["threshold"])] = float(row["event_pixel_ratio"])
+            out[str(row["threshold"])] = float(
+                row["event_pixel_ratio"]
+            )
     return out
+
+
+def exact_fixed_count(
+    stratum_counts: dict[str, int],
+    threshold: int,
+) -> int:
+    order = {
+        20: [
+            "ge20_lt25", "ge25_lt30", "ge30_lt35",
+            "ge35_lt40", "ge40_lt45", "ge45_lt50", "ge50",
+        ],
+        25: [
+            "ge25_lt30", "ge30_lt35", "ge35_lt40",
+            "ge40_lt45", "ge45_lt50", "ge50",
+        ],
+        30: [
+            "ge30_lt35", "ge35_lt40",
+            "ge40_lt45", "ge45_lt50", "ge50",
+        ],
+        35: [
+            "ge35_lt40", "ge40_lt45", "ge45_lt50", "ge50",
+        ],
+        40: ["ge40_lt45", "ge45_lt50", "ge50"],
+        45: ["ge45_lt50", "ge50"],
+        50: ["ge50"],
+    }
+    return int(sum(stratum_counts[name] for name in order[threshold]))
 
 
 def main() -> None:
@@ -419,148 +496,213 @@ def main() -> None:
     rng = np.random.default_rng(args.seed)
 
     root = open_group(args.dataset_dir / "train.zarr")
-    xds, yds, mds = root["input"], root["target"], root["mask"]
-    n = int(xds.shape[0])
+    xds = root["input"]
+    yds = root["target"]
+    mds = root["mask"]
+
+    n = int(yds.shape[0])
+    height = int(yds.shape[-2])
+    width = int(yds.shape[-1])
+    pixels_per_patch = height * width
 
     channels = list(root.attrs.get("channels", []))
     if not channels:
         metadata = args.dataset_dir / "metadata.json"
-        channels = list(
-            json.loads(
-                metadata.read_text(encoding="utf-8")
-            ).get("channels", [])
-        )
+        if metadata.exists():
+            channels = list(
+                json.loads(
+                    metadata.read_text(encoding="utf-8")
+                ).get("channels", [])
+            )
 
     missing = [name for name in RAW_CHANNELS if name not in channels]
     if missing:
-        raise RuntimeError(f"Required channels missing: {missing}")
+        raise RuntimeError(
+            f"Required input channels are missing: {missing}"
+        )
+
     channel_index = {
         name: channels.index(name) for name in channels
     }
 
-    block_size = args.block_size or int(
-        getattr(xds, "chunks", (256,))[0]
-    )
-    block_ids = select_blocks(
-        n, block_size, args.sample_patches, rng
-    )
+    target_chunk0 = int(getattr(yds, "chunks", (256,))[0])
+    input_chunk0 = int(getattr(xds, "chunks", (256,))[0])
+    scan_block_size = args.scan_block_size or target_chunk0
 
-    logger.info(
-        "Sampling %d blocks (~%d patches) with stratified reservoirs",
-        len(block_ids),
-        len(block_ids) * block_size,
-    )
-
+    capacities = {
+        name: (
+            args.zero_stratum_size
+            if name == "zero"
+            else args.stratum_size
+        )
+        for name in STRATA
+    }
     reservoirs = {
-        name: Reservoir(
-            capacity=args.stratum_size,
-            n_features=len(ALL_PREDICTORS),
+        name: AddressReservoir(
+            capacity=capacities[name],
             rng=rng,
         )
-        for name, *_ in STRATA
+        for name in STRATA
     }
 
-    block_rows: list[dict[str, Any]] = []
-    total_valid_seen = 0
+    # ------------------------------------------------------------------
+    # PASS A — global target/mask scan
+    # ------------------------------------------------------------------
+    total_scan_blocks = math.ceil(n / scan_block_size)
+    logger.info("=" * 72)
+    logger.info("PHASE 4 v3 — PASS A: GLOBAL TARGET/MASK SCAN")
+    logger.info("Patches in Zarr       : %d", n)
+    logger.info("Target scan block size: %d", scan_block_size)
+    logger.info("Target scan blocks    : %d", total_scan_blocks)
+    logger.info("=" * 72)
 
-    for block_number, block_id in enumerate(block_ids, start=1):
-        start = int(block_id * block_size)
-        end = min(n, start + block_size)
+    valid_pixels_global = 0
+    scan_rows: list[dict[str, Any]] = []
 
-        x = np.asarray(xds[start:end], dtype=np.float32)
-        target = np.expm1(
-            np.asarray(yds[start:end, 0], dtype=np.float32)
-        ).astype(np.float32)
-        mask = np.asarray(
-            mds[start:end, 0], dtype=np.float32
-        ) > 0.5
+    for block_no, start in enumerate(
+        range(0, n, scan_block_size),
+        start=1,
+    ):
+        end = min(n, start + scan_block_size)
 
-        fields: dict[str, np.ndarray] = {
-            name: x[:, channel_index[name], :, :]
-            for name in RAW_CHANNELS
-        }
-        fields.update(derive_from_x(x, channel_index))
+        stored = np.asarray(
+            yds[start:end, 0],
+            dtype=np.float32,
+        )
+        y = np.expm1(stored).astype(np.float32, copy=False)
 
-        valid = mask & np.isfinite(target)
-        for arr in fields.values():
-            valid &= np.isfinite(arr)
+        mask = (
+            np.asarray(
+                mds[start:end, 0],
+                dtype=np.float32,
+            )
+            > 0.5
+        )
 
-        flat_y = target.reshape(-1)
+        valid = mask & np.isfinite(y)
+        flat_y = y.reshape(-1)
         flat_valid = valid.reshape(-1)
-        flat_fields = [
-            fields[name].reshape(-1) for name in ALL_PREDICTORS
-        ]
 
         valid_count = int(flat_valid.sum())
-        total_valid_seen += valid_count
-        row = {
-            "block_id": int(block_id),
+        valid_pixels_global += valid_count
+
+        row: dict[str, Any] = {
+            "scan_block": block_no - 1,
             "start_patch": start,
             "end_patch": end,
             "patches": end - start,
             "valid_pixels": valid_count,
         }
 
-        for stratum_name, *_ in STRATA:
-            ids = np.flatnonzero(
+        for stratum_name in STRATA:
+            local_ids = np.flatnonzero(
                 flat_valid & stratum_mask(flat_y, stratum_name)
             )
-            row[f"count_{stratum_name}"] = int(ids.size)
-            reservoirs[stratum_name].update(
-                ids, flat_fields, flat_y
-            )
+            count = int(local_ids.size)
+            row[f"count_{stratum_name}"] = count
 
-        block_rows.append(row)
+            if count:
+                local_patch = local_ids // pixels_per_patch
+                pixel_flat = local_ids % pixels_per_patch
 
-        if block_number % 25 == 0 or block_number == len(block_ids):
+                global_patch = start + local_patch
+                addresses = (
+                    global_patch.astype(np.int64)
+                    * pixels_per_patch
+                    + pixel_flat.astype(np.int64)
+                )
+
+                reservoirs[stratum_name].update(
+                    addresses,
+                    flat_y[local_ids],
+                )
+
+        scan_rows.append(row)
+
+        if block_no % 100 == 0 or block_no == total_scan_blocks:
             logger.info(
-                "Processed %d/%d blocks",
-                block_number, len(block_ids),
+                "PASS A: %d/%d blocks scanned",
+                block_no,
+                total_scan_blocks,
             )
 
-    pd.DataFrame(block_rows).to_parquet(
-        args.output_dir / "sampling_blocks.parquet",
+    scan_df = pd.DataFrame(scan_rows)
+    scan_df.to_parquet(
+        args.output_dir / "global_scan_blocks.parquet",
         index=False,
     )
 
-    # Concatenate stratum reservoirs and assign inverse sampling weights.
-    X_parts: list[np.ndarray] = []
-    Y_parts: list[np.ndarray] = []
-    W_parts: list[np.ndarray] = []
-    S_parts: list[np.ndarray] = []
+    stratum_counts = {
+        name: int(reservoirs[name].total_seen)
+        for name in STRATA
+    }
+
+    if sum(stratum_counts.values()) != valid_pixels_global:
+        raise RuntimeError(
+            "Global stratum counts do not sum to valid pixel count: "
+            f"{sum(stratum_counts.values())} != {valid_pixels_global}"
+        )
+
+    # Assemble sampled addresses.
+    addr_parts: list[np.ndarray] = []
+    radar_parts: list[np.ndarray] = []
+    weight_parts: list[np.ndarray] = []
+    stratum_parts: list[np.ndarray] = []
     stratum_rows: list[dict[str, Any]] = []
 
-    for stratum_name, lower, upper, lower_inclusive, upper_inclusive in STRATA:
-        reservoir = reservoirs[stratum_name]
-        sample_count = 0 if reservoir.X is None else len(reservoir.X)
+    for name in STRATA:
+        reservoir = reservoirs[name]
+        sample_count = (
+            0
+            if reservoir.addresses is None
+            else int(reservoir.addresses.size)
+        )
         population_count = int(reservoir.total_seen)
+
         weight = (
             population_count / sample_count
-            if sample_count > 0 else np.nan
+            if sample_count > 0
+            else np.nan
         )
-        sampling_fraction = (
+        fraction = (
             sample_count / population_count
-            if population_count > 0 else np.nan
+            if population_count > 0
+            else np.nan
         )
 
         stratum_rows.append({
-            "stratum": stratum_name,
-            "lower": lower,
-            "upper": upper,
-            "population_count_in_sampled_blocks": population_count,
+            "stratum": name,
+            "global_population_count": population_count,
+            "global_population_ratio": (
+                population_count / valid_pixels_global
+                if valid_pixels_global > 0
+                else np.nan
+            ),
             "sample_count": sample_count,
-            "sampling_fraction": sampling_fraction,
-            "inverse_sampling_weight": weight,
+            "sampling_fraction_global": fraction,
+            "inverse_sampling_weight_global": weight,
         })
 
         if sample_count:
-            X_parts.append(reservoir.X.astype(np.float32))
-            Y_parts.append(reservoir.Y.astype(np.float32))
-            W_parts.append(
-                np.full(sample_count, weight, dtype=np.float64)
+            addr_parts.append(
+                reservoir.addresses.astype(np.int64, copy=False)
             )
-            S_parts.append(
-                np.full(sample_count, stratum_name, dtype="U32")
+            radar_parts.append(
+                reservoir.radar.astype(np.float32, copy=False)
+            )
+            weight_parts.append(
+                np.full(
+                    sample_count,
+                    weight,
+                    dtype=np.float64,
+                )
+            )
+            stratum_parts.append(
+                np.full(
+                    sample_count,
+                    name,
+                    dtype="U32",
+                )
             )
 
     stratum_df = pd.DataFrame(stratum_rows)
@@ -569,13 +711,94 @@ def main() -> None:
         index=False,
     )
 
-    if not X_parts:
-        raise RuntimeError("No valid pixels retained in stratified sample")
+    if not addr_parts:
+        raise RuntimeError("No pixels were retained by global reservoirs")
 
-    X = np.concatenate(X_parts, axis=0)
-    Y = np.concatenate(Y_parts, axis=0)
-    W = np.concatenate(W_parts, axis=0)
-    S = np.concatenate(S_parts, axis=0)
+    addresses = np.concatenate(addr_parts)
+    Y = np.concatenate(radar_parts)
+    W = np.concatenate(weight_parts)
+    S = np.concatenate(stratum_parts)
+
+    # ------------------------------------------------------------------
+    # PASS B — recover predictors at sampled global addresses
+    # ------------------------------------------------------------------
+    logger.info("=" * 72)
+    logger.info("PHASE 4 v3 — PASS B: INPUT EXTRACTION")
+    logger.info("Retained global sample: %d pixels", len(addresses))
+    logger.info("=" * 72)
+
+    patch_index = addresses // pixels_per_patch
+    pixel_flat = addresses % pixels_per_patch
+    row_index = pixel_flat // width
+    col_index = pixel_flat % width
+
+    input_block_id = patch_index // input_chunk0
+    unique_blocks = np.unique(input_block_id)
+
+    X = np.full(
+        (len(addresses), len(ALL_PREDICTORS)),
+        np.nan,
+        dtype=np.float32,
+    )
+
+    input_block_rows: list[dict[str, Any]] = []
+
+    for pos, block_id in enumerate(unique_blocks, start=1):
+        selected = np.flatnonzero(input_block_id == block_id)
+
+        start = int(block_id * input_chunk0)
+        end = min(n, start + input_chunk0)
+        x_block = np.asarray(
+            xds[start:end],
+            dtype=np.float32,
+        )
+
+        lp = (patch_index[selected] - start).astype(np.int64)
+        rr = row_index[selected].astype(np.int64)
+        cc = col_index[selected].astype(np.int64)
+
+        raw: dict[str, np.ndarray] = {}
+        for name in RAW_CHANNELS:
+            raw[name] = x_block[
+                lp,
+                channel_index[name],
+                rr,
+                cc,
+            ].astype(np.float32, copy=False)
+
+        derived = derive_selected(raw)
+
+        for j, name in enumerate(ALL_PREDICTORS):
+            values = raw[name] if name in raw else derived[name]
+            X[selected, j] = values
+
+        input_block_rows.append({
+            "input_block_id": int(block_id),
+            "start_patch": start,
+            "end_patch": end,
+            "selected_pixels": int(selected.size),
+        })
+
+        if pos % 100 == 0 or pos == len(unique_blocks):
+            logger.info(
+                "PASS B: %d/%d input chunks read",
+                pos,
+                len(unique_blocks),
+            )
+
+    input_blocks_df = pd.DataFrame(input_block_rows)
+    input_blocks_df.to_parquet(
+        args.output_dir / "input_blocks_read.parquet",
+        index=False,
+    )
+
+    finite_rows = np.isfinite(X).all(axis=1)
+    if not np.all(finite_rows):
+        bad = int((~finite_rows).sum())
+        raise RuntimeError(
+            f"Selected global sample contains {bad} rows with non-finite "
+            "input/derived predictors. Dataset was expected to be fully finite."
+        )
 
     catalog = pd.DataFrame({
         "predictor": ALL_PREDICTORS,
@@ -583,26 +806,32 @@ def main() -> None:
             "raw" if name in RAW_CHANNELS else "derived"
             for name in ALL_PREDICTORS
         ],
-        "unit": [UNITS.get(name, "unknown") for name in ALL_PREDICTORS],
+        "unit": [UNITS[name] for name in ALL_PREDICTORS],
     })
     catalog.to_parquet(
         args.output_dir / "predictor_catalog.parquet",
         index=False,
     )
 
-    # Weighted radar quantiles reconstruct the sampled-block population.
+    # ------------------------------------------------------------------
+    # Threshold definitions
+    # ------------------------------------------------------------------
     global_q = weighted_quantile(
-        Y, [0.90, 0.95, 0.99], W
-    )
-    positive_mask = Y > 0
-    positive_q = weighted_quantile(
-        Y[positive_mask],
+        Y,
         [0.90, 0.95, 0.99],
-        W[positive_mask],
+        W,
+    )
+
+    positive = Y > 0
+    positive_q = weighted_quantile(
+        Y[positive],
+        [0.90, 0.95, 0.99],
+        W[positive],
     )
 
     thresholds: list[dict[str, Any]] = []
-    for value in [20, 25, 30, 35, 40, 45, 50]:
+
+    for value in FIXED_THRESHOLDS:
         thresholds.append({
             "event_id": f"fixed_ge_{value}",
             "family": "fixed",
@@ -619,7 +848,10 @@ def main() -> None:
             "quantile": q,
             "threshold": float(value),
             "operator": ">",
-            "label": f"Radar > P{int(q * 100)} global (weighted)",
+            "label": (
+                f"Radar > P{int(q * 100)} global "
+                "(global stratified estimate)"
+            ),
         })
 
     for q, value in zip([0.90, 0.95, 0.99], positive_q):
@@ -629,7 +861,10 @@ def main() -> None:
             "quantile": q,
             "threshold": float(value),
             "operator": ">",
-            "label": f"Radar > P{int(q * 100)} positive-only (weighted)",
+            "label": (
+                f"Radar > P{int(q * 100)} positive-only "
+                "(global stratified estimate)"
+            ),
         })
 
     threshold_df = pd.DataFrame(thresholds)
@@ -640,6 +875,9 @@ def main() -> None:
 
     phase0_reference = load_phase0_reference(args.phase0_dir)
 
+    # ------------------------------------------------------------------
+    # Weighted analyses
+    # ------------------------------------------------------------------
     prevalence_rows: list[dict[str, Any]] = []
     conditional_rows: list[dict[str, Any]] = []
     effect_rows: list[dict[str, Any]] = []
@@ -653,33 +891,46 @@ def main() -> None:
         else:
             event = Y > th["threshold"]
 
-        event_weight = float(W[event].sum())
-        non_event_weight = float(W[~event].sum())
+        weighted_event_count = float(W[event].sum())
+        weighted_non_event_count = float(W[~event].sum())
         weighted_event_rate = (
-            event_weight / total_weight
-            if total_weight > 0 else np.nan
+            weighted_event_count / total_weight
+            if total_weight > 0
+            else np.nan
         )
 
-        reference_key = None
+        exact_count_v3 = np.nan
+        exact_rate_v3 = np.nan
+        phase0_rate = np.nan
+        phase0_abs_diff = np.nan
+
         if th["family"] == "fixed":
-            reference_key = (
-                "gt_0" if th["threshold"] == 0
-                else f"ge_{int(th['threshold'])}"
+            threshold_int = int(th["threshold"])
+            exact_count_v3 = exact_fixed_count(
+                stratum_counts,
+                threshold_int,
             )
-        reference_rate = (
-            phase0_reference.get(reference_key, np.nan)
-            if reference_key else np.nan
-        )
+            exact_rate_v3 = (
+                exact_count_v3 / valid_pixels_global
+                if valid_pixels_global > 0
+                else np.nan
+            )
+            phase0_rate = phase0_reference.get(
+                f"ge_{threshold_int}",
+                np.nan,
+            )
+            if np.isfinite(phase0_rate):
+                phase0_abs_diff = abs(exact_rate_v3 - phase0_rate)
 
         reported_rate = (
-            reference_rate
-            if np.isfinite(reference_rate)
+            exact_rate_v3
+            if np.isfinite(exact_rate_v3)
             else weighted_event_rate
         )
         rate_source = (
-            "phase0_exact_full_scan"
-            if np.isfinite(reference_rate)
-            else "phase4_weighted_sampled_blocks"
+            "phase4_v3_exact_global_scan"
+            if np.isfinite(exact_rate_v3)
+            else "phase4_v3_global_stratified_weighted"
         )
 
         prevalence_rows.append({
@@ -687,18 +938,21 @@ def main() -> None:
             "sample_n": int(len(Y)),
             "sample_event_count_unweighted": int(event.sum()),
             "sample_non_event_count_unweighted": int((~event).sum()),
-            "estimated_population_event_count_in_sampled_blocks": event_weight,
-            "estimated_population_non_event_count_in_sampled_blocks": non_event_weight,
-            "weighted_event_rate_sampled_blocks": weighted_event_rate,
-            "reference_event_rate_phase0": reference_rate,
-            "event_rate": reported_rate,
-            "event_rate_source": rate_source,
             "effective_sample_size_all": effective_sample_size(W),
             "effective_sample_size_event": effective_sample_size(W[event]),
+            "weighted_event_count_global_estimate": weighted_event_count,
+            "weighted_event_rate_global_estimate": weighted_event_rate,
+            "exact_global_event_count_v3": exact_count_v3,
+            "exact_global_event_rate_v3": exact_rate_v3,
+            "reference_event_rate_phase0": phase0_rate,
+            "abs_rate_diff_v3_vs_phase0": phase0_abs_diff,
+            "event_rate": reported_rate,
+            "event_rate_source": rate_source,
         })
 
         for j, name in enumerate(ALL_PREDICTORS):
             values = X[:, j].astype(np.float64)
+
             finite = np.isfinite(values)
             ev = event & finite
             ne = (~event) & finite
@@ -709,9 +963,13 @@ def main() -> None:
             ]:
                 xv = values[selector]
                 wv = W[selector]
+
                 q25, q50, q75, q95 = weighted_quantile(
-                    xv, [0.25, 0.50, 0.75, 0.95], wv
+                    xv,
+                    [0.25, 0.50, 0.75, 0.95],
+                    wv,
                 )
+
                 conditional_rows.append({
                     "event_id": th["event_id"],
                     "family": th["family"],
@@ -729,11 +987,14 @@ def main() -> None:
                     "p95": float(q95),
                 })
 
-            a, wa = values[ev], W[ev]
-            b, wb = values[ne], W[ne]
+            a = values[ev]
+            wa = W[ev]
+            b = values[ne]
+            wb = W[ne]
 
             event_mean = weighted_mean(a, wa)
             non_event_mean = weighted_mean(b, wb)
+
             event_median = weighted_quantile(
                 a, 0.5, wa
             )[0]
@@ -749,7 +1010,7 @@ def main() -> None:
                 "source": (
                     "raw" if name in RAW_CHANNELS else "derived"
                 ),
-                "unit": UNITS.get(name, "unknown"),
+                "unit": UNITS[name],
                 "n_event_sample": int(a.size),
                 "n_non_event_sample": int(b.size),
                 "effective_n_event": effective_sample_size(wa),
@@ -766,51 +1027,67 @@ def main() -> None:
                     a, wa, b, wb
                 ),
                 "statistics_weighted": True,
+                "weight_scope": "full_dataset_global_strata",
             })
 
-            # Weighted predictor deciles.
+            # Predictor deciles are estimated from the same globally weighted
+            # stratified sample.
             x_all = values[finite]
             w_all = W[finite]
             event_all = event[finite]
 
             edges = weighted_quantile(
                 x_all,
-                np.linspace(0, 1, args.deciles + 1),
+                np.linspace(0.0, 1.0, args.deciles + 1),
                 w_all,
             )
-            edges = np.unique(edges[np.isfinite(edges)])
+            edges = np.unique(
+                edges[np.isfinite(edges)]
+            )
+
             if edges.size < 2:
                 continue
 
             codes = np.searchsorted(
-                edges[1:-1], x_all, side="right"
+                edges[1:-1],
+                x_all,
+                side="right",
             )
-            n_bins = int(codes.max()) + 1 if codes.size else 0
+            n_bins = (
+                int(codes.max()) + 1
+                if codes.size
+                else 0
+            )
 
             for decile in range(n_bins):
-                sel = codes == decile
-                if not np.any(sel):
+                selector = codes == decile
+                if not np.any(selector):
                     continue
-                ww = w_all[sel]
-                xx = x_all[sel]
-                ee = event_all[sel]
+
+                ww = w_all[selector]
+                xx = x_all[selector]
+                ee = event_all[selector]
+
                 denominator = float(ww.sum())
-                event_rate = (
+                rate = (
                     float(ww[ee].sum() / denominator)
-                    if denominator > 0 else np.nan
+                    if denominator > 0
+                    else np.nan
                 )
+
                 decile_rows.append({
                     "event_id": th["event_id"],
                     "predictor": name,
                     "decile": decile + 1,
-                    "sample_n": int(sel.sum()),
+                    "sample_n": int(selector.sum()),
                     "effective_sample_size": effective_sample_size(ww),
                     "estimated_population_weight": denominator,
                     "predictor_mean": weighted_mean(xx, ww),
                     "predictor_min": float(np.min(xx)),
                     "predictor_max": float(np.max(xx)),
-                    "event_rate": event_rate,
+                    "event_rate": rate,
                     "weighted": True,
+                    "weight_scope": "full_dataset_global_strata",
                 })
 
     prevalence_df = pd.DataFrame(prevalence_rows)
@@ -818,14 +1095,17 @@ def main() -> None:
         args.output_dir / "event_prevalence.parquet",
         index=False,
     )
+
     pd.DataFrame(conditional_rows).to_parquet(
         args.output_dir / "conditional_predictor_stats.parquet",
         index=False,
     )
+
     pd.DataFrame(effect_rows).to_parquet(
         args.output_dir / "effect_sizes.parquet",
         index=False,
     )
+
     pd.DataFrame(decile_rows).to_parquet(
         args.output_dir / "event_rate_by_predictor_decile.parquet",
         index=False,
@@ -836,82 +1116,102 @@ def main() -> None:
         predictors=X.astype(np.float32),
         radar=Y.astype(np.float32),
         sample_weight=W.astype(np.float64),
+        global_address=addresses.astype(np.int64),
         stratum=S,
         predictor_names=np.asarray(
-            ALL_PREDICTORS, dtype="U64"
+            ALL_PREDICTORS,
+            dtype="U64",
         ),
     )
 
-    degenerate = prevalence_df.loc[
-        prevalence_df["sample_event_count_unweighted"].isin([0, len(Y)]),
-        "event_id",
-    ].tolist()
-
-    max_reference_abs_diff = np.nan
     fixed = prevalence_df[
         prevalence_df["family"] == "fixed"
     ].copy()
-    if (
-        "reference_event_rate_phase0" in fixed.columns and
-        fixed["reference_event_rate_phase0"].notna().any()
-    ):
-        diff = (
-            fixed["weighted_event_rate_sampled_blocks"] -
-            fixed["reference_event_rate_phase0"]
-        ).abs()
-        if diff.notna().any():
-            max_reference_abs_diff = float(diff.max())
+
+    max_abs_v3_vs_phase0 = np.nan
+    if fixed["abs_rate_diff_v3_vs_phase0"].notna().any():
+        max_abs_v3_vs_phase0 = float(
+            fixed["abs_rate_diff_v3_vs_phase0"].max()
+        )
+
+    exact_positive_count = (
+        valid_pixels_global - stratum_counts["zero"]
+    )
+    exact_positive_rate = (
+        exact_positive_count / valid_pixels_global
+        if valid_pixels_global > 0
+        else np.nan
+    )
+
+    total_input_blocks = math.ceil(n / input_chunk0)
 
     summary = {
         "phase_version": PHASE_VERSION,
-        "sample_source": "direct_zarr_stratified_reservoir",
-        "sampled_blocks": int(len(block_ids)),
-        "sampled_patches": int(
-            sum(row["patches"] for row in block_rows)
+        "sample_source": "full_zarr_global_stratified_reservoir",
+        "pass_a_scope": "all target/mask patches",
+        "pass_a_scan_block_size": int(scan_block_size),
+        "pass_a_blocks_scanned": int(total_scan_blocks),
+        "global_patches_scanned": int(n),
+        "global_valid_pixels_scanned": int(valid_pixels_global),
+        "exact_global_positive_pixel_count": int(exact_positive_count),
+        "exact_global_positive_pixel_rate": float(exact_positive_rate),
+        "retained_global_stratified_sample_rows": int(len(Y)),
+        "stratum_size": int(args.stratum_size),
+        "zero_stratum_size": int(args.zero_stratum_size),
+        "pass_b_input_chunk_size": int(input_chunk0),
+        "pass_b_unique_input_blocks_read": int(len(unique_blocks)),
+        "pass_b_total_input_blocks": int(total_input_blocks),
+        "pass_b_input_block_fraction_read": float(
+            len(unique_blocks) / total_input_blocks
         ),
-        "valid_population_pixels_seen_in_sampled_blocks": int(total_valid_seen),
-        "retained_stratified_sample_rows": int(len(Y)),
-        "stratum_capacity": int(args.stratum_size),
-        "predictor_count": len(ALL_PREDICTORS),
-        "positive_radar_rate_weighted_sampled_blocks": float(
-            W[Y > 0].sum() / W.sum()
-        ),
-        "positive_radar_rate_unweighted_retained_sample": float(
-            np.mean(Y > 0)
-        ),
+        "predictor_count": int(len(ALL_PREDICTORS)),
         "threshold_count": int(len(thresholds)),
-        "degenerate_event_definitions": degenerate,
         "phase0_reference_available": bool(phase0_reference),
-        "max_abs_fixed_threshold_rate_diff_vs_phase0": max_reference_abs_diff,
+        "max_abs_fixed_threshold_rate_diff_v3_vs_phase0": (
+            max_abs_v3_vs_phase0
+        ),
         "weighting_method": (
-            "inverse stratum sampling fraction; each retained pixel receives "
-            "population_count_in_sampled_blocks/sample_count for its stratum"
+            "global inverse stratum sampling fraction: "
+            "global_population_count/sample_count"
         ),
         "radar_domain": (
-            "expm1(stored_target): post-clip numerical radar-legend values; "
-            "physical unit not assumed"
+            "expm1(stored_target): post-clip numerical radar-legend "
+            "values; physical unit not assumed"
         ),
         "interpretation_note": (
-            "Conditional means, quantiles, SMD and predictor-decile event rates "
-            "are inverse-sampling-weighted. Fixed-threshold full-dataset "
-            "prevalence uses Phase 0 exact rates when available."
+            "PASS A scans the full target/mask Zarr. Fixed-threshold event "
+            "prevalence is exact for the stored patch distribution. "
+            "Conditional predictor statistics use a globally stratified, "
+            "inverse-probability-weighted pixel sample. ESS reflects unequal "
+            "weights only and does not remove spatial/temporal dependence."
         ),
     }
 
     (args.output_dir / "analysis_summary.json").write_text(
-        json.dumps(summary, indent=2, ensure_ascii=False),
+        json.dumps(
+            summary,
+            indent=2,
+            ensure_ascii=False,
+        ),
         encoding="utf-8",
     )
 
+    logger.info("=" * 72)
+    logger.info("PHASE 4 v3 COMPLETE")
+    logger.info("Global valid pixels       : %d", valid_pixels_global)
+    logger.info("Global retained sample    : %d", len(Y))
     logger.info(
-        "Phase 4 v2 complete. Retained %d stratified rows from %d valid pixels.",
-        len(Y), total_valid_seen,
+        "Input blocks read          : %d / %d (%.2f%%)",
+        len(unique_blocks),
+        total_input_blocks,
+        100.0 * len(unique_blocks) / total_input_blocks,
     )
     logger.info(
-        "Max |weighted fixed-event rate - Phase0 exact| = %s",
-        max_reference_abs_diff,
+        "Max |v3 exact - Phase0|    : %s",
+        max_abs_v3_vs_phase0,
     )
-    logger.info("Output: %s", args.output_dir)
+    logger.info("Output                    : %s", args.output_dir)
+    logger.info("=" * 72)
 
 
 if __name__ == "__main__":
