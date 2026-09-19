@@ -1,5 +1,5 @@
 {
-  "phase_version": "phase4-extremes-v3-global-stratified-weighted",
+  "phase_version": "phase4-extremes-v3.1-global-stratified-weighted",
   "sample_source": "full_zarr_global_stratified_reservoir",
   "pass_a_scope": "all target/mask patches",
   "pass_a_scan_block_size": 256,
@@ -12,14 +12,15 @@
   "stratum_size": 20000,
   "zero_stratum_size": 20000,
   "pass_b_input_chunk_size": 256,
-  "pass_b_unique_input_blocks_read": 3960,
+  "pass_b_unique_input_blocks_read": 3964,
   "pass_b_total_input_blocks": 3970,
-  "pass_b_input_block_fraction_read": 0.9974811083123426,
+  "pass_b_input_block_fraction_read": 0.9984886649874055,
   "predictor_count": 20,
   "threshold_count": 13,
   "phase0_reference_available": true,
-  "max_abs_fixed_threshold_rate_diff_v3_vs_phase0": 0.0024088384064827285,
+  "max_abs_fixed_threshold_rate_diff_v3_vs_phase0": 0.0,
   "weighting_method": "global inverse stratum sampling fraction: global_population_count/sample_count",
+  "fixed_threshold_comparison_domain": "stored_log1p_float32; fixed event membership derived from global intensity strata",
   "radar_domain": "expm1(stored_target): post-clip numerical radar-legend values; physical unit not assumed",
-  "interpretation_note": "PASS A scans the full target/mask Zarr. Fixed-threshold event prevalence is exact for the stored patch distribution. Conditional predictor statistics use a globally stratified, inverse-probability-weighted pixel sample. ESS reflects unequal weights only and does not remove spatial/temporal dependence."
+  "interpretation_note": "PASS A scans the full target/mask Zarr. Fixed-threshold event boundaries are evaluated in stored log1p float32 space to avoid expm1 boundary artifacts; prevalence is exact for the stored patch distribution. Conditional predictor statistics use a globally stratified, inverse-probability-weighted pixel sample. ESS reflects unequal weights only and does not remove spatial/temporal dependence."
 }

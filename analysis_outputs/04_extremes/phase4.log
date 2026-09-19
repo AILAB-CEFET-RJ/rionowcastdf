@@ -1,98 +1,98 @@
-2026-09-19 15:23:14 | INFO | ========================================================================
-2026-09-19 15:23:14 | INFO | PHASE 4 v3 — PASS A: GLOBAL TARGET/MASK SCAN
-2026-09-19 15:23:14 | INFO | Patches in Zarr       : 1016208
-2026-09-19 15:23:14 | INFO | Target scan block size: 256
-2026-09-19 15:23:14 | INFO | Target scan blocks    : 3970
-2026-09-19 15:23:14 | INFO | ========================================================================
-2026-09-19 15:23:15 | INFO | PASS A: 100/3970 blocks scanned
-2026-09-19 15:23:16 | INFO | PASS A: 200/3970 blocks scanned
-2026-09-19 15:23:17 | INFO | PASS A: 300/3970 blocks scanned
-2026-09-19 15:23:18 | INFO | PASS A: 400/3970 blocks scanned
-2026-09-19 15:23:19 | INFO | PASS A: 500/3970 blocks scanned
-2026-09-19 15:23:20 | INFO | PASS A: 600/3970 blocks scanned
-2026-09-19 15:23:21 | INFO | PASS A: 700/3970 blocks scanned
-2026-09-19 15:23:22 | INFO | PASS A: 800/3970 blocks scanned
-2026-09-19 15:23:22 | INFO | PASS A: 900/3970 blocks scanned
-2026-09-19 15:23:23 | INFO | PASS A: 1000/3970 blocks scanned
-2026-09-19 15:23:24 | INFO | PASS A: 1100/3970 blocks scanned
-2026-09-19 15:23:25 | INFO | PASS A: 1200/3970 blocks scanned
-2026-09-19 15:23:26 | INFO | PASS A: 1300/3970 blocks scanned
-2026-09-19 15:23:27 | INFO | PASS A: 1400/3970 blocks scanned
-2026-09-19 15:23:28 | INFO | PASS A: 1500/3970 blocks scanned
-2026-09-19 15:23:29 | INFO | PASS A: 1600/3970 blocks scanned
-2026-09-19 15:23:29 | INFO | PASS A: 1700/3970 blocks scanned
-2026-09-19 15:23:30 | INFO | PASS A: 1800/3970 blocks scanned
-2026-09-19 15:23:31 | INFO | PASS A: 1900/3970 blocks scanned
-2026-09-19 15:23:32 | INFO | PASS A: 2000/3970 blocks scanned
-2026-09-19 15:23:33 | INFO | PASS A: 2100/3970 blocks scanned
-2026-09-19 15:23:34 | INFO | PASS A: 2200/3970 blocks scanned
-2026-09-19 15:23:35 | INFO | PASS A: 2300/3970 blocks scanned
-2026-09-19 15:23:36 | INFO | PASS A: 2400/3970 blocks scanned
-2026-09-19 15:23:37 | INFO | PASS A: 2500/3970 blocks scanned
-2026-09-19 15:23:38 | INFO | PASS A: 2600/3970 blocks scanned
-2026-09-19 15:23:39 | INFO | PASS A: 2700/3970 blocks scanned
-2026-09-19 15:23:39 | INFO | PASS A: 2800/3970 blocks scanned
-2026-09-19 15:23:40 | INFO | PASS A: 2900/3970 blocks scanned
-2026-09-19 15:23:41 | INFO | PASS A: 3000/3970 blocks scanned
-2026-09-19 15:23:42 | INFO | PASS A: 3100/3970 blocks scanned
-2026-09-19 15:23:43 | INFO | PASS A: 3200/3970 blocks scanned
-2026-09-19 15:23:44 | INFO | PASS A: 3300/3970 blocks scanned
-2026-09-19 15:23:45 | INFO | PASS A: 3400/3970 blocks scanned
-2026-09-19 15:23:46 | INFO | PASS A: 3500/3970 blocks scanned
-2026-09-19 15:23:47 | INFO | PASS A: 3600/3970 blocks scanned
-2026-09-19 15:23:48 | INFO | PASS A: 3700/3970 blocks scanned
-2026-09-19 15:23:49 | INFO | PASS A: 3800/3970 blocks scanned
-2026-09-19 15:23:51 | INFO | PASS A: 3900/3970 blocks scanned
-2026-09-19 15:23:54 | INFO | PASS A: 3970/3970 blocks scanned
-2026-09-19 15:23:54 | INFO | ========================================================================
-2026-09-19 15:23:54 | INFO | PHASE 4 v3 — PASS B: INPUT EXTRACTION
-2026-09-19 15:23:54 | INFO | Retained global sample: 160163 pixels
-2026-09-19 15:23:54 | INFO | ========================================================================
-2026-09-19 15:24:25 | INFO | PASS B: 100/3960 input chunks read
-2026-09-19 15:24:49 | INFO | PASS B: 200/3960 input chunks read
-2026-09-19 15:25:14 | INFO | PASS B: 300/3960 input chunks read
-2026-09-19 15:25:38 | INFO | PASS B: 400/3960 input chunks read
-2026-09-19 15:26:00 | INFO | PASS B: 500/3960 input chunks read
-2026-09-19 15:26:29 | INFO | PASS B: 600/3960 input chunks read
-2026-09-19 15:26:51 | INFO | PASS B: 700/3960 input chunks read
-2026-09-19 15:27:16 | INFO | PASS B: 800/3960 input chunks read
-2026-09-19 15:27:42 | INFO | PASS B: 900/3960 input chunks read
-2026-09-19 15:28:05 | INFO | PASS B: 1000/3960 input chunks read
-2026-09-19 15:28:29 | INFO | PASS B: 1100/3960 input chunks read
-2026-09-19 15:28:59 | INFO | PASS B: 1200/3960 input chunks read
-2026-09-19 15:29:24 | INFO | PASS B: 1300/3960 input chunks read
-2026-09-19 15:29:53 | INFO | PASS B: 1400/3960 input chunks read
-2026-09-19 15:30:16 | INFO | PASS B: 1500/3960 input chunks read
-2026-09-19 15:30:32 | INFO | PASS B: 1600/3960 input chunks read
-2026-09-19 15:30:52 | INFO | PASS B: 1700/3960 input chunks read
-2026-09-19 15:31:10 | INFO | PASS B: 1800/3960 input chunks read
-2026-09-19 15:31:18 | INFO | PASS B: 1900/3960 input chunks read
-2026-09-19 15:31:27 | INFO | PASS B: 2000/3960 input chunks read
-2026-09-19 15:31:33 | INFO | PASS B: 2100/3960 input chunks read
-2026-09-19 15:31:36 | INFO | PASS B: 2200/3960 input chunks read
-2026-09-19 15:31:38 | INFO | PASS B: 2300/3960 input chunks read
-2026-09-19 15:31:42 | INFO | PASS B: 2400/3960 input chunks read
-2026-09-19 15:31:48 | INFO | PASS B: 2500/3960 input chunks read
-2026-09-19 15:31:55 | INFO | PASS B: 2600/3960 input chunks read
-2026-09-19 15:32:02 | INFO | PASS B: 2700/3960 input chunks read
-2026-09-19 15:32:09 | INFO | PASS B: 2800/3960 input chunks read
-2026-09-19 15:32:17 | INFO | PASS B: 2900/3960 input chunks read
-2026-09-19 15:32:23 | INFO | PASS B: 3000/3960 input chunks read
-2026-09-19 15:32:30 | INFO | PASS B: 3100/3960 input chunks read
-2026-09-19 15:32:36 | INFO | PASS B: 3200/3960 input chunks read
-2026-09-19 15:32:43 | INFO | PASS B: 3300/3960 input chunks read
-2026-09-19 15:32:49 | INFO | PASS B: 3400/3960 input chunks read
-2026-09-19 15:32:55 | INFO | PASS B: 3500/3960 input chunks read
-2026-09-19 15:33:01 | INFO | PASS B: 3600/3960 input chunks read
-2026-09-19 15:33:06 | INFO | PASS B: 3700/3960 input chunks read
-2026-09-19 15:33:13 | INFO | PASS B: 3800/3960 input chunks read
-2026-09-19 15:33:20 | INFO | PASS B: 3900/3960 input chunks read
-2026-09-19 15:33:23 | INFO | PASS B: 3960/3960 input chunks read
-2026-09-19 15:33:33 | INFO | ========================================================================
-2026-09-19 15:33:33 | INFO | PHASE 4 v3 COMPLETE
-2026-09-19 15:33:33 | INFO | Global valid pixels       : 1040596992
-2026-09-19 15:33:33 | INFO | Global retained sample    : 160163
-2026-09-19 15:33:33 | INFO | Input blocks read          : 3960 / 3970 (99.75%)
-2026-09-19 15:33:33 | INFO | Max |v3 exact - Phase0|    : 0.0024088384064827285
-2026-09-19 15:33:33 | INFO | Output                    : analysis_outputs/04_extremes
-2026-09-19 15:33:33 | INFO | ========================================================================
+2026-09-19 16:38:45 | INFO | ========================================================================
+2026-09-19 16:38:45 | INFO | PHASE 4 v3 — PASS A: GLOBAL TARGET/MASK SCAN
+2026-09-19 16:38:45 | INFO | Patches in Zarr       : 1016208
+2026-09-19 16:38:45 | INFO | Target scan block size: 256
+2026-09-19 16:38:45 | INFO | Target scan blocks    : 3970
+2026-09-19 16:38:45 | INFO | ========================================================================
+2026-09-19 16:38:46 | INFO | PASS A: 100/3970 blocks scanned
+2026-09-19 16:38:47 | INFO | PASS A: 200/3970 blocks scanned
+2026-09-19 16:38:48 | INFO | PASS A: 300/3970 blocks scanned
+2026-09-19 16:38:48 | INFO | PASS A: 400/3970 blocks scanned
+2026-09-19 16:38:49 | INFO | PASS A: 500/3970 blocks scanned
+2026-09-19 16:38:50 | INFO | PASS A: 600/3970 blocks scanned
+2026-09-19 16:38:51 | INFO | PASS A: 700/3970 blocks scanned
+2026-09-19 16:38:52 | INFO | PASS A: 800/3970 blocks scanned
+2026-09-19 16:38:53 | INFO | PASS A: 900/3970 blocks scanned
+2026-09-19 16:38:54 | INFO | PASS A: 1000/3970 blocks scanned
+2026-09-19 16:38:55 | INFO | PASS A: 1100/3970 blocks scanned
+2026-09-19 16:38:56 | INFO | PASS A: 1200/3970 blocks scanned
+2026-09-19 16:38:57 | INFO | PASS A: 1300/3970 blocks scanned
+2026-09-19 16:38:58 | INFO | PASS A: 1400/3970 blocks scanned
+2026-09-19 16:38:59 | INFO | PASS A: 1500/3970 blocks scanned
+2026-09-19 16:39:00 | INFO | PASS A: 1600/3970 blocks scanned
+2026-09-19 16:39:01 | INFO | PASS A: 1700/3970 blocks scanned
+2026-09-19 16:39:02 | INFO | PASS A: 1800/3970 blocks scanned
+2026-09-19 16:39:03 | INFO | PASS A: 1900/3970 blocks scanned
+2026-09-19 16:39:03 | INFO | PASS A: 2000/3970 blocks scanned
+2026-09-19 16:39:04 | INFO | PASS A: 2100/3970 blocks scanned
+2026-09-19 16:39:05 | INFO | PASS A: 2200/3970 blocks scanned
+2026-09-19 16:39:06 | INFO | PASS A: 2300/3970 blocks scanned
+2026-09-19 16:39:07 | INFO | PASS A: 2400/3970 blocks scanned
+2026-09-19 16:39:08 | INFO | PASS A: 2500/3970 blocks scanned
+2026-09-19 16:39:09 | INFO | PASS A: 2600/3970 blocks scanned
+2026-09-19 16:39:10 | INFO | PASS A: 2700/3970 blocks scanned
+2026-09-19 16:39:11 | INFO | PASS A: 2800/3970 blocks scanned
+2026-09-19 16:39:12 | INFO | PASS A: 2900/3970 blocks scanned
+2026-09-19 16:39:13 | INFO | PASS A: 3000/3970 blocks scanned
+2026-09-19 16:39:14 | INFO | PASS A: 3100/3970 blocks scanned
+2026-09-19 16:39:15 | INFO | PASS A: 3200/3970 blocks scanned
+2026-09-19 16:39:16 | INFO | PASS A: 3300/3970 blocks scanned
+2026-09-19 16:39:17 | INFO | PASS A: 3400/3970 blocks scanned
+2026-09-19 16:39:18 | INFO | PASS A: 3500/3970 blocks scanned
+2026-09-19 16:39:19 | INFO | PASS A: 3600/3970 blocks scanned
+2026-09-19 16:39:20 | INFO | PASS A: 3700/3970 blocks scanned
+2026-09-19 16:39:21 | INFO | PASS A: 3800/3970 blocks scanned
+2026-09-19 16:39:22 | INFO | PASS A: 3900/3970 blocks scanned
+2026-09-19 16:39:23 | INFO | PASS A: 3970/3970 blocks scanned
+2026-09-19 16:39:23 | INFO | ========================================================================
+2026-09-19 16:39:23 | INFO | PHASE 4 v3 — PASS B: INPUT EXTRACTION
+2026-09-19 16:39:23 | INFO | Retained global sample: 160163 pixels
+2026-09-19 16:39:23 | INFO | ========================================================================
+2026-09-19 16:39:25 | INFO | PASS B: 100/3964 input chunks read
+2026-09-19 16:39:26 | INFO | PASS B: 200/3964 input chunks read
+2026-09-19 16:39:27 | INFO | PASS B: 300/3964 input chunks read
+2026-09-19 16:39:27 | INFO | PASS B: 400/3964 input chunks read
+2026-09-19 16:39:28 | INFO | PASS B: 500/3964 input chunks read
+2026-09-19 16:39:30 | INFO | PASS B: 600/3964 input chunks read
+2026-09-19 16:39:31 | INFO | PASS B: 700/3964 input chunks read
+2026-09-19 16:39:33 | INFO | PASS B: 800/3964 input chunks read
+2026-09-19 16:39:35 | INFO | PASS B: 900/3964 input chunks read
+2026-09-19 16:39:36 | INFO | PASS B: 1000/3964 input chunks read
+2026-09-19 16:39:37 | INFO | PASS B: 1100/3964 input chunks read
+2026-09-19 16:39:38 | INFO | PASS B: 1200/3964 input chunks read
+2026-09-19 16:39:38 | INFO | PASS B: 1300/3964 input chunks read
+2026-09-19 16:39:39 | INFO | PASS B: 1400/3964 input chunks read
+2026-09-19 16:39:40 | INFO | PASS B: 1500/3964 input chunks read
+2026-09-19 16:39:41 | INFO | PASS B: 1600/3964 input chunks read
+2026-09-19 16:39:42 | INFO | PASS B: 1700/3964 input chunks read
+2026-09-19 16:39:42 | INFO | PASS B: 1800/3964 input chunks read
+2026-09-19 16:39:43 | INFO | PASS B: 1900/3964 input chunks read
+2026-09-19 16:39:43 | INFO | PASS B: 2000/3964 input chunks read
+2026-09-19 16:39:44 | INFO | PASS B: 2100/3964 input chunks read
+2026-09-19 16:39:44 | INFO | PASS B: 2200/3964 input chunks read
+2026-09-19 16:39:45 | INFO | PASS B: 2300/3964 input chunks read
+2026-09-19 16:39:45 | INFO | PASS B: 2400/3964 input chunks read
+2026-09-19 16:39:45 | INFO | PASS B: 2500/3964 input chunks read
+2026-09-19 16:39:46 | INFO | PASS B: 2600/3964 input chunks read
+2026-09-19 16:39:46 | INFO | PASS B: 2700/3964 input chunks read
+2026-09-19 16:39:46 | INFO | PASS B: 2800/3964 input chunks read
+2026-09-19 16:39:47 | INFO | PASS B: 2900/3964 input chunks read
+2026-09-19 16:39:47 | INFO | PASS B: 3000/3964 input chunks read
+2026-09-19 16:39:47 | INFO | PASS B: 3100/3964 input chunks read
+2026-09-19 16:39:48 | INFO | PASS B: 3200/3964 input chunks read
+2026-09-19 16:39:48 | INFO | PASS B: 3300/3964 input chunks read
+2026-09-19 16:39:48 | INFO | PASS B: 3400/3964 input chunks read
+2026-09-19 16:39:49 | INFO | PASS B: 3500/3964 input chunks read
+2026-09-19 16:39:49 | INFO | PASS B: 3600/3964 input chunks read
+2026-09-19 16:39:49 | INFO | PASS B: 3700/3964 input chunks read
+2026-09-19 16:39:50 | INFO | PASS B: 3800/3964 input chunks read
+2026-09-19 16:39:50 | INFO | PASS B: 3900/3964 input chunks read
+2026-09-19 16:39:50 | INFO | PASS B: 3964/3964 input chunks read
+2026-09-19 16:40:00 | INFO | ========================================================================
+2026-09-19 16:40:00 | INFO | PHASE 4 v3 COMPLETE
+2026-09-19 16:40:00 | INFO | Global valid pixels       : 1040596992
+2026-09-19 16:40:00 | INFO | Global retained sample    : 160163
+2026-09-19 16:40:00 | INFO | Input blocks read          : 3964 / 3970 (99.85%)
+2026-09-19 16:40:00 | INFO | Max |v3 exact - Phase0|    : 0.0
+2026-09-19 16:40:00 | INFO | Output                    : analysis_outputs/04_extremes
+2026-09-19 16:40:00 | INFO | ========================================================================

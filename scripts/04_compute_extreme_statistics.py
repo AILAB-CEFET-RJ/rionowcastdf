@@ -83,7 +83,7 @@ import pandas as pd
 import zarr
 
 
-PHASE_VERSION = "phase4-extremes-v3-global-stratified-weighted"
+PHASE_VERSION = "phase4-extremes-v3.1-global-stratified-weighted"
 
 RAW_CHANNELS = [
     "tcwv", "t2m", "u10", "v10",
@@ -226,26 +226,80 @@ def open_group(path: Path) -> Any:
         return zarr.open(str(path), mode="r")
 
 
-def stratum_mask(y: np.ndarray, name: str) -> np.ndarray:
+def stored_threshold(value: float) -> np.float32:
+    """
+    Return the exact float32 log1p threshold used by the builder domain.
+
+    Fixed event boundaries are classified in stored-log1p space, rather than
+    after expm1 reconstruction. This avoids float32 boundary artifacts such as
+    nominal 25 reconstructing as 24.999998 or nominal 30 reconstructing just
+    below 30.
+    """
+    return np.float32(np.log1p(np.float32(value)))
+
+
+def stratum_mask_stored(stored: np.ndarray, name: str) -> np.ndarray:
+    t20 = stored_threshold(20.0)
+    t25 = stored_threshold(25.0)
+    t30 = stored_threshold(30.0)
+    t35 = stored_threshold(35.0)
+    t40 = stored_threshold(40.0)
+    t45 = stored_threshold(45.0)
+    t50 = stored_threshold(50.0)
+
     if name == "zero":
-        return y == 0
+        return stored == np.float32(0.0)
     if name == "gt0_lt20":
-        return (y > 0) & (y < 20)
+        return (stored > 0) & (stored < t20)
     if name == "ge20_lt25":
-        return (y >= 20) & (y < 25)
+        return (stored >= t20) & (stored < t25)
     if name == "ge25_lt30":
-        return (y >= 25) & (y < 30)
+        return (stored >= t25) & (stored < t30)
     if name == "ge30_lt35":
-        return (y >= 30) & (y < 35)
+        return (stored >= t30) & (stored < t35)
     if name == "ge35_lt40":
-        return (y >= 35) & (y < 40)
+        return (stored >= t35) & (stored < t40)
     if name == "ge40_lt45":
-        return (y >= 40) & (y < 45)
+        return (stored >= t40) & (stored < t45)
     if name == "ge45_lt50":
-        return (y >= 45) & (y < 50)
+        return (stored >= t45) & (stored < t50)
     if name == "ge50":
-        return y >= 50
+        return stored >= t50
     raise KeyError(name)
+
+
+def fixed_strata_for_threshold(threshold: int) -> tuple[str, ...]:
+    mapping = {
+        20: (
+            "ge20_lt25", "ge25_lt30", "ge30_lt35",
+            "ge35_lt40", "ge40_lt45", "ge45_lt50", "ge50",
+        ),
+        25: (
+            "ge25_lt30", "ge30_lt35", "ge35_lt40",
+            "ge40_lt45", "ge45_lt50", "ge50",
+        ),
+        30: (
+            "ge30_lt35", "ge35_lt40",
+            "ge40_lt45", "ge45_lt50", "ge50",
+        ),
+        35: (
+            "ge35_lt40", "ge40_lt45", "ge45_lt50", "ge50",
+        ),
+        40: ("ge40_lt45", "ge45_lt50", "ge50"),
+        45: ("ge45_lt50", "ge50"),
+        50: ("ge50",),
+    }
+    try:
+        return mapping[int(threshold)]
+    except KeyError as exc:
+        raise ValueError(f"Unsupported fixed threshold: {threshold}") from exc
+
+
+def fixed_event_from_strata(
+    strata: np.ndarray,
+    threshold: int,
+) -> np.ndarray:
+    return np.isin(strata, fixed_strata_for_threshold(threshold))
 
 
 
@@ -528,27 +582,12 @@ def exact_fixed_count(
     stratum_counts: dict[str, int],
     threshold: int,
 ) -> int:
-    order = {
-        20: [
-            "ge20_lt25", "ge25_lt30", "ge30_lt35",
-            "ge35_lt40", "ge40_lt45", "ge45_lt50", "ge50",
-        ],
-        25: [
-            "ge25_lt30", "ge30_lt35", "ge35_lt40",
-            "ge40_lt45", "ge45_lt50", "ge50",
-        ],
-        30: [
-            "ge30_lt35", "ge35_lt40",
-            "ge40_lt45", "ge45_lt50", "ge50",
-        ],
-        35: [
-            "ge35_lt40", "ge40_lt45", "ge45_lt50", "ge50",
-        ],
-        40: ["ge40_lt45", "ge45_lt50", "ge50"],
-        45: ["ge45_lt50", "ge50"],
-        50: ["ge50"],
-    }
-    return int(sum(stratum_counts[name] for name in order[threshold]))
+    return int(
+        sum(
+            stratum_counts[name]
+            for name in fixed_strata_for_threshold(threshold)
+        )
+    )
 
 
 def main() -> None:
@@ -643,6 +682,7 @@ def main() -> None:
 
         valid = mask & np.isfinite(y)
         flat_y = y.reshape(-1)
+        flat_stored = stored.reshape(-1)
         flat_valid = valid.reshape(-1)
 
         valid_count = int(flat_valid.sum())
@@ -658,7 +698,8 @@ def main() -> None:
 
         for stratum_name in STRATA:
             local_ids = np.flatnonzero(
-                flat_valid & stratum_mask(flat_y, stratum_name)
+                flat_valid
+                & stratum_mask_stored(flat_stored, stratum_name)
             )
             count = int(local_ids.size)
             row[f"count_{stratum_name}"] = count
@@ -948,7 +989,12 @@ def main() -> None:
     total_weight = float(W.sum())
 
     for th in thresholds:
-        if th["operator"] == ">=":
+        if th["family"] == "fixed":
+            event = fixed_event_from_strata(
+                S,
+                int(th["threshold"]),
+            )
+        elif th["operator"] == ">=":
             event = Y >= th["threshold"]
         else:
             event = Y > th["threshold"]
@@ -1236,13 +1282,19 @@ def main() -> None:
             "global inverse stratum sampling fraction: "
             "global_population_count/sample_count"
         ),
+        "fixed_threshold_comparison_domain": (
+            "stored_log1p_float32; fixed event membership derived from "
+            "global intensity strata"
+        ),
         "radar_domain": (
             "expm1(stored_target): post-clip numerical radar-legend "
             "values; physical unit not assumed"
         ),
         "interpretation_note": (
             "PASS A scans the full target/mask Zarr. Fixed-threshold event "
-            "prevalence is exact for the stored patch distribution. "
+            "boundaries are evaluated in stored log1p float32 space to avoid "
+            "expm1 boundary artifacts; prevalence is exact for the stored "
+            "patch distribution. "
             "Conditional predictor statistics use a globally stratified, "
             "inverse-probability-weighted pixel sample. ESS reflects unequal "
             "weights only and does not remove spatial/temporal dependence."
