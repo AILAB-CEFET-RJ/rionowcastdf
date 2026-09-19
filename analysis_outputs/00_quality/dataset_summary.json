@@ -1,14 +1,14 @@
 {
   "audit_version": "phase0-audit-v3-coverage-events",
   "audit_mode": "full",
-  "audit_started_utc": "2026-09-14T14:52:38.334768+00:00",
-  "audit_finished_utc": "2026-09-14T15:02:53.530482+00:00",
-  "elapsed_seconds": 615.1957217198797,
+  "audit_started_utc": "2026-09-19T17:00:57.660959+00:00",
+  "audit_finished_utc": "2026-09-19T17:12:56.781292+00:00",
+  "elapsed_seconds": 719.1203392320313,
   "system": {
     "hostname": "librae",
     "platform": "Linux-5.15.0-107-generic-x86_64-with-glibc2.35",
     "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
-    "pid": 629578
+    "pid": 1043787
   },
   "paths": {
     "dataset_dir": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024",
@@ -19,7 +19,7 @@
     "output_dir": "/home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality"
   },
   "dataset": {
-    "num_samples": 1132464,
+    "num_samples": 1016208,
     "num_channels": 12,
     "channels": [
       "tcwv",
@@ -36,36 +36,36 @@
       "v_500"
     ],
     "input_shape": [
-      1132464,
+      1016208,
       12,
       32,
       32
     ],
     "target_shape": [
-      1132464,
+      1016208,
       1,
       32,
       32
     ],
     "mask_shape": [
-      1132464,
+      1016208,
       1,
       32,
       32
     ],
     "sample_dimensions": {
-      "input": 1132464,
-      "target": 1132464,
-      "mask": 1132464,
-      "timestamps": 1132464,
-      "patch_row": 1132464,
-      "patch_col": 1132464
+      "input": 1016208,
+      "target": 1016208,
+      "mask": 1016208,
+      "timestamps": 1016208,
+      "patch_row": 1016208,
+      "patch_col": 1016208
     },
     "sample_dimension_consistent": true,
     "zarr_arrays": {
       "input": {
         "shape": [
-          1132464,
+          1016208,
           12,
           32,
           32
@@ -81,7 +81,7 @@
       },
       "mask": {
         "shape": [
-          1132464,
+          1016208,
           1,
           32,
           32
@@ -97,7 +97,7 @@
       },
       "patch_col": {
         "shape": [
-          1132464
+          1016208
         ],
         "chunks": [
           256
@@ -107,7 +107,7 @@
       },
       "patch_row": {
         "shape": [
-          1132464
+          1016208
         ],
         "chunks": [
           256
@@ -117,7 +117,7 @@
       },
       "target": {
         "shape": [
-          1132464,
+          1016208,
           1,
           32,
           32
@@ -133,7 +133,7 @@
       },
       "timestamps": {
         "shape": [
-          1132464
+          1016208
         ],
         "chunks": [
           256
@@ -211,10 +211,10 @@
   "temporal": {
     "timestamp_storage_unit_detected": "s",
     "expected_timestamps": 122736,
-    "available_timestamps": 94372,
-    "missing_timestamps": 28364,
-    "coverage_ratio": 0.7689023595359145,
-    "first_observed_timestamp": "2011-01-17T18:00:00",
+    "available_timestamps": 84684,
+    "missing_timestamps": 38052,
+    "coverage_ratio": 0.6899687133359406,
+    "first_observed_timestamp": "2011-01-17T19:00:00",
     "last_observed_timestamp": "2024-12-31T23:00:00",
     "patches_per_timestamp": {
       "min": 12,
@@ -232,12 +232,12 @@
     "actual_spatial_coverage_ratio": 0.8707482993197279
   },
   "mask": {
-    "total_values": 1159643136,
-    "finite_count": 1159643136,
+    "total_values": 1040596992,
+    "finite_count": 1040596992,
     "nan_count": 0,
     "posinf_count": 0,
     "neginf_count": 0,
-    "valid_pixel_count": 1159643136,
+    "valid_pixel_count": 1040596992,
     "valid_pixel_ratio": 1.0,
     "binary_violation_count": 0
   },
@@ -316,96 +316,96 @@
         "condition": "> 0",
         "legend_value_threshold": 0.0,
         "stored_target_threshold": 0.0,
-        "patch_count": 1132464,
-        "valid_pixel_count": 1159643136,
-        "event_pixel_count": 17151018,
-        "event_pixel_ratio": 0.014789910333242381,
-        "event_patch_count": 337037,
-        "event_patch_ratio": 0.29761387558456603
+        "patch_count": 1016208,
+        "valid_pixel_count": 1040596992,
+        "event_pixel_count": 15257278,
+        "event_pixel_ratio": 0.014662043151475878,
+        "event_patch_count": 303716,
+        "event_patch_ratio": 0.2988718844960874
       },
       {
         "threshold": "ge_20",
         "condition": ">= 20",
         "legend_value_threshold": 20.0,
         "stored_target_threshold": 3.044522437723423,
-        "patch_count": 1132464,
-        "valid_pixel_count": 1159643136,
-        "event_pixel_count": 16948396,
-        "event_pixel_ratio": 0.014615182441781813,
-        "event_patch_count": 335600,
-        "event_patch_ratio": 0.29634496107602537
+        "patch_count": 1016208,
+        "valid_pixel_count": 1040596992,
+        "event_pixel_count": 15077040,
+        "event_pixel_ratio": 0.014488836808015682,
+        "event_patch_count": 302443,
+        "event_patch_ratio": 0.2976191881976918
       },
       {
         "threshold": "ge_25",
         "condition": ">= 25",
         "legend_value_threshold": 25.0,
         "stored_target_threshold": 3.258096538021482,
-        "patch_count": 1132464,
-        "valid_pixel_count": 1159643136,
-        "event_pixel_count": 10243179,
-        "event_pixel_ratio": 0.008833044134018829,
-        "event_patch_count": 246208,
-        "event_patch_ratio": 0.21740911852385594
+        "patch_count": 1016208,
+        "valid_pixel_count": 1040596992,
+        "event_pixel_count": 9029055,
+        "event_pixel_ratio": 0.008676802902001854,
+        "event_patch_count": 221376,
+        "event_patch_ratio": 0.2178451655566577
       },
       {
         "threshold": "ge_30",
         "condition": ">= 30",
         "legend_value_threshold": 30.0,
         "stored_target_threshold": 3.4339872044851463,
-        "patch_count": 1132464,
-        "valid_pixel_count": 1159643136,
-        "event_pixel_count": 6034052,
-        "event_pixel_ratio": 0.005203369737360305,
-        "event_patch_count": 181992,
-        "event_patch_ratio": 0.16070444623405247
+        "patch_count": 1016208,
+        "valid_pixel_count": 1040596992,
+        "event_pixel_count": 5253244,
+        "event_pixel_ratio": 0.005048298275303875,
+        "event_patch_count": 163401,
+        "event_patch_ratio": 0.1607948372774078
       },
       {
         "threshold": "ge_35",
         "condition": ">= 35",
         "legend_value_threshold": 35.0,
         "stored_target_threshold": 3.58351893845611,
-        "patch_count": 1132464,
-        "valid_pixel_count": 1159643136,
-        "event_pixel_count": 4060897,
-        "event_pixel_ratio": 0.0035018505900077175,
-        "event_patch_count": 138765,
-        "event_patch_ratio": 0.12253369643538338
+        "patch_count": 1016208,
+        "valid_pixel_count": 1040596992,
+        "event_pixel_count": 3494030,
+        "event_pixel_ratio": 0.0033577167980128084,
+        "event_patch_count": 124365,
+        "event_patch_ratio": 0.12238144159463417
       },
       {
         "threshold": "ge_40",
         "condition": ">= 40",
         "legend_value_threshold": 40.0,
         "stored_target_threshold": 3.713572066704308,
-        "patch_count": 1132464,
-        "valid_pixel_count": 1159643136,
-        "event_pixel_count": 1603595,
-        "event_pixel_ratio": 0.0013828348999946134,
-        "event_patch_count": 86592,
-        "event_patch_ratio": 0.0764633577756114
+        "patch_count": 1016208,
+        "valid_pixel_count": 1040596992,
+        "event_pixel_count": 1372827,
+        "event_pixel_ratio": 0.0013192686607343181,
+        "event_patch_count": 77270,
+        "event_patch_ratio": 0.0760375828570529
       },
       {
         "threshold": "ge_45",
         "condition": ">= 45",
         "legend_value_threshold": 45.0,
         "stored_target_threshold": 3.828641396489095,
-        "patch_count": 1132464,
-        "valid_pixel_count": 1159643136,
-        "event_pixel_count": 866991,
-        "event_pixel_ratio": 0.0007476360382647926,
-        "event_patch_count": 32214,
-        "event_patch_ratio": 0.028445937354300004
+        "patch_count": 1016208,
+        "valid_pixel_count": 1040596992,
+        "event_pixel_count": 727939,
+        "event_pixel_ratio": 0.000699539788790779,
+        "event_patch_count": 28620,
+        "event_patch_ratio": 0.02816352557744084
       },
       {
         "threshold": "ge_50",
         "condition": ">= 50",
         "legend_value_threshold": 50.0,
         "stored_target_threshold": 3.9318256327243257,
-        "patch_count": 1132464,
-        "valid_pixel_count": 1159643136,
-        "event_pixel_count": 173,
-        "event_pixel_ratio": 1.4918382615253112e-07,
-        "event_patch_count": 81,
-        "event_patch_ratio": 7.152545246471411e-05
+        "patch_count": 1016208,
+        "valid_pixel_count": 1040596992,
+        "event_pixel_count": 163,
+        "event_pixel_ratio": 1.5664085256168028e-07,
+        "event_patch_count": 71,
+        "event_patch_ratio": 6.98675861634626e-05
       }
     ]
   },
@@ -494,15 +494,15 @@
       "sampled_above_legend_max_count": 0,
       "sampled_min": 0.0,
       "sampled_max": 45.0,
-      "sampled_mean": 0.28898619038478923,
-      "sampled_std": 2.7483163500599743,
+      "sampled_mean": 0.20904508705130545,
+      "sampled_std": 2.3124024648838235,
       "sampled_p01": 0.0,
       "sampled_p05": 0.0,
       "sampled_p25": 0.0,
       "sampled_p50": 0.0,
       "sampled_p75": 0.0,
       "sampled_p95": 0.0,
-      "sampled_p99": 20.0
+      "sampled_p99": 0.0
     },
     "target_mapping_validation": {
       "status": "PASS",
@@ -521,14 +521,14 @@
   },
   "builder_counters": {
     "timestamps_total": 122736,
-    "timestamps_processed": 94372,
-    "missing_radar": 28361,
+    "timestamps_processed": 84684,
+    "missing_radar": 38049,
     "invalid_radar": 3,
     "missing_era5": 0,
     "shape_mismatch": 0,
     "patches_rejected_radar": 0,
     "patches_rejected_input": 0,
-    "patches_written": 1132464
+    "patches_written": 1016208
   },
   "warnings_count": 0,
   "notes_count": 5,

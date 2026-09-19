@@ -197,3 +197,44 @@
 2026-09-14 12:02:53 | INFO | Output                    : /home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality
 2026-09-14 12:02:53 | INFO | Elapsed                   : 615.20 s
 2026-09-14 12:02:53 | INFO | ========================================================================
+2026-09-19 13:58:41 | INFO | CorrDiff Phase 0 audit phase0-audit-v3-coverage-events
+2026-09-19 13:58:41 | INFO | Dataset directory: /home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024
+2026-09-19 13:58:41 | INFO | Zarr path       : /home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/train.zarr
+2026-09-19 13:58:41 | INFO | Output directory: /home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality
+2026-09-19 13:58:41 | INFO | Radar cache     : /home/vsantos/repositories/rionowcastdf
+2026-09-19 13:58:41 | INFO | Mode            : full
+2026-09-19 13:58:41 | INFO | target_transform_log1p: Stored target uses log1p. In the audited builder, the source cache is created from PNG RGB colors mapped to numerical radar-legend values and saved as float32; the builder itself does not declare the physical unit as dBZ. Direct cache -> target validation is performed when --radar-cache-dir is supplied.
+2026-09-19 13:58:41 | INFO | Reading timestamp index...
+2026-09-19 13:58:46 | INFO | temporal_gaps_present: Dataset contains 38052 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters.
+2026-09-19 13:58:46 | INFO | Reading patch positions...
+2026-09-19 13:58:48 | INFO | patch_geometry_uncovered_edges: Patch geometry covers 87.07% of the 70x84 radar grid. This follows directly from patch_size/stride and should be considered when reconstructing full fields.
+2026-09-19 13:58:48 | INFO | Auditing radar cache semantics and target transformation...
+2026-09-19 13:58:48 | INFO | Starting full numerical scan over 1016208 samples...
+2026-09-19 14:00:57 | INFO | CorrDiff Phase 0 audit phase0-audit-v3-coverage-events
+2026-09-19 14:00:57 | INFO | Dataset directory: /home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024
+2026-09-19 14:00:57 | INFO | Zarr path       : /home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/train.zarr
+2026-09-19 14:00:57 | INFO | Output directory: /home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality
+2026-09-19 14:00:57 | INFO | Radar cache     : /home/vsantos/repositories/rionowcastdf/data/radar_cache
+2026-09-19 14:00:57 | INFO | Mode            : full
+2026-09-19 14:00:57 | INFO | target_transform_log1p: Stored target uses log1p. In the audited builder, the source cache is created from PNG RGB colors mapped to numerical radar-legend values and saved as float32; the builder itself does not declare the physical unit as dBZ. Direct cache -> target validation is performed when --radar-cache-dir is supplied.
+2026-09-19 14:00:57 | INFO | Reading timestamp index...
+2026-09-19 14:00:57 | INFO | temporal_gaps_present: Dataset contains 38052 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters.
+2026-09-19 14:00:57 | INFO | Reading patch positions...
+2026-09-19 14:00:58 | INFO | patch_geometry_uncovered_edges: Patch geometry covers 87.07% of the 70x84 radar grid. This follows directly from patch_size/stride and should be considered when reconstructing full fields.
+2026-09-19 14:00:58 | INFO | Auditing radar cache semantics and target transformation...
+2026-09-19 14:01:05 | INFO | radar_target_mapping_verified: Directly reproduced cache -> Zarr target/mask for 256 sampled patches: isfinite mask + nan_to_num + clip(min=0) + log1p.
+2026-09-19 14:01:05 | INFO | Starting full numerical scan over 1016208 samples...
+2026-09-19 14:12:56 | INFO | target_event_rates_patch_weighted: Target threshold rates were computed over valid pixels in the stored patch dataset. Because patches overlap, pixel rates are training-distribution diagnostics rather than de-duplicated full-field climatological frequencies.
+2026-09-19 14:12:56 | INFO | ========================================================================
+2026-09-19 14:12:56 | INFO | PHASE 0 AUDIT COMPLETED
+2026-09-19 14:12:56 | INFO | Samples                  : 1016208
+2026-09-19 14:12:56 | INFO | Unique timestamps        : 84684
+2026-09-19 14:12:56 | INFO | Expected timestamps      : 122736
+2026-09-19 14:12:56 | INFO | Temporal coverage        : 69.00%
+2026-09-19 14:12:56 | INFO | Channels                 : 12
+2026-09-19 14:12:56 | INFO | Target event diagnostics : computed
+2026-09-19 14:12:56 | INFO | Warnings                 : 0
+2026-09-19 14:12:56 | INFO | Notes                    : 5
+2026-09-19 14:12:56 | INFO | Output                    : /home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality
+2026-09-19 14:12:56 | INFO | Elapsed                   : 719.12 s
+2026-09-19 14:12:56 | INFO | ========================================================================

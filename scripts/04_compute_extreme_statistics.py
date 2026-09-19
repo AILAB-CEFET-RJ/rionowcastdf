@@ -248,6 +248,69 @@ def stratum_mask(y: np.ndarray, name: str) -> np.ndarray:
     raise KeyError(name)
 
 
+
+def safe_hypergeometric(
+    rng: np.random.Generator,
+    ngood: int,
+    nbad: int,
+    nsample: int,
+) -> int:
+    """
+    Exact hypergeometric draw that avoids NumPy's <1e9 ngood/nbad limit.
+
+    Uses NumPy's fast implementation while both population components are
+    below the library limit. For larger populations, performs the at-most
+    `nsample` draws sequentially without replacement. In this Phase 4
+    reservoir, nsample is the reservoir capacity (typically 20,000), so the
+    fallback is only triggered late in the global zero-stratum scan and is
+    still inexpensive.
+    """
+    ngood = int(ngood)
+    nbad = int(nbad)
+    nsample = int(nsample)
+
+    if nsample <= 0 or ngood <= 0:
+        return 0
+    if nbad <= 0:
+        return min(nsample, ngood)
+    if nsample > ngood + nbad:
+        raise ValueError(
+            f"nsample={nsample} exceeds population={ngood + nbad}"
+        )
+
+    # NumPy Generator.hypergeometric rejects either component >= 1e9.
+    if ngood < 1_000_000_000 and nbad < 1_000_000_000:
+        return int(
+            rng.hypergeometric(
+                ngood=ngood,
+                nbad=nbad,
+                nsample=nsample,
+            )
+        )
+
+    # Exact sequential sampling without replacement.
+    good = ngood
+    bad = nbad
+    selected_good = 0
+
+    for draw_index in range(nsample):
+        remaining_draws = nsample - draw_index
+
+        if good <= 0:
+            break
+        if bad <= 0:
+            selected_good += remaining_draws
+            break
+
+        if rng.random() < (good / (good + bad)):
+            selected_good += 1
+            good -= 1
+        else:
+            bad -= 1
+
+    return selected_good
+
+
 @dataclass
 class AddressReservoir:
     """Uniform reservoir over a stream, updated in vectorized batches."""
@@ -278,12 +341,11 @@ class AddressReservoir:
             # Exact batch reservoir update:
             # among target_size samples from old_total + m stream elements,
             # the number coming from this new batch is hypergeometric.
-            k_new = int(
-                self.rng.hypergeometric(
-                    ngood=m,
-                    nbad=old_total,
-                    nsample=target_size,
-                )
+            k_new = safe_hypergeometric(
+                rng=self.rng,
+                ngood=m,
+                nbad=old_total,
+                nsample=target_size,
             )
             old_needed = target_size - k_new
             old_size = (

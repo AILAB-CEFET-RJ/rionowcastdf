@@ -1,0 +1,702 @@
+========================================================================================
+CORRDIFF — CONSOLIDAÇÃO DOS RESULTADOS DAS FASES 0 A 4
+========================================================================================
+Relatório composto somente por estatísticas agregadas dos analysis_outputs.
+O script não lê o Zarr, caches do radar ou arquivos NPZ com amostras.
+
+Fase 0: analysis_outputs/00_quality
+Fase 1: analysis_outputs/01_univariate
+Fase 2: analysis_outputs/02_derived
+Fase 3: analysis_outputs/03_joint
+Fase 4: analysis_outputs/04_extremes
+
+========================================================================================
+FASE 0 — QUALIDADE, COBERTURA E INTEGRIDADE
+========================================================================================
+
+Estrutura do dataset
+----------------------------------------------------------------------------------------
+Status da auditoria                       : PASS
+Amostras / patches                        : 1,016,208
+Canais de entrada                         : 12.0000
+Canais                                    : tcwv, t2m, u10, v10, t_850, r_850, u_850, v_850, t_500, r_500, u_500, v_500
+Shape input                               : [1016208, 12, 32, 32]
+Shape target                              : [1016208, 1, 32, 32]
+Shape mask                                : [1016208, 1, 32, 32]
+Dimensão amostral consistente             : True
+Transformação do target                   : log1p
+Período configurado                       : 2011-01-01T00:00:00 → 2024-12-31T23:00:00
+Frequência temporal                       : 1h
+Grade do radar                            : [70, 84]
+Resolução radar (km)                      : 2.0000
+Patch / stride                            : 32 / 16
+
+Cobertura temporal
+----------------------------------------------------------------------------------------
+Timestamps esperados                      : 122,736.00
+Timestamps disponíveis                    : 84,684.00
+Timestamps ausentes                       : 38,052.00
+Cobertura temporal                        : 69.00%
+Primeiro timestamp observado              : 2011-01-17T19:00:00
+Último timestamp observado                : 2024-12-31T23:00:00
+Patches por timestamp                     : {'min': 12, 'p25': 12.0, 'median': 12.0, 'mean': 12.0, 'p75': 12.0, 'max': 12}
+
+Cobertura por ano
+----------------------------------------------------------------------------------------
+ year  expected_timestamps  available_timestamps  samples  missing_timestamps  coverage_ratio  mean_patches_per_available_timestamp
+ 2011                 8760                  4270    51240                4490        0.487443                                  12.0
+ 2012                 8784                  7333    87996                1451        0.834813                                  12.0
+ 2013                 8760                  6968    83616                1792        0.795434                                  12.0
+ 2014                 8760                  7046    84552                1714        0.804338                                  12.0
+ 2015                 8760                  6577    78924                2183        0.750799                                  12.0
+ 2016                 8784                  6727    80724                2057        0.765824                                  12.0
+ 2017                 8760                  6585    79020                2175        0.751712                                  12.0
+ 2018                 8760                  6713    80556                2047        0.766324                                  12.0
+ 2019                 8760                  6007    72084                2753        0.685731                                  12.0
+ 2020                 8784                  5406    64872                3378        0.615437                                  12.0
+ 2021                 8760                  6764    81168                1996        0.772146                                  12.0
+ 2022                 8760                  6151    73812                2609        0.702169                                  12.0
+ 2023                 8760                  5006    60072                3754        0.571461                                  12.0
+ 2024                 8784                  3131    37572                5653        0.356444                                  12.0
+
+Horas UTC com menor cobertura
+----------------------------------------------------------------------------------------
+ hour_utc  expected_timestamps  available_timestamps  coverage_ratio  mean_patches_per_available_timestamp
+       11                 5114                  3135        0.613023                                  12.0
+       15                 5114                  3165        0.618889                                  12.0
+       10                 5114                  3193        0.624364                                  12.0
+       14                 5114                  3198        0.625342                                  12.0
+       12                 5114                  3214        0.628471                                  12.0
+       16                 5114                  3237        0.632968                                  12.0
+
+Horas UTC com maior cobertura
+ hour_utc  expected_timestamps  available_timestamps  coverage_ratio  mean_patches_per_available_timestamp
+        1                 5114                  3992        0.780602                                  12.0
+        0                 5114                  3872        0.757137                                  12.0
+        2                 5114                  3828        0.748533                                  12.0
+       23                 5114                  3787        0.740516                                  12.0
+        5                 5114                  3782        0.739539                                  12.0
+       22                 5114                  3779        0.738952                                  12.0
+
+Geometria dos patches
+----------------------------------------------------------------------------------------
+Posições esperadas por campo              : 12.0000
+Posições efetivamente observadas          : 12.0000
+Cobertura espacial geométrica esperada    : 87.07%
+Cobertura espacial observada              : 87.07%
+
+Integridade de máscara e target
+----------------------------------------------------------------------------------------
+Pixels válidos na máscara                 : 1,040,596,992
+Razão de pixels válidos                   : 100.00%
+Violações de máscara binária              : 0
+negative_finite_value_count               : 0
+invalid_mask_region_nonzero_count         : 0
+nan_count_all_stored_target_pixels        : 0
+posinf_count_all_stored_target_pixels     : 0
+neginf_count_all_stored_target_pixels     : 0
+
+Validação cache radar → target Zarr
+----------------------------------------------------------------------------------------
+Status                                    : PASS
+Patches comparados                        : 256.000
+Shapes compatíveis                        : 256.000
+Maior erro target vs transformação esperada: 0
+Maior erro expm1(target) vs cache clipado : 7.629e-06
+Mismatches de máscara                     : 0
+Valores negativos na origem observados    : 0
+
+Desbalanceamento global do radar — distribuição de treinamento
+----------------------------------------------------------------------------------------
+threshold condition  legend_value_threshold  event_pixel_ratio  event_patch_ratio  event_pixel_count  event_patch_count
+     gt_0       > 0                     0.0       1.466204e-02           0.298872           15257278             303716
+    ge_20     >= 20                    20.0       1.448884e-02           0.297619           15077040             302443
+    ge_25     >= 25                    25.0       8.676803e-03           0.217845            9029055             221376
+    ge_30     >= 30                    30.0       5.048298e-03           0.160795            5253244             163401
+    ge_35     >= 35                    35.0       3.357717e-03           0.122381            3494030             124365
+    ge_40     >= 40                    40.0       1.319269e-03           0.076038            1372827              77270
+    ge_45     >= 45                    45.0       6.995398e-04           0.028164             727939              28620
+    ge_50     >= 50                    50.0       1.566409e-07           0.000070                163                 71
+
+Avisos e notas do auditor
+----------------------------------------------------------------------------------------
+AVISOS: nenhum
+NOTAS:
+  - target_transform_log1p: Stored target uses log1p. In the audited builder, the source cache is created from PNG RGB colors mapped to numerical radar-legend values and saved as float32; the builder itself does not declare the physical unit as dBZ. Direct cache -> target validation is performed when --radar-cache-dir is supplied.
+  - temporal_gaps_present: Dataset contains 38052 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters.
+  - patch_geometry_uncovered_edges: Patch geometry covers 87.07% of the 70x84 radar grid. This follows directly from patch_size/stride and should be considered when reconstructing full fields.
+  - radar_target_mapping_verified: Directly reproduced cache -> Zarr target/mask for 256 sampled patches: isfinite mask + nan_to_num + clip(min=0) + log1p.
+  - target_event_rates_patch_weighted: Target threshold rates were computed over valid pixels in the stored patch dataset. Because patches overlap, pixel rates are training-distribution diagnostics rather than de-duplicated full-field climatological frequencies.
+
+========================================================================================
+FASE 1 — CARACTERIZAÇÃO ESTATÍSTICA UNIVARIADA
+========================================================================================
+
+Amostragem e representatividade
+----------------------------------------------------------------------------------------
+Patches do dataset                        : 1,016,208
+Patches amostrados                        : 32,768.00
+Estratégia                                : systematic
+Referência exata da Fase 0 disponível     : True
+Máx. diferença de média em unidades de σ  : 0.161431
+Máx. diferença relativa de std            : 8.49%
+
+Resumo dos 12 canais ERA5
+----------------------------------------------------------------------------------------
+channel expected_unit  sampled_skewness_from_reservoir  sampled_excess_kurtosis_from_reservoir  sample_mean_diff_in_phase0_std  sample_std_relative_diff_vs_phase0
+   tcwv       kg m^-2                         0.276803                              -0.571312                         0.130036                            0.072217
+    t2m             K                         0.263971                               0.598705                         0.013893                            0.042993
+    u10        m s^-1                        -0.311214                               1.318036                         0.019450                            0.028781
+    v10        m s^-1                         0.336738                               0.822014                         0.024213                            0.045500
+  t_850             K                        -0.434555                              -0.374279                         0.004790                            0.083225
+  r_850             %                        -0.479101                              -0.303475                         0.035837                            0.040565
+  u_850        m s^-1                         0.520062                               0.842807                         0.034323                            0.032866
+  v_850        m s^-1                        -0.098955                               0.332882                         0.039076                            0.082514
+  t_500             K                        -0.437773                               0.214488                         0.000196                            0.071302
+  r_500             %                         1.075701                              -0.123312                         0.161431                            0.084890
+  u_500        m s^-1                         0.412677                              -0.048279                         0.048498                            0.039274
+  v_500        m s^-1                         0.184269                              -0.179074                         0.043515                            0.053189
+
+Qualidade da umidade relativa
+----------------------------------------------------------------------------------------
+channel  below_0_ratio  above_100_ratio  outside_0_100_ratio  within_0_100_ratio
+  r_850       0.000000         0.011940             0.011940            0.988060
+  r_500       0.000026         0.004889             0.004915            0.995085
+
+Resumo do target em seus diferentes domínios
+----------------------------------------------------------------------------------------
+                           domain  sampled_skewness_from_reservoir  sampled_excess_kurtosis_from_reservoir
+                     stored_log1p                         8.633721                              73.136741 
+              reconstructed_expm1                         9.805482                             102.068482 
+reconstructed_expm1_positive_only                         0.747228                              -0.532226 
+
+Quantis do radar
+----------------------------------------------------------------------------------------
+                           domain quantile  probability     value
+                     stored_log1p      p50        0.500  0.000000
+                     stored_log1p      p75        0.750  0.000000
+                     stored_log1p      p90        0.900  0.000000
+                     stored_log1p      p95        0.950  0.000000
+                     stored_log1p      p99        0.990  3.044523
+                     stored_log1p     p999        0.999  3.828641
+              reconstructed_expm1      p50        0.500  0.000000
+              reconstructed_expm1      p75        0.750  0.000000
+              reconstructed_expm1      p90        0.900  0.000000
+              reconstructed_expm1      p95        0.950  0.000000
+              reconstructed_expm1      p99        0.990 20.000002
+              reconstructed_expm1     p999        0.999 45.000000
+reconstructed_expm1_positive_only      p50        0.500 24.999998
+reconstructed_expm1_positive_only      p75        0.750 35.000000
+reconstructed_expm1_positive_only      p90        0.900 40.000000
+reconstructed_expm1_positive_only      p95        0.950 46.781574
+reconstructed_expm1_positive_only      p99        0.990 46.781574
+reconstructed_expm1_positive_only     p999        0.999 47.036119
+
+Taxas por limiar do radar
+----------------------------------------------------------------------------------------
+threshold  legend_value_threshold  event_pixel_ratio  event_patch_ratio
+     gt_0                     0.0       1.466204e-02           0.298872
+    ge_20                    20.0       1.448884e-02           0.297619
+    ge_25                    25.0       8.676803e-03           0.217845
+    ge_30                    30.0       5.048298e-03           0.160795
+    ge_35                    35.0       3.357717e-03           0.122381
+    ge_40                    40.0       1.319269e-03           0.076038
+    ge_45                    45.0       6.995398e-04           0.028164
+    ge_50                    50.0       1.566409e-07           0.000070
+
+Esparsidade do target
+----------------------------------------------------------------------------------------
+Pixels com radar > 0                      : 1.47%
+Pixels secos / zero                       : 98.53%
+Patches com ao menos um pixel > 0         : 29.89%
+Patches sem evento                        : 70.11%
+Fonte                                     : phase0 exact full scan
+
+Avisos da Fase 1
+----------------------------------------------------------------------------------------
+  - sample_mean_shift_vs_phase0: At least one sampled channel mean differs from the Phase 0 exact mean by more than 0.10 standard deviations (max=0.1614).
+  - r_850_outside_0_100: Sampled r_850 contains 1.193976% of values outside [0,100]. Values were measured, not clipped.
+  - r_500_outside_0_100: Sampled r_500 contains 0.491500% of values outside [0,100]. Values were measured, not clipped.
+
+========================================================================================
+FASE 2 — VARIÁVEIS DERIVADAS
+========================================================================================
+
+Amostragem e validade metodológica
+----------------------------------------------------------------------------------------
+Versão                                    : phase2-derived-v2-aligned
+Patches amostrados                        : 32,768.00
+Blocos amostrados                         : 128.000
+Estratégia/fonte                          : phase1_sampling_blocks
+Variáveis derivadas                       : wind_speed_10, wind_speed_850, wind_speed_500, delta_t_500_850, delta_t_850_surface, delta_r_500_850, bulk_wind_diff_10_850, bulk_wind_diff_850_500
+Correlação com pixels alinhados           : True
+Linhas no reservoir alinhado              : 300,000.00
+Nota de correlação                        : All derived variables in each correlation row come from the same selected patch/pixel.
+Observação metodológica                   : Bulk wind differences are vector-wind differences in m/s, not height-normalized shear rates.
+
+Catálogo das variáveis derivadas
+----------------------------------------------------------------------------------------
+                  name                                formula              unit                         interpretation
+         wind_speed_10                    sqrt(u10^2 + v10^2)            m s^-1             Magnitude do vento a 10 m.
+        wind_speed_850                sqrt(u_850^2 + v_850^2)            m s^-1         Magnitude do vento em 850 hPa.
+        wind_speed_500                sqrt(u_500^2 + v_500^2)            m s^-1         Magnitude do vento em 500 hPa.
+       delta_t_500_850                          t_500 - t_850                 K Diferença vertical de temperatura 5...
+   delta_t_850_surface                            t_850 - t2m                 K Diferença de temperatura entre 850 ...
+       delta_r_500_850                          r_500 - r_850 percentage points Diferença de umidade relativa 500-8...
+ bulk_wind_diff_10_850    sqrt((u_850-u10)^2 + (v_850-v10)^2)            m s^-1 Diferença vetorial de vento 10 m-85...
+bulk_wind_diff_850_500 sqrt((u_500-u_850)^2 + (v_500-v_850...            m s^-1 Diferença vetorial de vento 850-500...
+
+Estatísticas das variáveis derivadas
+----------------------------------------------------------------------------------------
+                  name              unit       mean       std         min        max  skewness_reservoir  excess_kurtosis_reservoir  aligned_reservoir_count
+         wind_speed_10            m s^-1   2.854374  2.041276    0.000745  14.252112            1.274043                   1.569296                   300000
+        wind_speed_850            m s^-1   4.548512  2.722100    0.002591  21.578323            1.341232                   3.425504                   300000
+        wind_speed_500            m s^-1  11.102148  6.291218    0.001620  37.983486            0.745545                   0.366265                   300000
+       delta_t_500_850                 K -23.267191  2.999742  -33.815125 -13.527039            0.150858                   0.117940                   300000
+   delta_t_850_surface                 K  -7.593543  2.838588  -16.343994   3.850281            0.141043                  -0.063984                   300000
+       delta_r_500_850 percentage points -44.049913 30.284591 -101.350883  57.301880            0.671742                  -0.264938                   300000
+ bulk_wind_diff_10_850            m s^-1   4.560092  2.813111    0.001230  19.676224            1.085388                   1.604003                   300000
+bulk_wind_diff_850_500            m s^-1  10.399497  5.437283    0.003187  32.896687            0.514715                  -0.087644                   300000
+
+Maiores correlações entre variáveis derivadas — Pearson
+----------------------------------------------------------------------------------------
+                 var_a               var_b  pearson_r  spearman_rho  n_aligned
+bulk_wind_diff_850_500      wind_speed_500   0.832515      0.821416     300000
+ bulk_wind_diff_10_850      wind_speed_850   0.682246      0.644671     300000
+       delta_r_500_850     delta_t_500_850  -0.534803     -0.552111     300000
+bulk_wind_diff_850_500     delta_t_500_850   0.411256      0.414338     300000
+       delta_t_500_850 delta_t_850_surface  -0.400763     -0.378123     300000
+ bulk_wind_diff_10_850       wind_speed_10   0.339701      0.284172     300000
+        wind_speed_500      wind_speed_850   0.312752      0.245247     300000
+       delta_t_500_850      wind_speed_500   0.305435      0.307392     300000
+       delta_r_500_850 delta_t_850_surface   0.294514      0.308144     300000
+ bulk_wind_diff_10_850     delta_t_500_850  -0.269151     -0.232850     300000
+bulk_wind_diff_850_500     delta_r_500_850  -0.230840     -0.244633     300000
+         wind_speed_10      wind_speed_850   0.225278      0.199079     300000
+
+Maiores correlações entre variáveis derivadas — Spearman
+----------------------------------------------------------------------------------------
+                 var_a               var_b  spearman_rho  pearson_r  n_aligned
+bulk_wind_diff_850_500      wind_speed_500      0.821416   0.832515     300000
+ bulk_wind_diff_10_850      wind_speed_850      0.644671   0.682246     300000
+       delta_r_500_850     delta_t_500_850     -0.552111  -0.534803     300000
+bulk_wind_diff_850_500     delta_t_500_850      0.414338   0.411256     300000
+       delta_t_500_850 delta_t_850_surface     -0.378123  -0.400763     300000
+       delta_r_500_850 delta_t_850_surface      0.308144   0.294514     300000
+       delta_t_500_850      wind_speed_500      0.307392   0.305435     300000
+ bulk_wind_diff_10_850       wind_speed_10      0.284172   0.339701     300000
+        wind_speed_500      wind_speed_850      0.245247   0.312752     300000
+bulk_wind_diff_850_500     delta_r_500_850     -0.244633  -0.230840     300000
+ bulk_wind_diff_10_850     delta_t_500_850     -0.232850  -0.269151     300000
+   delta_t_850_surface       wind_speed_10     -0.219437  -0.163302     300000
+
+========================================================================================
+FASE 3 — RELAÇÕES ERA5 × RADAR
+========================================================================================
+
+Amostragem conjunta
+----------------------------------------------------------------------------------------
+Observações pixel-a-pixel retidas         : 300,000.00
+Preditores                                : 20.0000
+Preditores ERA5 brutos                    : 12.0000
+Preditores derivados                      : 8.0000
+Taxa de radar > 0 na amostra              : 1.44%
+Domínio radar                             : expm1(stored_target): post-clip numerical radar-legend values; physical unit not assumed
+Nota                                      : Associations are descriptive and represent overlapping training patches.
+
+Top 8 — |Pearson| com intensidade do radar (todos os pixels válidos)
+----------------------------------------------------------------------------------------
+      predictor  source  pearson_r  spearman_rho  mutual_information_regression
+           tcwv     raw   0.116105      0.121463                       0.009558
+          r_500     raw   0.114308      0.112405                       0.008528
+delta_r_500_850 derived   0.078104      0.081913                       0.004194
+          v_500     raw  -0.075059     -0.078016                       0.005074
+            t2m     raw   0.068786      0.062365                       0.003112
+          t_500     raw   0.068662      0.075937                       0.005714
+          t_850     raw   0.064628      0.065165                       0.005528
+          r_850     raw   0.062922      0.074018                       0.003300
+
+Top 8 — |Spearman| com intensidade do radar
+----------------------------------------------------------------------------------------
+      predictor  source  spearman_rho  pearson_r  mutual_information_regression
+           tcwv     raw      0.121463   0.116105                       0.009558
+          r_500     raw      0.112405   0.114308                       0.008528
+delta_r_500_850 derived      0.081913   0.078104                       0.004194
+          v_500     raw     -0.078016  -0.075059                       0.005074
+          t_500     raw      0.075937   0.068662                       0.005714
+          r_850     raw      0.074018   0.062922                       0.003300
+          t_850     raw      0.065165   0.064628                       0.005528
+            t2m     raw      0.062365   0.068786                       0.003112
+
+Top 8 — Mutual information com intensidade do radar
+----------------------------------------------------------------------------------------
+      predictor  source  mutual_information_regression  pearson_r  spearman_rho
+           tcwv     raw                       0.009558   0.116105      0.121463
+          r_500     raw                       0.008528   0.114308      0.112405
+          t_500     raw                       0.005714   0.068662      0.075937
+          t_850     raw                       0.005528   0.064628      0.065165
+          v_500     raw                       0.005074  -0.075059     -0.078016
+delta_r_500_850 derived                       0.004194   0.078104      0.081913
+          r_850     raw                       0.003300   0.062922      0.074018
+            t2m     raw                       0.003112   0.068786      0.062365
+
+Top 8 — associação com ocorrência radar > 0
+----------------------------------------------------------------------------------------
+      predictor  source  point_biserial_r_positive  mutual_information_positive_event  positive_event_rate
+          r_500     raw                   0.120612                           0.008606              0.01445
+           tcwv     raw                   0.119179                           0.009533              0.01445
+delta_r_500_850 derived                   0.081907                           0.003835              0.01445
+          v_500     raw                  -0.076213                           0.005240              0.01445
+          t_500     raw                   0.068892                           0.005262              0.01445
+          r_850     raw                   0.067327                           0.003748              0.01445
+            t2m     raw                   0.065666                           0.002990              0.01445
+          t_850     raw                   0.062623                           0.005387              0.01445
+
+Top 8 — relações somente entre pixels positivos
+----------------------------------------------------------------------------------------
+      predictor  source  pearson_r_positive  spearman_rho_positive  mutual_information_regression_positive  n_positive
+          t_850     raw            0.199540               0.199492                               0.062789         4335
+            t2m     raw            0.179496               0.159503                               0.051809         4335
+delta_t_500_850 derived           -0.173496              -0.147578                               0.061421         4335
+          r_850     raw           -0.130574              -0.107658                               0.033017         4335
+            u10     raw           -0.107705              -0.107220                               0.038987         4335
+          r_500     raw           -0.110327              -0.096943                               0.035219         4335
+          t_500     raw            0.103908               0.064269                               0.048161         4335
+delta_r_500_850 derived           -0.056666              -0.058690                               0.037533         4335
+
+Tabela completa de métricas de associação
+----------------------------------------------------------------------------------------
+             predictor  source  pearson_r  spearman_rho  mutual_information_regression  point_biserial_r_positive  mutual_information_positive_event  pearson_r_positive  spearman_rho_positive  mutual_information_regression_positive
+                  tcwv     raw   0.116105      0.121463                       0.009558                   0.119179                           0.009533            0.024839               0.001280                               0.028943 
+                 r_500     raw   0.114308      0.112405                       0.008528                   0.120612                           0.008606           -0.110327              -0.096943                               0.035219 
+                 t_500     raw   0.068662      0.075937                       0.005714                   0.068892                           0.005262            0.103908               0.064269                               0.048161 
+                 t_850     raw   0.064628      0.065165                       0.005528                   0.062623                           0.005387            0.199540               0.199492                               0.062789 
+                 v_500     raw  -0.075059     -0.078016                       0.005074                  -0.076213                           0.005240           -0.045060              -0.056767                               0.062768 
+       delta_r_500_850 derived   0.078104      0.081913                       0.004194                   0.081907                           0.003835           -0.056666              -0.058690                               0.037533 
+                 r_850     raw   0.062922      0.074018                       0.003300                   0.067327                           0.003748           -0.130574              -0.107658                               0.033017 
+                   t2m     raw   0.068786      0.062365                       0.003112                   0.065666                           0.002990            0.179496               0.159503                               0.051809 
+        wind_speed_500 derived   0.000059      0.011201                       0.003105                   0.001589                           0.002157           -0.063896              -0.035970                               0.068374 
+       delta_t_500_850 derived  -0.027512     -0.024196                       0.003023                  -0.024554                           0.002459           -0.173496              -0.147578                               0.061421 
+                 u_500     raw   0.009119      0.019306                       0.002649                   0.011231                           0.003087           -0.085575              -0.055984                               0.050222 
+                   u10     raw   0.031750      0.034805                       0.002228                   0.034900                           0.000542           -0.107705              -0.107220                               0.038987 
+                 u_850     raw   0.010957      0.014756                       0.002114                   0.011522                           0.001712           -0.010567              -0.014007                               0.036118 
+         wind_speed_10 derived  -0.037924     -0.034601                       0.001748                  -0.038996                           0.001770           -0.003245               0.025733                               0.028351 
+        wind_speed_850 derived  -0.027363     -0.029954                       0.001634                  -0.026831                           0.001153           -0.048201              -0.054521                               0.020055 
+                   v10     raw   0.029253      0.036561                       0.001628                   0.031537                           0.001632           -0.058078              -0.043654                               0.023989 
+                 v_850     raw  -0.014135     -0.010043                       0.001549                  -0.013141                           0.002066           -0.052120              -0.054449                               0.027667 
+   delta_t_850_surface derived  -0.000302      0.007709                       0.001297                   0.000856                           0.000716           -0.047348              -0.032341                               0.027559 
+bulk_wind_diff_850_500 derived  -0.007856     -0.005417                       0.000200                  -0.007293                           0.000461           -0.029156               0.003257                               0.030982 
+ bulk_wind_diff_10_850 derived  -0.014318     -0.012550                       0.000176                  -0.014882                           0.000000            0.005055               0.013627                               0.032589 
+
+Curvas condicionais — amplitude do efeito entre primeiro e último bin
+----------------------------------------------------------------------------------------
+      predictor  radar_mean_delta_last_minus_first  positive_rate_delta  ge20_rate_delta  ge30_rate_delta  ge40_rate_delta
+            t2m                           0.873258             0.031200         0.030700         0.008133         0.003467
+           tcwv                           1.151962             0.044667         0.043900         0.006467         0.002000
+          t_850                           0.473813             0.016234         0.015934         0.005534         0.002267
+          v_500                          -0.925583            -0.035800        -0.035200        -0.005000        -0.001100
+          t_500                           0.448485             0.016034         0.015634         0.004533         0.001967
+          r_500                           1.064035             0.042567         0.042100         0.004433         0.000533
+delta_r_500_850                           0.664437             0.025567         0.025200         0.004100         0.000833
+ wind_speed_850                          -0.414323            -0.015167        -0.014900        -0.003167        -0.001200
+
+========================================================================================
+FASE 4 — EVENTOS INTENSOS E EXTREMOS
+========================================================================================
+
+Configuração, amostragem e pesos
+----------------------------------------------------------------------------------------
+Versão                                    : phase4-extremes-v3-global-stratified-weighted
+Fonte da amostra                          : full_zarr_global_stratified_reservoir
+Escopo PASSO A                            : all target/mask patches
+Blocos target/mask varridos               : 3,970.00
+Patches globais varridos                  : 1,016,208
+Pixels válidos globais                    : 1,040,596,992
+Pixels positivos globais exatos           : 15,257,278
+Taxa positiva global exata                : 1.47%
+Linhas retidas no reservoir global        : 160,163.00
+Chunks input lidos no PASSO B             : 3,960.00
+Total de chunks input                     : 3,970.00
+Fração de chunks input lidos              : 99.75%
+Preditores                                : 20.0000
+Definições de evento                      : 13.0000
+Referência exata Fase 0 disponível        : True
+Máx. |taxa exata v3 - Fase 0|             : 0.002409
+Método de ponderação                      : global inverse stratum sampling fraction: global_population_count/sample_count
+Domínio radar                             : expm1(stored_target): post-clip numerical radar-legend values; physical unit not assumed
+Nota                                      : PASS A scans the full target/mask Zarr. Fixed-threshold event prevalence is exact for the stored patch distribution. Conditional predictor statistics use a globally stratified, inverse-probability-weighted pixel sample. ESS reflects unequal weights only and does not remove spatial/temporal dependence.
+
+Amostragem por estrato de intensidade
+----------------------------------------------------------------------------------------
+  stratum  global_population_count  global_population_ratio  sample_count  sampling_fraction_global  inverse_sampling_weight_global
+     zero               1025339714             9.853380e-01         20000                  0.000020                     51266.98570
+ gt0_lt20                   180238             1.732063e-04         20000                  0.110964                         9.01190
+ge20_lt25                  8554615             8.220872e-03         20000                  0.002338                       427.73075
+ge25_lt30                  2974448             2.858405e-03         20000                  0.006724                       148.72240
+ge30_lt35                    53947             5.184236e-05         20000                  0.370734                         2.69735
+ge35_lt40                  2121203             2.038448e-03         20000                  0.009429                       106.06015
+ge40_lt45                   644888             6.197289e-04         20000                  0.031013                        32.24440
+ge45_lt50                   727776             6.993831e-04         20000                  0.027481                        36.38880
+     ge50                      163             1.566409e-07           163                  1.000000                         1.00000
+
+PASSO B — cobertura dos chunks de input
+----------------------------------------------------------------------------------------
+Chunks lidos                              : 3,960.00
+Pixels selecionados recuperados           : 160,163.00
+Mediana de pixels selecionados/chunk      : 11.0000
+Máximo de pixels selecionados/chunk       : 4,409.00
+
+Prevalência das definições de evento
+----------------------------------------------------------------------------------------
+    event_id            family  threshold operator  sample_event_count_unweighted  effective_sample_size_event  weighted_event_rate_global_estimate  exact_global_event_count_v3  exact_global_event_rate_v3  reference_event_rate_phase0  abs_rate_diff_v3_vs_phase0   event_rate                    event_rate_source
+ fixed_ge_20             fixed  20.000000       >=                         120163                 51972.022219                         1.448884e-02                   15077040.0                1.448884e-02                 1.448884e-02                    0.000000 1.448884e-02          phase4_v3_exact_global_scan
+ fixed_ge_25             fixed  25.000000       >=                         100163                 59518.922462                         6.267964e-03                    6522425.0                6.267964e-03                 8.676803e-03                    0.002409 6.267964e-03          phase4_v3_exact_global_scan
+ fixed_ge_30             fixed  30.000000       >=                          80163                 46212.359569                         3.409559e-03                    3547977.0                3.409559e-03                 5.048298e-03                    0.001639 3.409559e-03          phase4_v3_exact_global_scan
+ fixed_ge_35             fixed  35.000000       >=                          60163                 44841.679669                         3.357717e-03                    3494030.0                3.357717e-03                 3.357717e-03                    0.000000 3.357717e-03          phase4_v3_exact_global_scan
+ fixed_ge_40             fixed  40.000000       >=                          40163                 39864.005458                         1.319269e-03                    1372827.0                1.319269e-03                 1.319269e-03                    0.000000 1.319269e-03          phase4_v3_exact_global_scan
+ fixed_ge_45             fixed  45.000000       >=                          20163                 20008.836651                         6.995398e-04                     727939.0                6.995398e-04                 6.995398e-04                    0.000000 6.995398e-04          phase4_v3_exact_global_scan
+ fixed_ge_50             fixed  50.000000       >=                            163                   163.000000                         1.566409e-07                        163.0                1.566409e-07                 1.566409e-07                    0.000000 1.566409e-07          phase4_v3_exact_global_scan
+  global_p90   global_quantile   0.000000        >                         140163                 53202.287881                         1.466204e-02                          NaN                         NaN                          NaN                         NaN 1.466204e-02 phase4_v3_global_stratified_weighted
+  global_p95   global_quantile   0.000000        >                         140163                 53202.287881                         1.466204e-02                          NaN                         NaN                          NaN                         NaN 1.466204e-02 phase4_v3_global_stratified_weighted
+  global_p99   global_quantile  20.000002        >                         108559                 45443.399833                         9.719087e-03                          NaN                         NaN                          NaN                         NaN 9.719087e-03 phase4_v3_global_stratified_weighted
+positive_p90 positive_quantile  39.652798        >                          40391                 39156.557381                         1.342507e-03                          NaN                         NaN                          NaN                         NaN 1.342507e-03 phase4_v3_global_stratified_weighted
+positive_p95 positive_quantile  43.163494        >                          21235                 21067.538049                         7.327573e-04                          NaN                         NaN                          NaN                         NaN 7.327573e-04 phase4_v3_global_stratified_weighted
+positive_p99 positive_quantile  46.781574        >                           2014                  1859.845954                         6.488455e-05                          NaN                         NaN                          NaN                         NaN 6.488455e-05 phase4_v3_global_stratified_weighted
+
+Validação exata Fase 4 v3 × Fase 0
+----------------------------------------------------------------------------------------
+   event_id  threshold  exact_global_event_count_v3  exact_global_event_rate_v3  reference_event_rate_phase0  abs_rate_diff_v3_vs_phase0  sample_event_count_unweighted  effective_sample_size_event
+fixed_ge_20       20.0                   15077040.0                1.448884e-02                 1.448884e-02                    0.000000                         120163                 51972.022219
+fixed_ge_25       25.0                    6522425.0                6.267964e-03                 8.676803e-03                    0.002409                         100163                 59518.922462
+fixed_ge_30       30.0                    3547977.0                3.409559e-03                 5.048298e-03                    0.001639                          80163                 46212.359569
+fixed_ge_35       35.0                    3494030.0                3.357717e-03                 3.357717e-03                    0.000000                          60163                 44841.679669
+fixed_ge_40       40.0                    1372827.0                1.319269e-03                 1.319269e-03                    0.000000                          40163                 39864.005458
+fixed_ge_45       45.0                     727939.0                6.995398e-04                 6.995398e-04                    0.000000                          20163                 20008.836651
+fixed_ge_50       50.0                        163.0                1.566409e-07                 1.566409e-07                    0.000000                            163                   163.000000
+
+Preditores que mais diferenciam evento × não-evento
+----------------------------------------------------------------------------------------
+
+[fixed_ge_20]  top 5 por |standardized_mean_difference|
+      predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+          r_500     raw   64.380629       33.713783        30.666846                      0.959111          120163       51972.022219 full_dataset_global_strata
+           tcwv     raw   45.960131       36.137321         9.822810                      0.913032          120163       51972.022219 full_dataset_global_strata
+delta_r_500_850 derived  -16.550308      -40.032282        23.481974                      0.740747          120163       51972.022219 full_dataset_global_strata
+          v_500     raw   -3.300783       -0.102630        -3.198153                     -0.584625          120163       51972.022219 full_dataset_global_strata
+          r_850     raw   80.930937       73.746065         7.184872                      0.414324          120163       51972.022219 full_dataset_global_strata
+
+[fixed_ge_25]  top 5 por |standardized_mean_difference|
+      predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+           tcwv     raw   43.889939       36.231641         7.658298                      0.662641          100163       59518.922462 full_dataset_global_strata
+          r_500     raw   54.799847       34.027912        20.771936                      0.624502          100163       59518.922462 full_dataset_global_strata
+delta_r_500_850 derived  -22.533011      -39.800286        17.267276                      0.535207          100163       59518.922462 full_dataset_global_strata
+          t_850     raw  290.385972      288.741385         1.644588                      0.523764          100163       59518.922462 full_dataset_global_strata
+          v_500     raw   -2.869470       -0.131808        -2.737662                     -0.507336          100163       59518.922462 full_dataset_global_strata
+
+[fixed_ge_30]  top 5 por |standardized_mean_difference|
+          predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+              t_850     raw  290.732211      288.744917         1.987294                      0.640184           80163       46212.359569 full_dataset_global_strata
+              t_500     raw  266.755320      265.470285         1.285035                      0.609427           80163       46212.359569 full_dataset_global_strata
+              v_500     raw   -2.149675       -0.142123        -2.007552                     -0.375822           80163       46212.359569 full_dataset_global_strata
+                t2m     raw  297.358545      296.297995         1.060550                      0.291531           80163       46212.359569 full_dataset_global_strata
+delta_t_850_surface derived   -6.626334       -7.553078         0.926744                      0.287682           80163       46212.359569 full_dataset_global_strata
+
+[fixed_ge_35]  top 5 por |standardized_mean_difference|
+          predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+              t_850     raw  290.738839      288.744998         1.993841                      0.642370           60163       44841.679669 full_dataset_global_strata
+              t_500     raw  266.763103      265.470326         1.292777                      0.612795           60163       44841.679669 full_dataset_global_strata
+              v_500     raw   -2.131701       -0.142288        -1.989414                     -0.372511           60163       44841.679669 full_dataset_global_strata
+delta_t_850_surface derived   -6.607643       -7.553093         0.945450                      0.292894           60163       44841.679669 full_dataset_global_strata
+                t2m     raw  297.346482      296.298091         1.048391                      0.287946           60163       44841.679669 full_dataset_global_strata
+
+[fixed_ge_40]  top 5 por |standardized_mean_difference|
+          predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+              t_850     raw  290.958520      288.748778         2.209742                      0.723423           40163       39864.005458 full_dataset_global_strata
+              t_500     raw  266.919825      265.472758         1.447068                      0.684517           40163       39864.005458 full_dataset_global_strata
+      wind_speed_10 derived    1.847518        2.947966        -1.100448                     -0.662704           40163       39864.005458 full_dataset_global_strata
+delta_t_850_surface derived   -6.360821       -7.551489         1.190668                      0.333900           40163       39864.005458 full_dataset_global_strata
+              v_850     raw   -2.583496       -1.406919        -1.176578                     -0.318781           40163       39864.005458 full_dataset_global_strata
+
+[fixed_ge_45]  top 5 por |standardized_mean_difference|
+          predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+              t_500     raw  267.268827      265.473411         1.795416                      0.832523           20163       20008.836651 full_dataset_global_strata
+      wind_speed_10 derived    1.676725        2.947404        -1.270678                     -0.800504           20163       20008.836651 full_dataset_global_strata
+              t_850     raw  290.915678      288.750178         2.165500                      0.715577           20163       20008.836651 full_dataset_global_strata
+delta_t_850_surface derived   -4.996077       -7.551706         2.555629                      0.691804           20163       20008.836651 full_dataset_global_strata
+              r_500     raw   18.624657       34.168983       -15.544326                     -0.565348           20163       20008.836651 full_dataset_global_strata
+
+[fixed_ge_50]  top 5 por |standardized_mean_difference|
+             predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+                 u_500     raw   16.049059        8.032865         8.016194                      1.074374             163              163.0 full_dataset_global_strata
+                 r_850     raw   89.450504       73.850163        15.600341                      1.026022             163              163.0 full_dataset_global_strata
+        wind_speed_500 derived   17.013572       10.805050         6.208522                      0.986381             163              163.0 full_dataset_global_strata
+         wind_speed_10 derived    1.651589        2.946515        -1.294926                     -0.828111             163              163.0 full_dataset_global_strata
+bulk_wind_diff_850_500 derived   14.223154       10.195013         4.028140                      0.721195             163              163.0 full_dataset_global_strata
+
+[global_p90]  top 5 por |standardized_mean_difference|
+      predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+          r_500     raw   64.456564       33.707262        30.749302                      0.962455          140163       53202.287881 full_dataset_global_strata
+           tcwv     raw   45.988169       36.135177         9.852991                      0.916666          140163       53202.287881 full_dataset_global_strata
+delta_r_500_850 derived  -16.507921      -40.037041        23.529119                      0.742560          140163       53202.287881 full_dataset_global_strata
+          v_500     raw   -3.303785       -0.102023        -3.201762                     -0.585291          140163       53202.287881 full_dataset_global_strata
+          r_850     raw   80.964485       73.744303         7.220182                      0.416887          140163       53202.287881 full_dataset_global_strata
+
+[global_p95]  top 5 por |standardized_mean_difference|
+      predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+          r_500     raw   64.456564       33.707262        30.749302                      0.962455          140163       53202.287881 full_dataset_global_strata
+           tcwv     raw   45.988169       36.135177         9.852991                      0.916666          140163       53202.287881 full_dataset_global_strata
+delta_r_500_850 derived  -16.507921      -40.037041        23.529119                      0.742560          140163       53202.287881 full_dataset_global_strata
+          v_500     raw   -3.303785       -0.102023        -3.201762                     -0.585291          140163       53202.287881 full_dataset_global_strata
+          r_850     raw   80.964485       73.744303         7.220182                      0.416887          140163       53202.287881 full_dataset_global_strata
+
+[global_p99]  top 5 por |standardized_mean_difference|
+      predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+          r_500     raw   61.238837       33.892326        27.346511                      0.842561          108559       45443.399833 full_dataset_global_strata
+           tcwv     raw   45.421482       36.189920         9.231562                      0.837333          108559       45443.399833 full_dataset_global_strata
+delta_r_500_850 derived  -18.536544      -39.899686        21.363142                      0.671804          108559       45443.399833 full_dataset_global_strata
+          v_500     raw   -3.192622       -0.119096        -3.073527                     -0.566442          108559       45443.399833 full_dataset_global_strata
+          t_850     raw  290.133879      288.738127         1.395752                      0.439894          108559       45443.399833 full_dataset_global_strata
+
+[positive_p90]  top 5 por |standardized_mean_difference|
+          predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+              t_850     raw  290.953355      288.748733         2.204622                      0.721634           40391       39156.557381 full_dataset_global_strata
+              t_500     raw  266.928728      265.472712         1.456016                      0.688177           40391       39156.557381 full_dataset_global_strata
+      wind_speed_10 derived    1.850153        2.947989        -1.097835                     -0.661093           40391       39156.557381 full_dataset_global_strata
+delta_t_850_surface derived   -6.339789       -7.551545         1.211756                      0.339890           40391       39156.557381 full_dataset_global_strata
+              v_850     raw   -2.586947       -1.406887        -1.180060                     -0.320043           40391       39156.557381 full_dataset_global_strata
+
+[positive_p95]  top 5 por |standardized_mean_difference|
+          predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+              t_500     raw  267.242540      265.473371         1.769169                      0.822639           21235       21067.538049 full_dataset_global_strata
+      wind_speed_10 derived    1.685428        2.947439        -1.262011                     -0.793175           21235       21067.538049 full_dataset_global_strata
+              t_850     raw  290.940759      288.750088         2.190671                      0.723845           21235       21067.538049 full_dataset_global_strata
+delta_t_850_surface derived   -5.148529       -7.551679         2.403150                      0.647861           21235       21067.538049 full_dataset_global_strata
+              r_500     raw   19.755748       34.168671       -14.412922                     -0.516664           21235       21067.538049 full_dataset_global_strata
+
+[positive_p99]  top 5 por |standardized_mean_difference|
+          predictor  source  event_mean  non_event_mean  mean_difference  standardized_mean_difference  n_event_sample  effective_n_event               weight_scope
+delta_t_850_surface derived   -4.401894       -7.550122         3.148228                      0.890544            2014        1859.845954 full_dataset_global_strata
+              t_500     raw  267.388650      265.474543         1.914108                      0.886384            2014        1859.845954 full_dataset_global_strata
+              r_500     raw   13.198778       34.159470       -20.960692                     -0.833651            2014        1859.845954 full_dataset_global_strata
+      wind_speed_10 derived    1.684941        2.946597        -1.261656                     -0.801173            2014        1859.845954 full_dataset_global_strata
+              t_850     raw  290.794713      288.751560         2.043152                      0.668576            2014        1859.845954 full_dataset_global_strata
+
+Resumo máximo por preditor ao longo das definições de evento
+----------------------------------------------------------------------------------------
+             predictor  source     event_id  threshold  event_mean  non_event_mean  standardized_mean_difference  effective_n_event
+                 u_500     raw  fixed_ge_50  50.000000   16.049059        8.032865                      1.074374         163.000000
+                 r_850     raw  fixed_ge_50  50.000000   89.450504       73.850163                      1.026022         163.000000
+        wind_speed_500 derived  fixed_ge_50  50.000000   17.013572       10.805050                      0.986381         163.000000
+                 r_500     raw   global_p90   0.000000   64.456564       33.707262                      0.962455       53202.287881
+                  tcwv     raw   global_p90   0.000000   45.988169       36.135177                      0.916666       53202.287881
+   delta_t_850_surface derived positive_p99  46.781574   -4.401894       -7.550122                      0.890544        1859.845954
+                 t_500     raw positive_p99  46.781574  267.388650      265.474543                      0.886384        1859.845954
+         wind_speed_10 derived  fixed_ge_50  50.000000    1.651589        2.946515                     -0.828111         163.000000
+       delta_r_500_850 derived   global_p90   0.000000  -16.507921      -40.037041                      0.742560       53202.287881
+                 t_850     raw positive_p95  43.163494  290.940759      288.750088                      0.723845       21067.538049
+bulk_wind_diff_850_500 derived  fixed_ge_50  50.000000   14.223154       10.195013                      0.721195         163.000000
+                   v10     raw  fixed_ge_50  50.000000    1.228045        0.052098                      0.705367         163.000000
+                 u_850     raw  fixed_ge_50  50.000000    3.117514        1.074936                      0.644765         163.000000
+                   u10     raw  fixed_ge_50  50.000000    0.164651       -1.046623                      0.601303         163.000000
+                 v_500     raw  fixed_ge_50  50.000000   -2.918997       -0.148967                     -0.593210         163.000000
+                 v_850     raw positive_p99  46.781574   -2.993555       -1.408368                     -0.452236        1859.845954
+                   t2m     raw  fixed_ge_25  25.000000  297.504221      296.294026                      0.346960       59518.922462
+ bulk_wind_diff_10_850 derived  fixed_ge_50  50.000000    5.530443        4.817146                      0.267573         163.000000
+       delta_t_500_850 derived  fixed_ge_40  40.000000  -24.038694      -23.276020                     -0.239755       39864.005458
+        wind_speed_850 derived positive_p95  43.163494    4.399280        4.898368                     -0.177795       21067.538049
+
+Monotonicidade aproximada por decil do preditor
+----------------------------------------------------------------------------------------
+   event_id       predictor  rate_decile_1  rate_decile_last  delta_last_minus_first  weighted               weight_scope
+ global_p95           r_500       0.005776          0.051473                0.045696      True full_dataset_global_strata
+ global_p90           r_500       0.005776          0.051473                0.045696      True full_dataset_global_strata
+fixed_ge_20           r_500       0.005757          0.050813                0.045056      True full_dataset_global_strata
+ global_p95            tcwv       0.006141          0.045057                0.038916      True full_dataset_global_strata
+ global_p90            tcwv       0.006141          0.045057                0.038916      True full_dataset_global_strata
+fixed_ge_20            tcwv       0.006130          0.044431                0.038301      True full_dataset_global_strata
+ global_p95           v_500       0.030295          0.002497               -0.027799      True full_dataset_global_strata
+ global_p90           v_500       0.030295          0.002497               -0.027799      True full_dataset_global_strata
+fixed_ge_20           v_500       0.029915          0.002463               -0.027453      True full_dataset_global_strata
+ global_p95 delta_r_500_850       0.007445          0.034698                0.027253      True full_dataset_global_strata
+ global_p90 delta_r_500_850       0.007445          0.034698                0.027253      True full_dataset_global_strata
+fixed_ge_20 delta_r_500_850       0.007409          0.034258                0.026849      True full_dataset_global_strata
+ global_p99           r_500       0.004742          0.030585                0.025843      True full_dataset_global_strata
+ global_p99            tcwv       0.005410          0.029051                0.023641      True full_dataset_global_strata
+ global_p99           v_500       0.018935          0.001332               -0.017602      True full_dataset_global_strata
+ global_p95             t2m       0.007105          0.022910                0.015805      True full_dataset_global_strata
+ global_p90             t2m       0.007105          0.022910                0.015805      True full_dataset_global_strata
+fixed_ge_20             t2m       0.007039          0.022603                0.015564      True full_dataset_global_strata
+ global_p95           r_850       0.008828          0.023759                0.014931      True full_dataset_global_strata
+ global_p90           r_850       0.008828          0.023759                0.014931      True full_dataset_global_strata
+
+Medianas condicionais — eventos fixos mais intensos
+----------------------------------------------------------------------------------------
+   event_id              predictor      event  non_event  median_difference
+fixed_ge_30        delta_r_500_850 -27.633387 -44.084305          16.450918
+fixed_ge_45                  r_500   5.927834  20.831097         -14.903263
+fixed_ge_30                  r_500  32.874191  20.794460          12.079731
+fixed_ge_45                  r_850  64.372063  76.085999         -11.713936
+fixed_ge_40        delta_r_500_850 -32.400436 -44.025703          11.625267
+fixed_ge_45        delta_r_500_850 -37.123421 -44.019684           6.896263
+fixed_ge_30                   tcwv  42.425430  36.202465           6.222965
+fixed_ge_40                   tcwv  40.329376  36.210373           4.119003
+fixed_ge_30                  r_850  80.172874  76.071838           4.101036
+fixed_ge_45                  u_500  10.860322   7.567414           3.292908
+fixed_ge_40                  r_500  23.867945  20.814535           3.053410
+fixed_ge_45         wind_speed_500  12.252240   9.665989           2.586251
+fixed_ge_40                  r_850  78.483635  76.083473           2.400162
+fixed_ge_30                  u_500   9.719571   7.562874           2.156697
+fixed_ge_45    delta_t_850_surface  -5.557068  -7.645111           2.088043
+fixed_ge_30                  v_500  -2.269469  -0.206773          -2.062696
+fixed_ge_40                  u_500   9.308141   7.567414           1.740727
+fixed_ge_40                  t_850 290.850739 289.138641           1.712097
+fixed_ge_45 bulk_wind_diff_850_500  10.904609   9.232600           1.672009
+fixed_ge_40                  v_500  -1.848967  -0.210233          -1.638734
+
+========================================================================================
+SÍNTESE CRUZADA AUTOMÁTICA — FASES 0 A 4
+========================================================================================
+Esta seção não substitui interpretação científica; ela apenas cruza métricas agregadas produzidas pelos scripts anteriores.
+
+Preditores com evidência em múltiplas métricas da Fase 3
+----------------------------------------------------------------------------------------
+      predictor  source  mean_rank_phase3  pearson_r  spearman_rho  mutual_information_regression  point_biserial_r_positive  spearman_rho_positive
+          r_500     raw          3.714286   0.114308      0.112405                       0.008528                   0.120612              -0.096943
+          t_850     raw          4.571429   0.064628      0.065165                       0.005528                   0.062623               0.199492
+          v_500     raw          4.857143  -0.075059     -0.078016                       0.005074                  -0.076213              -0.056767
+          t_500     raw          5.285714   0.068662      0.075937                       0.005714                   0.068892               0.064269
+delta_r_500_850 derived          5.428571   0.078104      0.081913                       0.004194                   0.081907              -0.058690
+           tcwv     raw          5.857143   0.116105      0.121463                       0.009558                   0.119179               0.001280
+            t2m     raw          6.285714   0.068786      0.062365                       0.003112                   0.065666               0.159503
+          r_850     raw          7.142857   0.062922      0.074018                       0.003300                   0.067327              -0.107658
+
+Preditores mais recorrentes entre os extremos da Fase 4
+----------------------------------------------------------------------------------------
+      predictor  source  mean_abs_smd  median_abs_smd  max_abs_smd  event_definitions
+          t_500     raw      0.571364        0.609427     0.886384                 13
+          t_850     raw      0.556751        0.640184     0.723845                 13
+           tcwv     raw      0.541627        0.596927     0.916666                 13
+          r_500     raw      0.530814        0.565348     0.962455                 13
+  wind_speed_10 derived      0.491546        0.291735     0.828111                 13
+          v_500     raw      0.414964        0.375822     0.593210                 13
+delta_r_500_850 derived      0.387779        0.262610     0.742560                 13
+          r_850     raw      0.358626        0.396517     1.026022                 13
+
+Cruzamento Fase 3 × Fase 4
+----------------------------------------------------------------------------------------
+ATENÇÃO: 'descriptive_cross_phase_score' é apenas um índice exploratório de percentis, não uma medida de importância causal nem critério definitivo de seleção.
+      predictor  source  spearman_rho  mutual_information_regression  point_biserial_r_positive  mean_abs_smd  max_abs_smd  descriptive_cross_phase_score
+           tcwv     raw      0.121463                       0.009558                   0.119179      0.541627     0.916666                         0.9625
+          r_500     raw      0.112405                       0.008528                   0.120612      0.530814     0.962455                         0.9375
+          t_500     raw      0.075937                       0.005714                   0.068892      0.571364     0.886384                         0.8750
+          v_500     raw     -0.078016                       0.005074                  -0.076213      0.414964     0.593210                         0.8125
+delta_r_500_850 derived      0.081913                       0.004194                   0.081907      0.387779     0.742560                         0.8125
+          t_850     raw      0.065165                       0.005528                   0.062623      0.556751     0.723845                         0.7875
+          r_850     raw      0.074018                       0.003300                   0.067327      0.358626     1.026022                         0.7125
+            t2m     raw      0.062365                       0.003112                   0.065666      0.248273     0.346960                         0.6125
+
+========================================================================================
+FIM DA CONSOLIDAÇÃO
+========================================================================================
+Para revisão externa, copie o conteúdo deste relatório textual.
+Evite compartilhar train.zarr, caches, NPZ de amostras ou dados brutos se a política corporativa não permitir.

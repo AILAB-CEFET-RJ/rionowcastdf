@@ -7,7 +7,7 @@
     },
     {
       "code": "temporal_gaps_present",
-      "message": "Dataset contains 28364 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters."
+      "message": "Dataset contains 38052 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters."
     },
     {
       "code": "patch_geometry_uncovered_edges",

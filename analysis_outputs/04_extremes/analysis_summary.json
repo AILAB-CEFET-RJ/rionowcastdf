@@ -1,13 +1,25 @@
 {
-  "phase_version": "phase4-extremes-v1",
-  "sample_source": "phase3_relationship_samples",
-  "observations": 300000,
+  "phase_version": "phase4-extremes-v3-global-stratified-weighted",
+  "sample_source": "full_zarr_global_stratified_reservoir",
+  "pass_a_scope": "all target/mask patches",
+  "pass_a_scan_block_size": 256,
+  "pass_a_blocks_scanned": 3970,
+  "global_patches_scanned": 1016208,
+  "global_valid_pixels_scanned": 1040596992,
+  "exact_global_positive_pixel_count": 15257278,
+  "exact_global_positive_pixel_rate": 0.014662043151475878,
+  "retained_global_stratified_sample_rows": 160163,
+  "stratum_size": 20000,
+  "zero_stratum_size": 20000,
+  "pass_b_input_chunk_size": 256,
+  "pass_b_unique_input_blocks_read": 3960,
+  "pass_b_total_input_blocks": 3970,
+  "pass_b_input_block_fraction_read": 0.9974811083123426,
   "predictor_count": 20,
-  "positive_radar_rate": 0.01525,
   "threshold_count": 13,
-  "degenerate_event_definitions": [
-    "fixed_ge_50"
-  ],
-  "radar_domain": "post-log1p inverse using expm1; numerical radar-legend units, not assumed dBZ",
-  "interpretation_note": "Global P90/P95 can equal zero in a highly sparse target; positive-only quantiles are included to characterize event intensity separately."
+  "phase0_reference_available": true,
+  "max_abs_fixed_threshold_rate_diff_v3_vs_phase0": 0.0024088384064827285,
+  "weighting_method": "global inverse stratum sampling fraction: global_population_count/sample_count",
+  "radar_domain": "expm1(stored_target): post-clip numerical radar-legend values; physical unit not assumed",
+  "interpretation_note": "PASS A scans the full target/mask Zarr. Fixed-threshold event prevalence is exact for the stored patch distribution. Conditional predictor statistics use a globally stratified, inverse-probability-weighted pixel sample. ESS reflects unequal weights only and does not remove spatial/temporal dependence."
 }

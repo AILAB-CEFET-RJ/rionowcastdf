@@ -1,8 +1,8 @@
 {
-  "phase_version": "phase2-derived-v1",
+  "phase_version": "phase2-derived-v2-aligned",
   "dataset_dir": "datasets/corrdiff_2011_2024",
   "dataset_shape": [
-    1132464,
+    1016208,
     12,
     32,
     32
@@ -35,6 +35,9 @@
   "sampling_source": "phase1_sampling_blocks",
   "sampled_blocks": 128,
   "sampled_patches": 32768,
-  "reservoir_values_per_variable": 300000,
+  "aligned_reservoir_rows": 300000,
+  "reservoir_values_requested": 300000,
+  "correlation_alignment_verified": true,
+  "correlation_note": "All derived variables in each correlation row come from the same selected patch/pixel.",
   "note": "Bulk wind differences are vector-wind differences in m/s, not height-normalized shear rates."
 }

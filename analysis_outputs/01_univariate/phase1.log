@@ -17,3 +17,22 @@
 2026-09-14 22:00:11 | INFO |   - sample_mean_shift_vs_phase0: At least one sampled channel mean differs from the Phase 0 exact mean by more than 0.10 standard deviations (max=0.1275).
 2026-09-14 22:00:11 | INFO |   - r_850_outside_0_100: Sampled r_850 contains 1.518050% of values outside [0,100]. Values were measured, not clipped.
 2026-09-14 22:00:11 | INFO |   - r_500_outside_0_100: Sampled r_500 contains 1.075721% of values outside [0,100]. Values were measured, not clipped.
+2026-09-19 14:38:16 | INFO | ========================================================================
+2026-09-19 14:38:17 | INFO | CORRDIFF PHASE 1 - UNIVARIATE ANALYSIS
+2026-09-19 14:38:17 | INFO | Version              : phase1-univariate-v1
+2026-09-19 14:38:17 | INFO | Zarr                 : datasets/corrdiff_2011_2024/train.zarr
+2026-09-19 14:38:17 | INFO | Samples              : 1016208
+2026-09-19 14:38:17 | INFO | Channels             : 12
+2026-09-19 14:38:17 | INFO | Patch                : 32x32
+2026-09-19 14:38:17 | INFO | Sampling block       : 256 patches
+2026-09-19 14:38:17 | INFO | Selected blocks      : 128
+2026-09-19 14:38:17 | INFO | Approx sampled patch : 32768
+2026-09-19 14:38:17 | INFO | Reservoir/channel    : 300000
+2026-09-19 14:38:17 | INFO | ========================================================================
+2026-09-19 14:38:41 | INFO | Phase 1 completed in 25.1 s
+2026-09-19 14:38:41 | INFO | Sampled patches       : 32768
+2026-09-19 14:38:41 | INFO | Output                : analysis_outputs/01_univariate
+2026-09-19 14:38:41 | INFO | Warnings              : 3
+2026-09-19 14:38:41 | INFO |   - sample_mean_shift_vs_phase0: At least one sampled channel mean differs from the Phase 0 exact mean by more than 0.10 standard deviations (max=0.1614).
+2026-09-19 14:38:41 | INFO |   - r_850_outside_0_100: Sampled r_850 contains 1.193976% of values outside [0,100]. Values were measured, not clipped.
+2026-09-19 14:38:41 | INFO |   - r_500_outside_0_100: Sampled r_500 contains 0.491500% of values outside [0,100]. Values were measured, not clipped.

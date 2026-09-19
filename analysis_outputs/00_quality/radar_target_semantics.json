@@ -78,15 +78,15 @@
     "sampled_above_legend_max_count": 0,
     "sampled_min": 0.0,
     "sampled_max": 45.0,
-    "sampled_mean": 0.28898619038478923,
-    "sampled_std": 2.7483163500599743,
+    "sampled_mean": 0.20904508705130545,
+    "sampled_std": 2.3124024648838235,
     "sampled_p01": 0.0,
     "sampled_p05": 0.0,
     "sampled_p25": 0.0,
     "sampled_p50": 0.0,
     "sampled_p75": 0.0,
     "sampled_p95": 0.0,
-    "sampled_p99": 20.0
+    "sampled_p99": 0.0
   },
   "target_mapping_validation": {
     "status": "PASS",

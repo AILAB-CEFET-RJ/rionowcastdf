@@ -1,3 +1,4 @@
-2026-09-15 20:57:40 | INFO | Dataset shape: (1132464, 12, 32, 32)
-2026-09-15 20:57:40 | INFO | Sampling 128 blocks of 256 patches (phase1_sampling_blocks)
-2026-09-15 20:57:45 | INFO | Phase 2 complete: analysis_outputs/02_derived
+2026-09-19 14:56:02 | INFO | Dataset shape: (1016208, 12, 32, 32)
+2026-09-19 14:56:02 | INFO | Sampling 128 blocks of 256 patches (phase1_sampling_blocks)
+2026-09-19 14:57:38 | INFO | Phase 2 v2 complete. Aligned correlation sample: 300000 rows
+2026-09-19 14:57:38 | INFO | Output: analysis_outputs/02_derived
