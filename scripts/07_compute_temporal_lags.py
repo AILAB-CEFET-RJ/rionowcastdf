@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-PHASE_VERSION = 'phase7-temporal-lags-v1-season-hour-adjusted'
+PHASE_VERSION = 'phase7-temporal-lags-v1.1-phase6-compatible'
 RAW = ['tcwv','t2m','u10','v10','t_850','r_850','u_850','v_850','t_500','r_500','u_500','v_500']
 DERIVED = ['wind_speed_10','wind_speed_850','wind_speed_500','delta_t_500_850','delta_t_850_surface','delta_r_500_850','bulk_wind_diff_10_850','bulk_wind_diff_850_500']
 PREDICTORS = RAW + DERIVED
@@ -80,6 +80,13 @@ def load_base(phase6: Path):
         if not p.exists(): raise FileNotFoundError(f'Required Phase 6 output missing: {p}')
     e = pd.read_parquet(ep); p = pd.read_parquet(pp)
     s = json.loads(sp.read_text(encoding='utf-8'))
+
+    # Compatibilidade com a Fase 6 v1: o arquivo timestamp_event_metrics.parquet
+    # grava a fração de pixels positivos como event_pixel_fraction_gt_0.
+    # Internamente a Fase 7 usa o nome canônico positive_pixel_fraction.
+    if 'positive_pixel_fraction' not in e.columns and 'event_pixel_fraction_gt_0' in e.columns:
+        e['positive_pixel_fraction'] = e['event_pixel_fraction_gt_0']
+
     needed_e = ['timestamp_utc','month_local','hour_local','season_code','positive_pixels','positive_pixel_fraction','max_dbz','mean_positive_dbz','event_pixels_ge_20','event_pixels_ge_30','event_pixels_ge_40','event_pixels_ge_45','event_pixel_fraction_ge_30','event_pixel_fraction_ge_40','event_pixel_fraction_ge_45']
     missing = [c for c in needed_e if c not in e.columns]
     if missing: raise RuntimeError(f'Phase 6 event metrics missing: {missing}')
