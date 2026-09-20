@@ -44,6 +44,53 @@ def open_group(path: Path):
         return zarr.open(str(path), mode="r")
 
 
+def zarr_take_first_axis(arr, indices: np.ndarray, tail_selection=None):
+    """
+    Compatibility helper for Zarr v2/v3.
+
+    NumPy-style ``arr[np.ndarray]`` is not supported by Zarr v2 basic
+    indexing. For a list/array of row indices, use orthogonal indexing.
+
+    Parameters
+    ----------
+    arr
+        Zarr array.
+    indices
+        1-D integer indices for the first axis.
+    tail_selection
+        Optional tuple for remaining axes. When omitted, all remaining
+        dimensions are selected with ``slice(None)``.
+
+    Returns
+    -------
+    np.ndarray
+        Materialized selection, preserving the order of ``indices``.
+    """
+    idx = np.asarray(indices, dtype=np.int64)
+    if idx.ndim != 1:
+        raise ValueError("indices must be a 1-D integer array")
+
+    if tail_selection is None:
+        tail_selection = tuple(
+            slice(None) for _ in range(arr.ndim - 1)
+        )
+
+    selection = (idx,) + tuple(tail_selection)
+
+    # Zarr v2 and v3 both expose orthogonal indexing in common releases.
+    if hasattr(arr, "oindex"):
+        return np.asarray(arr.oindex[selection])
+
+    # Fallback for implementations exposing the method directly.
+    if hasattr(arr, "get_orthogonal_selection"):
+        return np.asarray(arr.get_orthogonal_selection(selection))
+
+    raise RuntimeError(
+        "This Zarr implementation does not expose orthogonal indexing "
+        "(oindex/get_orthogonal_selection)."
+    )
+
+
 def set_seed(seed: int) -> None:
     np.random.seed(seed)
     torch.manual_seed(seed)

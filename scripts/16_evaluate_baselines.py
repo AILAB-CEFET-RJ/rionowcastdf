@@ -50,10 +50,11 @@ from phase16_common import (
     gaussian_nll,
     normal_exceedance_probability,
     open_group,
+    zarr_take_first_axis,
 )
 
 
-PHASE_VERSION = "phase16-baselines-v1-frozen-split-deterministic-probabilistic"
+PHASE_VERSION = "phase16-baselines-v1.1-zarr-oindex-frozen-split"
 
 THRESHOLDS = [20.0, 30.0, 40.0, 45.0]
 FSS_SUPPORT_PIXELS = [1, 2, 4, 8]
@@ -751,7 +752,10 @@ def prediction_for_baseline(
     use_amp: bool = False,
 ):
     y = torch.from_numpy(
-        np.asarray(root["target"][idx], dtype=np.float32)
+        np.asarray(
+            zarr_take_first_axis(root["target"], idx),
+            dtype=np.float32,
+        )
     ).to(device)
 
     gaussian = None
@@ -793,11 +797,17 @@ def prediction_for_baseline(
                 "Persistence prediction called on patches without t-1h."
             )
         pred = torch.from_numpy(
-            np.asarray(root["target"][prev], dtype=np.float32)
+            np.asarray(
+                zarr_take_first_axis(root["target"], prev),
+                dtype=np.float32,
+            )
         ).to(device)
 
     elif baseline in LEARNED_MODELS:
-        x = np.asarray(root["input"][idx], dtype=np.float32)
+        x = np.asarray(
+            zarr_take_first_axis(root["input"], idx),
+            dtype=np.float32,
+        )
         x = (
             x
             - norm_mean[None, :, None, None]

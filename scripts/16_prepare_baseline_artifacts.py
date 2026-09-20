@@ -32,7 +32,9 @@ except ImportError as exc:
     raise SystemExit("Fase 16 requer zarr: pip install zarr") from exc
 
 
-PHASE_VERSION = "phase16-baselines-v1-frozen-split-deterministic-probabilistic"
+from phase16_common import zarr_take_first_axis
+
+PHASE_VERSION = "phase16-baselines-v1.1-zarr-oindex-frozen-split"
 
 CHANNELS = [
     "tcwv",
@@ -244,8 +246,18 @@ def main() -> None:
     for start in range(0, len(train_idx), args.chunk_size):
         idx = train_idx[start:start + args.chunk_size]
 
-        x = np.asarray(x_arr[idx], dtype=np.float64)
-        y = np.asarray(y_arr[idx, 0], dtype=np.float64)
+        x = np.asarray(
+            zarr_take_first_axis(x_arr, idx),
+            dtype=np.float64,
+        )
+        y = np.asarray(
+            zarr_take_first_axis(
+                y_arr,
+                idx,
+                tail_selection=(0, slice(None), slice(None)),
+            ),
+            dtype=np.float64,
+        )
 
         sum_x += x.sum(axis=(0, 2, 3))
         sumsq_x += np.square(x).sum(axis=(0, 2, 3))

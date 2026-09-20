@@ -1,6 +1,29 @@
 # CorrDiff - Fase 16: Baselines Formais e Protocolo de Avaliação
 
-Versão: `phase16-baselines-v1-frozen-split-deterministic-probabilistic`
+Versão: `phase16-baselines-v1.1-zarr-oindex-frozen-split`
+
+## Hotfix v1.1 — compatibilidade com Zarr v2
+
+A versão v1.1 substitui seleções em lote no formato NumPy:
+
+```python
+array[idx]
+array[idx, 0]
+```
+
+por **orthogonal indexing** (`oindex`) através de
+`zarr_take_first_axis(...)`.
+
+Isso é necessário em ambientes Zarr v2, onde `__getitem__` com
+`numpy.ndarray` é interpretado como basic indexing e gera:
+
+```text
+IndexError: unsupported selection item for basic indexing
+```
+
+A alteração não muda os índices, splits ou cálculos; apenas a forma de
+materializar batches do Zarr.
+
 
 A Fase 16 é a primeira etapa diretamente orientada a medir o que o CorrDiff
 precisa superar no protocolo temporal congelado da Fase 15.

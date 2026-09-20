@@ -40,7 +40,7 @@ from phase16_common import (
 )
 
 
-PHASE_VERSION = "phase16-baselines-v1-frozen-split-deterministic-probabilistic"
+PHASE_VERSION = "phase16-baselines-v1.1-zarr-oindex-frozen-split"
 
 
 def parse_args() -> argparse.Namespace:
