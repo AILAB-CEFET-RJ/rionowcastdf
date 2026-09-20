@@ -82,6 +82,7 @@ analysis_outputs/08_persistence_baselines/
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import logging
 import math
@@ -92,6 +93,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+import zarr
 
 try:
     from sklearn.linear_model import LogisticRegression, Ridge
@@ -107,7 +109,7 @@ except ImportError as exc:
     ) from exc
 
 
-PHASE_VERSION = "phase8-persistence-baselines-v1-chronological"
+PHASE_VERSION = "phase8-persistence-baselines-v2-continuity-audited"
 
 EVENT_SPECS = {
     "gt_0": ("positive_pixels", 0.0),
@@ -143,6 +145,15 @@ def parse_args() -> argparse.Namespace:
         default=Path("analysis_outputs/08_persistence_baselines"),
     )
     p.add_argument(
+        "--dataset-dir",
+        type=Path,
+        default=Path("datasets/corrdiff_2011_2024"),
+        help=(
+            "Diretório do dataset contendo train.zarr. Usado pela auditoria "
+            "de continuidade target(t) vs target(t-1h)."
+        ),
+    )
+    p.add_argument(
         "--lags",
         default="1,2,3,6",
         help="Lags passados usados no cohort e baselines. Deve conter 1.",
@@ -168,6 +179,17 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=1.0,
         help="Regularização L2 do baseline Ridge temporal.",
+    )
+    p.add_argument(
+        "--audit-batch-timestamps",
+        type=int,
+        default=512,
+        help="Número de timestamps por lote na auditoria de hashes do target.",
+    )
+    p.add_argument(
+        "--skip-target-audit",
+        action="store_true",
+        help="Executa apenas os baselines, sem auditoria direta do train.zarr.",
     )
     p.add_argument(
         "--overwrite",
@@ -678,6 +700,441 @@ def fit_continuous_models(
     return preds, status
 
 
+
+# ---------------------------------------------------------------------------
+# Auditoria de continuidade do radar
+# ---------------------------------------------------------------------------
+
+def _open_zarr_group(path: Path):
+    try:
+        return zarr.open_group(str(path), mode="r")
+    except Exception:
+        return zarr.open(str(path), mode="r")
+
+
+def _infer_datetime_unit(values: np.ndarray) -> str:
+    finite = values[np.isfinite(values)]
+    if finite.size == 0:
+        return "ns"
+    magnitude = float(np.nanmedian(np.abs(finite.astype(np.float64))))
+    if magnitude >= 1e17:
+        return "ns"
+    if magnitude >= 1e14:
+        return "us"
+    if magnitude >= 1e11:
+        return "ms"
+    return "s"
+
+
+def _to_datetime_utc(values: np.ndarray) -> pd.DatetimeIndex:
+    unit = _infer_datetime_unit(values)
+    return pd.DatetimeIndex(pd.to_datetime(values, unit=unit, utc=True))
+
+
+def _hash_target_groups(
+    dataset_dir: Path,
+    batch_timestamps: int,
+    logger: logging.Logger,
+) -> pd.DataFrame:
+    """
+    Gera um hash BLAKE2b-128 para o conjunto ordenado de patches armazenados
+    em cada timestamp. O objetivo é detectar reutilização exata do target.
+
+    O hash é deliberadamente calculado sobre bytes float32 armazenados, sem
+    expm1, arredondamento ou thresholding.
+    """
+    zarr_path = dataset_dir / "train.zarr"
+    if not zarr_path.exists():
+        raise FileNotFoundError(
+            f"train.zarr not found for target audit: {zarr_path}"
+        )
+
+    root = _open_zarr_group(zarr_path)
+    target = root["target"]
+    timestamps = np.asarray(root["timestamps"][:])
+
+    if len(timestamps) != int(target.shape[0]):
+        raise RuntimeError(
+            "target and timestamps have inconsistent first dimension."
+        )
+
+    n_patches = len(timestamps)
+    if n_patches == 0:
+        raise RuntimeError("Empty target dataset.")
+
+    change = np.flatnonzero(timestamps[1:] != timestamps[:-1]) + 1
+    starts = np.r_[0, change]
+    ends = np.r_[change, n_patches]
+    unique_raw = timestamps[starts]
+    unique_utc = _to_datetime_utc(unique_raw)
+
+    if batch_timestamps <= 0:
+        raise ValueError("--audit-batch-timestamps must be > 0.")
+
+    hashes: list[str] = []
+    patch_counts: list[int] = []
+
+    n_groups = len(starts)
+    logger.info("=" * 80)
+    logger.info("PHASE 8 - RADAR TARGET CONTINUITY AUDIT")
+    logger.info("Zarr target patches  : %d", n_patches)
+    logger.info("Unique timestamps    : %d", n_groups)
+    logger.info("Hash                 : BLAKE2b-128 over stored target bytes")
+    logger.info("=" * 80)
+
+    for batch_start in range(0, n_groups, batch_timestamps):
+        batch_end = min(n_groups, batch_start + batch_timestamps)
+        p0 = int(starts[batch_start])
+        p1 = int(ends[batch_end - 1])
+
+        block = np.asarray(
+            target[p0:p1],
+            dtype=np.float32,
+        )
+
+        for gi in range(batch_start, batch_end):
+            local_start = int(starts[gi] - p0)
+            local_end = int(ends[gi] - p0)
+            arr = np.ascontiguousarray(block[local_start:local_end])
+
+            digest = hashlib.blake2b(
+                arr.tobytes(order="C"),
+                digest_size=16,
+            ).hexdigest()
+            hashes.append(digest)
+            patch_counts.append(local_end - local_start)
+
+        if (
+            batch_end == n_groups
+            or batch_end % max(batch_timestamps * 20, 1) == 0
+        ):
+            logger.info(
+                "Target hash audit: %d/%d timestamps",
+                batch_end,
+                n_groups,
+            )
+
+    return pd.DataFrame({
+        "timestamp_utc": unique_utc,
+        "target_hash_blake2b128": hashes,
+        "patch_count": np.asarray(patch_counts, dtype=np.int32),
+    })
+
+
+def _exact_equal(a: pd.Series, b: pd.Series) -> np.ndarray:
+    av = a.to_numpy()
+    bv = b.to_numpy()
+    return (av == bv) | (pd.isna(av) & pd.isna(bv))
+
+
+def _build_continuity_pairs(
+    hashes: pd.DataFrame,
+    base: pd.DataFrame,
+) -> pd.DataFrame:
+    metric_cols = [
+        "positive_pixels",
+        "max_dbz",
+        "positive_pixel_fraction",
+        "event_pixel_fraction_ge_30",
+        "event_pixel_fraction_ge_40",
+        "event_pixel_fraction_ge_45",
+        "event_ge_30",
+        "event_ge_40",
+        "event_ge_45",
+    ]
+
+    current = hashes.merge(
+        base[["timestamp_utc", *metric_cols]],
+        on="timestamp_utc",
+        how="inner",
+        validate="one_to_one",
+    )
+
+    previous = current[
+        ["timestamp_utc", "target_hash_blake2b128", *metric_cols]
+    ].copy()
+    previous["timestamp_utc"] = (
+        previous["timestamp_utc"] + pd.Timedelta(hours=1)
+    )
+    previous = previous.rename(
+        columns={
+            "target_hash_blake2b128": "target_hash_blake2b128_prev",
+            **{c: f"{c}_prev" for c in metric_cols},
+        }
+    )
+
+    pairs = current.merge(
+        previous,
+        on="timestamp_utc",
+        how="inner",
+        validate="one_to_one",
+    ).sort_values("timestamp_utc").reset_index(drop=True)
+
+    pairs["previous_timestamp_utc"] = (
+        pairs["timestamp_utc"] - pd.Timedelta(hours=1)
+    )
+    pairs["year_utc"] = pairs["timestamp_utc"].dt.year.astype(np.int16)
+
+    pairs["exact_target_equal"] = (
+        pairs["target_hash_blake2b128"]
+        == pairs["target_hash_blake2b128_prev"]
+    )
+
+    equal_cols = [
+        "max_dbz",
+        "positive_pixel_fraction",
+        "event_pixel_fraction_ge_30",
+        "event_pixel_fraction_ge_40",
+        "event_pixel_fraction_ge_45",
+    ]
+    for col in equal_cols:
+        pairs[f"exact_{col}_equal"] = _exact_equal(
+            pairs[col],
+            pairs[f"{col}_prev"],
+        )
+
+    pairs["both_dry"] = (
+        (pairs["positive_pixels"] == 0)
+        & (pairs["positive_pixels_prev"] == 0)
+    )
+    pairs["any_wet"] = ~pairs["both_dry"]
+
+    for event_id in ("ge_30", "ge_40", "ge_45"):
+        pairs[f"either_{event_id}"] = (
+            (pairs[f"event_{event_id}"] > 0)
+            | (pairs[f"event_{event_id}_prev"] > 0)
+        )
+
+    return pairs
+
+
+def _audit_condition_rows(
+    pairs: pd.DataFrame,
+    year: int | None = None,
+) -> list[dict[str, Any]]:
+    if year is not None:
+        frame = pairs[pairs["year_utc"] == year]
+    else:
+        frame = pairs
+
+    conditions = {
+        "all": np.ones(len(frame), dtype=bool),
+        "both_dry": frame["both_dry"].to_numpy(dtype=bool),
+        "any_wet": frame["any_wet"].to_numpy(dtype=bool),
+        "either_ge_30": frame["either_ge_30"].to_numpy(dtype=bool),
+        "either_ge_40": frame["either_ge_40"].to_numpy(dtype=bool),
+        "either_ge_45": frame["either_ge_45"].to_numpy(dtype=bool),
+    }
+
+    equality_cols = [
+        "exact_target_equal",
+        "exact_max_dbz_equal",
+        "exact_positive_pixel_fraction_equal",
+        "exact_event_pixel_fraction_ge_30_equal",
+        "exact_event_pixel_fraction_ge_40_equal",
+        "exact_event_pixel_fraction_ge_45_equal",
+    ]
+
+    rows: list[dict[str, Any]] = []
+    for condition, mask in conditions.items():
+        g = frame.loc[mask]
+        row: dict[str, Any] = {
+            "year_utc": "ALL" if year is None else str(year),
+            "condition": condition,
+            "n_pairs": int(len(g)),
+        }
+        for col in equality_cols:
+            row[f"{col}_ratio"] = (
+                float(g[col].mean()) if len(g) else np.nan
+            )
+        rows.append(row)
+    return rows
+
+
+def _identical_hash_runs(
+    hashes: pd.DataFrame,
+    base: pd.DataFrame,
+) -> pd.DataFrame:
+    frame = hashes.merge(
+        base[["timestamp_utc", "positive_pixels"]],
+        on="timestamp_utc",
+        how="inner",
+        validate="one_to_one",
+    ).sort_values("timestamp_utc").reset_index(drop=True)
+
+    if frame.empty:
+        return pd.DataFrame()
+
+    runs: list[dict[str, Any]] = []
+    start_idx = 0
+
+    def close_run(end_idx: int) -> None:
+        nonlocal start_idx
+        length = end_idx - start_idx + 1
+        if length < 2:
+            return
+        start_row = frame.iloc[start_idx]
+        end_row = frame.iloc[end_idx]
+        runs.append({
+            "start_timestamp_utc": start_row["timestamp_utc"],
+            "end_timestamp_utc": end_row["timestamp_utc"],
+            "length_timestamps": int(length),
+            "duration_hours": int(length - 1),
+            "target_hash_blake2b128": start_row[
+                "target_hash_blake2b128"
+            ],
+            "dry_target": bool(start_row["positive_pixels"] == 0),
+            "start_year_utc": int(start_row["timestamp_utc"].year),
+        })
+
+    for i in range(1, len(frame)):
+        prev = frame.iloc[i - 1]
+        cur = frame.iloc[i]
+        contiguous = (
+            cur["timestamp_utc"] - prev["timestamp_utc"]
+            == pd.Timedelta(hours=1)
+        )
+        same_hash = (
+            cur["target_hash_blake2b128"]
+            == prev["target_hash_blake2b128"]
+        )
+
+        if not (contiguous and same_hash):
+            close_run(i - 1)
+            start_idx = i
+
+    close_run(len(frame) - 1)
+    return pd.DataFrame(runs)
+
+
+def run_target_continuity_audit(
+    dataset_dir: Path,
+    output_dir: Path,
+    base: pd.DataFrame,
+    batch_timestamps: int,
+    logger: logging.Logger,
+) -> dict[str, Any]:
+    hashes = _hash_target_groups(
+        dataset_dir,
+        batch_timestamps,
+        logger,
+    )
+
+    pairs = _build_continuity_pairs(hashes, base)
+    runs = _identical_hash_runs(hashes, base)
+
+    overall_rows = _audit_condition_rows(pairs, year=None)
+    years = sorted(int(y) for y in pairs["year_utc"].unique())
+    yearly_rows: list[dict[str, Any]] = []
+    for year in years:
+        yearly_rows.extend(
+            _audit_condition_rows(pairs, year=year)
+        )
+
+    overall = pd.DataFrame(overall_rows)
+    yearly = pd.DataFrame(yearly_rows)
+
+    hashes.to_parquet(
+        output_dir / "radar_timestamp_hashes.parquet",
+        index=False,
+    )
+    pairs.to_parquet(
+        output_dir / "radar_continuity_pair_audit.parquet",
+        index=False,
+    )
+    overall.to_parquet(
+        output_dir / "radar_continuity_summary.parquet",
+        index=False,
+    )
+    yearly.to_parquet(
+        output_dir / "radar_continuity_by_year.parquet",
+        index=False,
+    )
+    runs.to_parquet(
+        output_dir / "radar_identical_target_runs.parquet",
+        index=False,
+    )
+
+    def ratio(condition: str, col: str) -> float | None:
+        t = overall[overall["condition"] == condition]
+        if t.empty:
+            return None
+        value = t.iloc[0][col]
+        return None if pd.isna(value) else float(value)
+
+    wet_runs = (
+        runs[~runs["dry_target"]]
+        if not runs.empty
+        else runs
+    )
+    dry_runs = (
+        runs[runs["dry_target"]]
+        if not runs.empty
+        else runs
+    )
+
+    summary = {
+        "audit_version": "target-continuity-v1",
+        "dataset_dir": str(dataset_dir),
+        "hash_algorithm": "BLAKE2b-128",
+        "hash_domain": (
+            "exact stored float32 target bytes, ordered patches per timestamp"
+        ),
+        "timestamps_hashed": int(len(hashes)),
+        "exact_1h_pairs": int(len(pairs)),
+        "patch_count_min": int(hashes["patch_count"].min()),
+        "patch_count_median": float(hashes["patch_count"].median()),
+        "patch_count_max": int(hashes["patch_count"].max()),
+        "exact_target_equal_ratio_all": ratio(
+            "all", "exact_target_equal_ratio"
+        ),
+        "exact_target_equal_ratio_any_wet": ratio(
+            "any_wet", "exact_target_equal_ratio"
+        ),
+        "exact_target_equal_ratio_either_ge_30": ratio(
+            "either_ge_30", "exact_target_equal_ratio"
+        ),
+        "exact_target_equal_ratio_either_ge_40": ratio(
+            "either_ge_40", "exact_target_equal_ratio"
+        ),
+        "exact_target_equal_ratio_either_ge_45": ratio(
+            "either_ge_45", "exact_target_equal_ratio"
+        ),
+        "max_identical_run_timestamps_all": (
+            int(runs["length_timestamps"].max())
+            if not runs.empty else 1
+        ),
+        "max_identical_run_timestamps_wet": (
+            int(wet_runs["length_timestamps"].max())
+            if not wet_runs.empty else 1
+        ),
+        "max_identical_run_timestamps_dry": (
+            int(dry_runs["length_timestamps"].max())
+            if not dry_runs.empty else 1
+        ),
+        "notes": [
+            (
+                "Exact equality among both-dry timestamps is expected and "
+                "must not be interpreted as evidence of duplicated radar."
+            ),
+            (
+                "The main audit statistic is exact target equality for "
+                "any_wet and high-dBZ pair conditions."
+            ),
+            (
+                "Equal aggregate fractions alone do not prove identical "
+                "spatial fields; target hashes test exact stored arrays."
+            ),
+            (
+                "The ordered-patch hash assumes the builder preserves a "
+                "stable patch ordering within timestamps. Aggregate equality "
+                "metrics are order-independent."
+            ),
+        ],
+    }
+    return summary
+
+
 def main() -> None:
     args = parse_args()
     lags = parse_lags(args.lags)
@@ -960,6 +1417,22 @@ def main() -> None:
     )
 
     # ------------------------------------------------------------------
+    # Direct target-continuity audit
+    # ------------------------------------------------------------------
+    target_audit_summary: dict[str, Any] | None = None
+
+    if args.skip_target_audit:
+        logger.info("Target continuity audit skipped by --skip-target-audit.")
+    else:
+        target_audit_summary = run_target_continuity_audit(
+            dataset_dir=args.dataset_dir,
+            output_dir=args.output_dir,
+            base=base,
+            batch_timestamps=args.audit_batch_timestamps,
+            logger=logger,
+        )
+
+    # ------------------------------------------------------------------
     # Summary
     # ------------------------------------------------------------------
     warnings: list[str] = []
@@ -975,6 +1448,19 @@ def main() -> None:
             "Common-lag cohort retains <70% of Phase 6 available timestamps. "
             "Results describe periods with all configured lags available."
         )
+
+    if target_audit_summary is not None:
+        wet_equal = target_audit_summary.get(
+            "exact_target_equal_ratio_any_wet"
+        )
+        if wet_equal is not None and wet_equal > 0.05:
+            warnings.append(
+                "More than 5% of exact 1h pairs with any radar echo have "
+                "byte-identical stored targets. Inspect "
+                "radar_continuity_by_year.parquet and "
+                "radar_identical_target_runs.parquet before interpreting "
+                "near-perfect persistence as physical."
+            )
 
     test_binary = binary_df[binary_df["split"] == "test"].copy()
     best_binary = []
@@ -1045,6 +1531,7 @@ def main() -> None:
         },
         "binary_reference_baseline": "climatology_month_hour",
         "continuous_reference_baseline": "climatology_month_hour",
+        "target_continuity_audit": target_audit_summary,
         "best_test_binary_by_brier": best_binary,
         "best_test_continuous_by_rmse": best_continuous,
         "warnings": warnings,
@@ -1073,6 +1560,12 @@ def main() -> None:
             (
                 "Pixel fractions still represent the overlapping-patch "
                 "training distribution rather than a de-duplicated radar field."
+            ),
+            (
+                "When target continuity audit is enabled, exact BLAKE2b hashes "
+                "of stored target arrays are compared between t and t-1h; "
+                "all-dry identical targets are expected and are reported "
+                "separately from wet/high-dBZ pairs."
             ),
         ],
     }

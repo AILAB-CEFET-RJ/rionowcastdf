@@ -69,6 +69,26 @@ def main():
         d / "model_status.parquet"
     )
 
+    audit_summary_path = d / "radar_continuity_summary.parquet"
+    audit_year_path = d / "radar_continuity_by_year.parquet"
+    audit_runs_path = d / "radar_identical_target_runs.parquet"
+
+    audit_summary = (
+        pd.read_parquet(audit_summary_path)
+        if audit_summary_path.exists()
+        else None
+    )
+    audit_year = (
+        pd.read_parquet(audit_year_path)
+        if audit_year_path.exists()
+        else None
+    )
+    audit_runs = (
+        pd.read_parquet(audit_runs_path)
+        if audit_runs_path.exists()
+        else None
+    )
+
     lines = []
     add = lines.append
 
@@ -198,6 +218,72 @@ def main():
     ]]
     add(cond.to_string(index=False))
     add("")
+
+    if audit_summary is not None:
+        add("AUDITORIA DE CONTINUIDADE DO TARGET - t vs t-1h")
+        add("-" * 112)
+        cols = [
+            "year_utc",
+            "condition",
+            "n_pairs",
+            "exact_target_equal_ratio",
+            "exact_max_dbz_equal_ratio",
+            "exact_positive_pixel_fraction_equal_ratio",
+            "exact_event_pixel_fraction_ge_30_equal_ratio",
+            "exact_event_pixel_fraction_ge_40_equal_ratio",
+            "exact_event_pixel_fraction_ge_45_equal_ratio",
+        ]
+        add(audit_summary[cols].to_string(index=False))
+        add("")
+
+        if audit_year is not None:
+            add("AUDITORIA DE CONTINUIDADE POR ANO - CONDIÇÕES-CHAVE")
+            add("-" * 112)
+            t = audit_year[
+                audit_year["condition"].isin(
+                    ["any_wet", "either_ge_30", "either_ge_40", "either_ge_45"]
+                )
+            ][cols]
+            add(t.to_string(index=False))
+            add("")
+
+        if audit_runs is not None:
+            add("RUNS DE TARGETS EXATAMENTE IDÊNTICOS")
+            add("-" * 112)
+            if audit_runs.empty:
+                add("Nenhum run consecutivo de target exatamente idêntico com >=2 timestamps.")
+            else:
+                wet = audit_runs[~audit_runs["dry_target"]]
+                dry = audit_runs[audit_runs["dry_target"]]
+                add(
+                    f"Runs totais: {len(audit_runs)} | "
+                    f"wet: {len(wet)} | dry: {len(dry)}"
+                )
+                add(
+                    "Maior run wet: "
+                    f"{int(wet['length_timestamps'].max()) if len(wet) else 1} timestamps"
+                )
+                add(
+                    "Maior run dry: "
+                    f"{int(dry['length_timestamps'].max()) if len(dry) else 1} timestamps"
+                )
+                add("")
+                if len(wet):
+                    add("TOP RUNS WET:")
+                    top = wet.nlargest(
+                        20,
+                        "length_timestamps",
+                    )[
+                        [
+                            "start_timestamp_utc",
+                            "end_timestamp_utc",
+                            "length_timestamps",
+                            "duration_hours",
+                            "start_year_utc",
+                        ]
+                    ]
+                    add(top.to_string(index=False))
+            add("")
 
     add("MENOR BRIER NO TESTE POR EVENTO")
     add("-" * 112)
