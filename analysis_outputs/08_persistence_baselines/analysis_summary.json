@@ -1,0 +1,147 @@
+{
+  "phase_version": "phase8-persistence-baselines-v2-continuity-audited",
+  "source_phase6_version": "phase6-diurnal-v1-availability-conditioned-season-standardized",
+  "source_phase6_dir": "analysis_outputs/06_diurnal",
+  "radar_unit": "dBZ",
+  "lags_hours": [
+    1,
+    2,
+    3,
+    6
+  ],
+  "decay_tau_hours": 3.0,
+  "decay_weights": {
+    "1": 0.4134240385356247,
+    "2": 0.2962312681546399,
+    "3": 0.21225897880377975,
+    "6": 0.07808571450595551
+  },
+  "provisional_split": {
+    "train_end_utc": "2019-12-31 23:00:00+00:00",
+    "validation_end_utc": "2021-12-31 23:00:00+00:00",
+    "test_start_utc": "2022-01-01 00:00:00+00:00",
+    "note": "Phase 8 split is provisional for baseline evaluation; formal split design is deferred to Phase 15."
+  },
+  "source_available_timestamps": 84684,
+  "common_lag_cohort_timestamps": 49466,
+  "common_lag_cohort_retention": 0.5841245099428464,
+  "cohort_counts": {
+    "train": 32820,
+    "val": 7665,
+    "test": 8981
+  },
+  "binary_reference_baseline": "climatology_month_hour",
+  "continuous_reference_baseline": "climatology_month_hour",
+  "target_continuity_audit": {
+    "audit_version": "target-continuity-v1",
+    "dataset_dir": "datasets/corrdiff_2011_2024",
+    "hash_algorithm": "BLAKE2b-128",
+    "hash_domain": "exact stored float32 target bytes, ordered patches per timestamp",
+    "timestamps_hashed": 84684,
+    "exact_1h_pairs": 73977,
+    "patch_count_min": 12,
+    "patch_count_median": 12.0,
+    "patch_count_max": 12,
+    "exact_target_equal_ratio_all": 0.3364288900604242,
+    "exact_target_equal_ratio_any_wet": 0.002438578308845943,
+    "exact_target_equal_ratio_either_ge_30": 0.001484396575531621,
+    "exact_target_equal_ratio_either_ge_40": 0.002414209346439041,
+    "exact_target_equal_ratio_either_ge_45": 0.0048811013767209015,
+    "max_identical_run_timestamps_all": 34,
+    "max_identical_run_timestamps_wet": 10,
+    "max_identical_run_timestamps_dry": 34,
+    "notes": [
+      "Exact equality among both-dry timestamps is expected and must not be interpreted as evidence of duplicated radar.",
+      "The main audit statistic is exact target equality for any_wet and high-dBZ pair conditions.",
+      "Equal aggregate fractions alone do not prove identical spatial fields; target hashes test exact stored arrays.",
+      "The ordered-patch hash assumes the builder preserves a stable patch ordering within timestamps. Aggregate equality metrics are order-independent."
+    ]
+  },
+  "best_test_binary_by_brier": [
+    {
+      "event_id": "ge_20",
+      "baseline_lowest_test_brier": "logistic_temporal",
+      "test_brier": 0.11962026958594156,
+      "brier_skill_vs_climatology": 0.5199678136945884,
+      "average_precision": 0.9421246143839016
+    },
+    {
+      "event_id": "ge_30",
+      "baseline_lowest_test_brier": "logistic_temporal",
+      "test_brier": 0.11227807104698194,
+      "brier_skill_vs_climatology": 0.4462468073943434,
+      "average_precision": 0.8462511285235148
+    },
+    {
+      "event_id": "ge_40",
+      "baseline_lowest_test_brier": "logistic_temporal",
+      "test_brier": 0.075028545163708,
+      "brier_skill_vs_climatology": 0.3982013023822478,
+      "average_precision": 0.7285585629020341
+    },
+    {
+      "event_id": "ge_45",
+      "baseline_lowest_test_brier": "logistic_temporal",
+      "test_brier": 0.04399273880589634,
+      "brier_skill_vs_climatology": 0.2832338960962957,
+      "average_precision": 0.5449471480481702
+    },
+    {
+      "event_id": "gt_0",
+      "baseline_lowest_test_brier": "logistic_temporal",
+      "test_brier": 0.11910233837451478,
+      "brier_skill_vs_climatology": 0.5202520128129755,
+      "average_precision": 0.9420436192940219
+    }
+  ],
+  "best_test_continuous_by_rmse": [
+    {
+      "metric": "event_pixel_fraction_ge_30",
+      "baseline_lowest_test_rmse": "persistence_1h",
+      "test_rmse": 0.0066958206136690755,
+      "rmse_skill_vs_climatology": 0.8732809175220564,
+      "test_mae": 0.0020474357903722674
+    },
+    {
+      "metric": "event_pixel_fraction_ge_40",
+      "baseline_lowest_test_rmse": "persistence_1h",
+      "test_rmse": 0.0016419339468398306,
+      "rmse_skill_vs_climatology": 0.9293727298045119,
+      "test_mae": 0.00037467879238113795
+    },
+    {
+      "metric": "event_pixel_fraction_ge_45",
+      "baseline_lowest_test_rmse": "persistence_1h",
+      "test_rmse": 0.0006382077236336025,
+      "rmse_skill_vs_climatology": 0.9666964893084617,
+      "test_mae": 7.356024176038304e-05
+    },
+    {
+      "metric": "max_dbz",
+      "baseline_lowest_test_rmse": "ridge_temporal",
+      "test_rmse": 9.904828131095382,
+      "rmse_skill_vs_climatology": 0.3541595685564043,
+      "test_mae": 7.198620129776185
+    },
+    {
+      "metric": "positive_pixel_fraction",
+      "baseline_lowest_test_rmse": "ridge_temporal",
+      "test_rmse": 0.01816690293677181,
+      "rmse_skill_vs_climatology": 0.7240882356812484,
+      "test_mae": 0.008392764321956262
+    }
+  ],
+  "warnings": [
+    "Phase 6 reported coverage warnings; Phase 8 inherits non-random availability risk.",
+    "Common-lag cohort retains <70% of Phase 6 available timestamps. Results describe periods with all configured lags available."
+  ],
+  "methodological_notes": [
+    "All configured lags must exist exactly in UTC for a target timestamp to enter the common evaluation cohort.",
+    "Climatology, logistic regression and ridge regression are fit using training rows only.",
+    "Past radar observations are allowed as predictors because they are assumed operationally known before target time t.",
+    "Brier Skill Score and continuous skill scores use the training-only month x local-hour climatology as reference.",
+    "Rare-event evaluation should prioritize Brier score, average precision, calibration and conditional metrics; global RMSE/MAE can be dominated by dry timestamps.",
+    "Pixel fractions still represent the overlapping-patch training distribution rather than a de-duplicated radar field.",
+    "When target continuity audit is enabled, exact BLAKE2b hashes of stored target arrays are compared between t and t-1h; all-dry identical targets are expected and are reported separately from wet/high-dBZ pairs."
+  ]
+}

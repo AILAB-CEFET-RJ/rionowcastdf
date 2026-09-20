@@ -1,0 +1,90 @@
+{
+  "phase_version": "phase10-spatial-era5-radar-v1-aligned-centered-offset",
+  "dataset_dir": "datasets/corrdiff_2011_2024",
+  "input_shape": [
+    1016208,
+    12,
+    32,
+    32
+  ],
+  "target_shape": [
+    1016208,
+    1,
+    32,
+    32
+  ],
+  "patch_shape": [
+    32,
+    32
+  ],
+  "total_patches": 1016208,
+  "sampled_patches": 16273,
+  "sample_ratio": 0.01601345393856376,
+  "sample_per_stratum": 3000,
+  "seed": 42,
+  "raw_channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "derived_channels": [
+    "wind_speed_10",
+    "wind_speed_850",
+    "wind_speed_500",
+    "delta_t_500_850",
+    "delta_t_850_surface",
+    "delta_r_500_850",
+    "bulk_wind_diff_10_850",
+    "bulk_wind_diff_850_500"
+  ],
+  "channel_name_source": "cli",
+  "radar_fields": [
+    "target_log1p",
+    "gt_0",
+    "ge_20",
+    "ge_30",
+    "ge_40",
+    "ge_45"
+  ],
+  "smoothing_windows_pixels": [
+    1,
+    3,
+    5,
+    9,
+    17
+  ],
+  "offset_steps_pixels": [
+    2,
+    4,
+    8
+  ],
+  "radar_resolution_km": 2.0,
+  "local_timezone": "America/Sao_Paulo",
+  "radar_unit": "dBZ",
+  "stored_target": "log1p(clip(dBZ, min=0)) float32",
+  "scope": "aligned overlapping 32x32 training-patch distribution; not de-duplicated full-field radar climatology",
+  "association_modes": {
+    "raw": "pixelwise predictor-radar association across the weighted sample; may include season/time/regime differences",
+    "within_patch_centered": "predictor and radar values de-meaned independently within each patch before correlation; emphasizes local spatial co-location and removes patch-level mean differences"
+  },
+  "warnings": [
+    "The aligned input/target analysis uses a stratified patch sample containing <5% of all patches. Inverse stratum weights are used."
+  ],
+  "methodological_notes": [
+    "ERA5 fields have been spatially mapped to the CorrDiff grid. Fine-grid values must not be interpreted as independent meteorological observations below ERA5 native effective resolution.",
+    "Smoothing-window associations are a screening analysis of local context. Formal scale decomposition is deferred to Phase 11.",
+    "Within-patch event contrasts compare predictor means in event pixels against non-event pixels of the same patch, reducing large-scale background and seasonal confounding but not establishing causality.",
+    "Cross-offset associations use predictor(x) versus radar(x+delta). A stronger displaced association can reflect spatial organization, interpolation, advection, or patch geometry and must not be read as causal displacement.",
+    "Overlapping patches duplicate physical pixels and pixel pairs. Weighted observation mass is not an independent sample size.",
+    "bulk_wind_diff variables are vector wind differences in m/s, not height-normalized vertical shear."
+  ]
+}

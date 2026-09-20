@@ -1,0 +1,101 @@
+{
+  "phase_version": "phase9-radar-spatial-structure-v1-patch-distribution",
+  "dataset_dir": "datasets/corrdiff_2011_2024",
+  "target_shape": [
+    1016208,
+    1,
+    32,
+    32
+  ],
+  "patch_shape": [
+    32,
+    32
+  ],
+  "total_patches": 1016208,
+  "sampled_patches": 26273,
+  "sample_ratio": 0.025853959032009197,
+  "sample_per_stratum": 5000,
+  "seed": 42,
+  "radar_resolution_km": 2.0,
+  "spatial_steps_pixels": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "directions": {
+    "EW": [
+      0,
+      1
+    ],
+    "NS": [
+      1,
+      0
+    ],
+    "NW_SE": [
+      1,
+      1
+    ],
+    "NE_SW": [
+      1,
+      -1
+    ]
+  },
+  "local_timezone": "America/Sao_Paulo",
+  "radar_unit": "dBZ",
+  "stored_target": "log1p(clip(dBZ, min=0)) float32",
+  "threshold_rule": "thresholds are applied directly in stored float32 log1p domain",
+  "stratification": {
+    "0": {
+      "name": "dry",
+      "patch_count": 712492,
+      "patch_ratio": 0.7011281155039126
+    },
+    "1": {
+      "name": "gt0_lt20",
+      "patch_count": 1273,
+      "patch_ratio": 0.001252696298395604
+    },
+    "2": {
+      "name": "ge20_lt30",
+      "patch_count": 139042,
+      "patch_ratio": 0.13682435092028403
+    },
+    "3": {
+      "name": "ge30_lt40",
+      "patch_count": 86131,
+      "patch_ratio": 0.0847572544203549
+    },
+    "4": {
+      "name": "ge40_lt45",
+      "patch_count": 48650,
+      "patch_ratio": 0.047874057279612046
+    },
+    "5": {
+      "name": "ge45",
+      "patch_count": 28620,
+      "patch_ratio": 0.02816352557744084
+    }
+  },
+  "exact_patch_any_event_rates": {
+    "gt_0": 0.2988718844960874,
+    "ge_20": 0.2976191881976918,
+    "ge_30": 0.1607948372774078,
+    "ge_40": 0.0760375828570529,
+    "ge_45": 0.02816352557744084
+  },
+  "scope": "overlapping 32x32 training-patch spatial distribution; not de-duplicated full-field radar climatology",
+  "component_connectivity": "4-neighbor",
+  "warnings": [
+    "At least one intense-event threshold has >50% patch-border contact among event patches. Connected-component morphology is therefore strongly affected by patch truncation.",
+    "Spatial/morphology statistics use a stratified sample containing <5% of all patches; inverse stratum weights are used for global summaries."
+  ],
+  "methodological_notes": [
+    "Spatial correlations and semivariograms are computed within stored patches only; no cross-patch reconstruction is used.",
+    "Inverse stratum-sampling weights recover patch-distribution summaries, but spatial pairs can still be duplicated because the original patches overlap.",
+    "Connected components touching patch borders may continue outside the patch; component count and size are therefore patch-truncated diagnostics.",
+    "The continuous spatial variogram is calculated on the stored log1p target, not directly on linear dBZ.",
+    "Binary spatial semivariance equals half the mismatch probability between pixels at the specified displacement."
+  ]
+}

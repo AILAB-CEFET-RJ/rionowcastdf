@@ -1,0 +1,142 @@
+{
+  "phase_version": "phase6-diurnal-v1-availability-conditioned-season-standardized",
+  "dataset_patches": 1016208,
+  "available_unique_timestamps": 84684,
+  "expected_timestamps": 122736,
+  "temporal_coverage_ratio": 0.6899687133359406,
+  "period_start_utc": "2011-01-01 00:00:00+00:00",
+  "period_end_utc": "2024-12-31 23:00:00+00:00",
+  "time_frequency": "1h",
+  "local_timezone": "America/Sao_Paulo",
+  "observed_utc_offset_hours_counts": {
+    "-3.0": 65130,
+    "-2.0": 19554
+  },
+  "fixed_thresholds_dbz": [
+    20,
+    25,
+    30,
+    35,
+    40,
+    45
+  ],
+  "fixed_threshold_comparison_domain": "stored_log1p_float32",
+  "radar_target_semantics": "dBZ clipped at zero by builder, then stored as log1p; continuous diagnostics use expm1(stored_target)",
+  "negative_dbz_preserved": false,
+  "season_standardization": "equal-weight DJF/MAM/JJA/SON using complete season-years only",
+  "predictor_diurnal_cycle_computed": true,
+  "raw_local_peak_trough_timestamp_event": [
+    {
+      "event_id": "gt_0",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 13,
+      "peak_value": 0.7023846392071849,
+      "trough_hour": 1,
+      "trough_value": 0.4892315873437915,
+      "absolute_amplitude": 0.21315305186339334,
+      "peak_to_trough_ratio": 1.435689471770773
+    },
+    {
+      "event_id": "ge_20",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 13,
+      "peak_value": 0.6999070919789409,
+      "trough_hour": 1,
+      "trough_value": 0.48657272002127094,
+      "absolute_amplitude": 0.2133343719576699,
+      "peak_to_trough_ratio": 1.4384429360288506
+    },
+    {
+      "event_id": "ge_30",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 14,
+      "peak_value": 0.5104166666666666,
+      "trough_hour": 4,
+      "trough_value": 0.22136775611095852,
+      "absolute_amplitude": 0.28904891055570814,
+      "peak_to_trough_ratio": 2.3057407981803144
+    },
+    {
+      "event_id": "ge_40",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 14,
+      "peak_value": 0.37224264705882354,
+      "trough_hour": 6,
+      "trough_value": 0.08819951338199514,
+      "absolute_amplitude": 0.28404313367682843,
+      "peak_to_trough_ratio": 4.220461460446248
+    },
+    {
+      "event_id": "ge_45",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 13,
+      "peak_value": 0.23381851966553113,
+      "trough_hour": 7,
+      "trough_value": 0.01747269890795632,
+      "absolute_amplitude": 0.2163458207575748,
+      "peak_to_trough_ratio": 13.381934920143344
+    }
+  ],
+  "season_standardized_local_peak_trough_timestamp_event": [
+    {
+      "event_id": "gt_0",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 13,
+      "peak_value": 0.6876031686526352,
+      "trough_hour": 2,
+      "trough_value": 0.4843325105664019,
+      "absolute_amplitude": 0.20327065808623324,
+      "peak_to_trough_ratio": 1.4196923676432927
+    },
+    {
+      "event_id": "ge_20",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 13,
+      "peak_value": 0.6851755716117961,
+      "trough_hour": 2,
+      "trough_value": 0.4818418912124425,
+      "absolute_amplitude": 0.20333368039935362,
+      "peak_to_trough_ratio": 1.4219925334588737
+    },
+    {
+      "event_id": "ge_30",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 14,
+      "peak_value": 0.49142306820225296,
+      "trough_hour": 6,
+      "trough_value": 0.2165749679360039,
+      "absolute_amplitude": 0.27484810026624906,
+      "peak_to_trough_ratio": 2.269066794217254
+    },
+    {
+      "event_id": "ge_40",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 14,
+      "peak_value": 0.35534531077310405,
+      "trough_hour": 6,
+      "trough_value": 0.08689031233792781,
+      "absolute_amplitude": 0.26845499843517623,
+      "peak_to_trough_ratio": 4.08958491702872
+    },
+    {
+      "event_id": "ge_45",
+      "metric": "timestamp_any_event_rate",
+      "peak_hour": 13,
+      "peak_value": 0.2217416634970819,
+      "trough_hour": 7,
+      "trough_value": 0.016801449212341932,
+      "absolute_amplitude": 0.20494021428473996,
+      "peak_to_trough_ratio": 13.197770067012787
+    }
+  ],
+  "warnings": [
+    "At least one year-local-hour cell has <25% coverage; inspect year_hour_coverage_local.parquet before interpreting individual years."
+  ],
+  "methodological_notes": [
+    "Primary occurrence metric: P(event | available timestamp, hour).",
+    "Season-standardized local profile helps separate diurnal structure from unequal seasonal composition.",
+    "America/Sao_Paulo historical timezone rules handle past DST transitions.",
+    "Pixel rates describe the stored overlapping-patch distribution, not a de-duplicated radar field climatology.",
+    "mean_event_pixel_fraction_given_event_timestamp separates spatial extent from occurrence frequency."
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "phase_version": "phase13-meteorological-regimes-v1-pca-kmeans-dualspace",
+  "phase6_dir": "analysis_outputs/06_diurnal",
+  "n_aligned_timestamps": 84684,
+  "reference_n_regimes": 5,
+  "candidate_k": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "pca_variance_threshold": 0.9,
+  "pca_components_by_space": {
+    "absolute": 7,
+    "anomaly_month_hour": 7
+  },
+  "regime_spaces": [
+    "absolute",
+    "anomaly_month_hour"
+  ],
+  "clustering_features": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "profile_predictors": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500",
+    "wind_speed_10",
+    "wind_speed_850",
+    "wind_speed_500",
+    "delta_t_500_850",
+    "delta_t_850_surface",
+    "delta_r_500_850",
+    "bulk_wind_diff_10_850",
+    "bulk_wind_diff_850_500"
+  ],
+  "events": {
+    "gt_0": 0.0,
+    "ge_20": 20.0,
+    "ge_30": 30.0,
+    "ge_40": 40.0,
+    "ge_45": 45.0
+  },
+  "scope": "timestamp-level unsupervised ERA5 regime discovery with radar characterization after clustering",
+  "warnings": [
+    "Regime occupancy is conditioned on Phase 6 timestamps with radar availability. Missingness may not be random with respect to weather.",
+    "The reference number of regimes is fixed by configuration; candidate k diagnostics are sensitivity information, not an automatic proof of a uniquely correct number of meteorological regimes.",
+    "Absolute-space regimes can reflect seasonality and the diurnal cycle. The anomaly_month_hour space is provided to isolate departures from month x local-hour climatology.",
+    "Regimes are defined from ERA5 predictors only. Radar metrics are joined after clustering to avoid direct target leakage.",
+    "The 12 raw channels define clustering; derived variables characterize regimes but do not influence cluster geometry, reducing redundancy.",
+    "KMeans imposes approximately convex clusters in PCA space. Meteorological states need not be truly discrete or spherical.",
+    "One-hour transitions use only exact consecutive UTC timestamp pairs; gaps are not bridged.",
+    "Regime labels R1..Rk are display identifiers ordered by mean tcwv then t2m. They are not ordinal physical rankings.",
+    "Phase 13 is descriptive. Phase 14 remains responsible for formal distribution-shift analysis, especially the 2023-2024 degradation."
+  ],
+  "methodological_notes": [
+    "absolute space answers which broad atmospheric states recur over the historical record.",
+    "anomaly_month_hour space answers which synoptic/anomalous states recur after removing the mean seasonal-diurnal background.",
+    "PCA is fit separately in each regime space on standardized raw predictors and retains the configured cumulative variance.",
+    "Cluster stability is summarized with Adjusted Rand Index across multiple KMeans seeds for the reference k.",
+    "Event enrichment is expressed relative to the global event rate among the same radar-available timestamps.",
+    "Yearly regime prevalence and regime-specific event rates are screening outputs for Phase 14, not a formal shift test.",
+    "All associations between regime and radar are descriptive and do not establish causality."
+  ]
+}
