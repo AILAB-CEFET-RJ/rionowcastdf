@@ -42,6 +42,20 @@ def main():
         (d / "metric_protocol.json").read_text(encoding="utf-8")
     )
 
+    calendar_audit_path = d / "calendar_metadata_audit.json"
+    calendar_audit = (
+        json.loads(calendar_audit_path.read_text(encoding="utf-8"))
+        if calendar_audit_path.exists()
+        else {}
+    )
+
+    persistence_audit_path = d / "persistence_metadata_audit.json"
+    persistence_audit = (
+        json.loads(persistence_audit_path.read_text(encoding="utf-8"))
+        if persistence_audit_path.exists()
+        else {}
+    )
+
     eval_manifest_path = d / "classical_evaluation_manifest.json"
     eval_manifest = (
         json.loads(eval_manifest_path.read_text(encoding="utf-8"))
@@ -77,6 +91,33 @@ def main():
     add(f"Thresholds dBZ: {protocol.get('thresholds_dbz')}")
     add(f"FSS km: {protocol.get('fss_nominal_support_km')}")
     add("")
+
+    if calendar_audit:
+        add("AUDITORIA DE CALENDÁRIO")
+        add("-" * 136)
+        add(f"Fonte: {calendar_audit.get('source')}")
+        add(f"Grupos de timestamp: {calendar_audit.get('n_timestamp_groups')}")
+        add(f"Meses locais: {calendar_audit.get('unique_months_local')}")
+        add(f"Horas locais: {calendar_audit.get('unique_hours_local')}")
+        add("")
+
+    if persistence_audit:
+        add("AUDITORIA DE PERSISTÊNCIA")
+        add("-" * 136)
+        add(f"Fonte: {persistence_audit.get('source')}")
+        add(
+            "Grupos com t-1h exato: "
+            f"{persistence_audit.get('n_groups_with_exact_t_minus_1h')}"
+        )
+        add(
+            "Fração com t-1h exato: "
+            f"{persistence_audit.get('fraction_groups_with_exact_t_minus_1h')}"
+        )
+        add(
+            "Patches com t-1h exato: "
+            f"{persistence_audit.get('n_patches_with_exact_t_minus_1h')}"
+        )
+        add("")
 
     add("BASELINES DA FASE 16 v2")
     add("-" * 136)

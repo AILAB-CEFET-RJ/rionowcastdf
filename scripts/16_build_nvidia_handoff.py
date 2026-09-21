@@ -16,7 +16,7 @@ import shutil
 from pathlib import Path
 
 
-PHASE_VERSION = "phase16-baselines-v2-classical-nvidia-handoff"
+PHASE_VERSION = "phase16-baselines-v2.1-manifest-calendar-persistence-fix"
 
 
 def parse_args():

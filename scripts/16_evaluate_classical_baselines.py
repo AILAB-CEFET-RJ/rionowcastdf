@@ -22,7 +22,7 @@ from numpy.lib.stride_tricks import sliding_window_view
 from phase16_common import open_group, zarr_take_first_axis, infer_datetime_unit
 
 
-PHASE_VERSION = "phase16-baselines-v2-classical-nvidia-handoff"
+PHASE_VERSION = "phase16-baselines-v2.1-manifest-calendar-persistence-fix"
 
 BASELINES = [
     "zero",
@@ -115,37 +115,71 @@ def timestamps_as_ns(values: np.ndarray) -> np.ndarray:
 
 
 def persistence_prev_patch_map(
-    root,
+    phase15_dir: Path,
+    n_patches: int,
     patches_per_timestamp: int = 12,
-) -> np.ndarray:
-    ts = timestamps_as_ns(np.asarray(root["timestamps"][:]))
-    if len(ts) % patches_per_timestamp != 0:
-        raise RuntimeError("Unexpected patch count.")
+) -> tuple[np.ndarray, dict]:
+    """Exact t-1h mapping from the frozen Phase 15 timestamp manifest."""
+    manifest_path = (
+        phase15_dir / "timestamp_split_manifest.parquet"
+    )
+    if not manifest_path.exists():
+        raise FileNotFoundError(manifest_path)
 
-    groups = ts.reshape(-1, patches_per_timestamp)
-    if not np.all(groups == groups[:, [0]]):
+    manifest = pd.read_parquet(manifest_path).copy()
+    manifest["timestamp_utc"] = pd.to_datetime(
+        manifest["timestamp_utc"],
+        utc=True,
+    )
+    manifest = manifest.sort_values(
+        "timestamp_utc"
+    ).reset_index(drop=True)
+
+    n_groups = len(manifest)
+    if n_groups * patches_per_timestamp != n_patches:
         raise RuntimeError(
-            "Persistence requires contiguous timestamp groups."
+            "Manifest timestamp groups do not match Zarr patch count: "
+            f"{n_groups} * {patches_per_timestamp} != {n_patches}"
         )
 
-    unique_ns = groups[:, 0]
-    lookup = {int(t): i for i, t in enumerate(unique_ns)}
+    ts_ns = pd.DatetimeIndex(manifest["timestamp_utc"]).asi8
+    lookup = {int(t): i for i, t in enumerate(ts_ns)}
     hour_ns = int(pd.Timedelta(hours=1).value)
 
-    prev_group = np.full(len(unique_ns), -1, dtype=np.int64)
-    for i, t in enumerate(unique_ns):
+    prev_group = np.full(n_groups, -1, dtype=np.int64)
+    for i, t in enumerate(ts_ns):
         prev_group[i] = lookup.get(int(t - hour_ns), -1)
 
-    patch_group = np.arange(len(ts), dtype=np.int64) // patches_per_timestamp
-    slot = np.arange(len(ts), dtype=np.int64) % patches_per_timestamp
+    patch_group = (
+        np.arange(n_patches, dtype=np.int64)
+        // patches_per_timestamp
+    )
+    slot = (
+        np.arange(n_patches, dtype=np.int64)
+        % patches_per_timestamp
+    )
     pg = prev_group[patch_group]
 
-    out = np.full(len(ts), -1, dtype=np.int64)
+    out = np.full(n_patches, -1, dtype=np.int64)
     valid = pg >= 0
     out[valid] = (
         pg[valid] * patches_per_timestamp + slot[valid]
     )
-    return out
+
+    audit = {
+        "source": "phase15 timestamp_split_manifest.parquet",
+        "n_timestamp_groups": int(n_groups),
+        "n_groups_with_exact_t_minus_1h": int(
+            (prev_group >= 0).sum()
+        ),
+        "fraction_groups_with_exact_t_minus_1h": float(
+            (prev_group >= 0).mean()
+        ),
+        "n_patches_with_exact_t_minus_1h": int(
+            (out >= 0).sum()
+        ),
+    }
+    return out, audit
 
 
 def season_codes(month: np.ndarray) -> np.ndarray:
@@ -610,7 +644,26 @@ def main() -> None:
         args.phase16_dir / "patch_slot_codes.npy"
     )
     seasons = season_codes(month)
-    prev_patch = persistence_prev_patch_map(root)
+    prev_patch, persistence_audit = persistence_prev_patch_map(
+        args.phase15_dir,
+        n_patches=int(root["target"].shape[0]),
+        patches_per_timestamp=12,
+    )
+    (
+        args.phase16_dir / "persistence_metadata_audit.json"
+    ).write_text(
+        json.dumps(
+            persistence_audit,
+            indent=2,
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    if persistence_audit["n_groups_with_exact_t_minus_1h"] <= 0:
+        raise RuntimeError(
+            "Persistence audit failed: no exact t-1h pairs were found."
+        )
 
     point_rows = []
     threshold_rows = []
@@ -631,6 +684,15 @@ def main() -> None:
         )
         full_idx = np.load(idx_path).astype(np.int64)
         common_idx = full_idx[prev_patch[full_idx] >= 0]
+
+        if (
+            "persistence_1h_radar_reference" in baselines
+            and len(full_idx) > 0
+            and len(common_idx) == 0
+        ):
+            raise RuntimeError(
+                f"Persistence audit failed for {split}: common cohort is empty."
+            )
 
         cohort_rows.extend([
             {

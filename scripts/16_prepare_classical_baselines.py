@@ -21,7 +21,7 @@ import pandas as pd
 from phase16_common import open_group, zarr_take_first_axis, infer_datetime_unit
 
 
-PHASE_VERSION = "phase16-baselines-v2-classical-nvidia-handoff"
+PHASE_VERSION = "phase16-baselines-v2.1-manifest-calendar-persistence-fix"
 
 CHANNELS = [
     "tcwv", "t2m", "u10", "v10",
@@ -158,24 +158,77 @@ def main() -> None:
             f"Expected 12 input channels; got {x_arr.shape[1]}."
         )
 
-    unique_ts, slot_codes = validate_patch_order(
+    # Validate physical grouping in Zarr, but source all calendar metadata
+    # from the frozen Phase 15 manifest. This avoids timestamp-encoding
+    # ambiguities in Phase 16.
+    unique_ts_zarr, slot_codes = validate_patch_order(
         np.asarray(ts_arr[:]),
         args.expected_patches_per_timestamp,
     )
 
+    manifest_path = (
+        args.phase15_dir / "timestamp_split_manifest.parquet"
+    )
+    if not manifest_path.exists():
+        raise FileNotFoundError(manifest_path)
+
+    manifest = pd.read_parquet(manifest_path).copy()
+    manifest["timestamp_utc"] = pd.to_datetime(
+        manifest["timestamp_utc"],
+        utc=True,
+    )
+    manifest = manifest.sort_values(
+        "timestamp_utc"
+    ).reset_index(drop=True)
+
+    if len(manifest) != len(unique_ts_zarr):
+        raise RuntimeError(
+            "Phase 15 manifest timestamp count does not match Zarr "
+            f"timestamp groups: {len(manifest)} != {len(unique_ts_zarr)}"
+        )
+
+    unique_ts = pd.DatetimeIndex(manifest["timestamp_utc"])
     local = unique_ts.tz_convert(args.local_timezone)
+    month_group = local.month.to_numpy(dtype=np.uint8)
+    hour_group = local.hour.to_numpy(dtype=np.uint8)
+
     month_patch = np.repeat(
-        local.month.to_numpy(dtype=np.uint8),
+        month_group,
         args.expected_patches_per_timestamp,
     )
     hour_patch = np.repeat(
-        local.hour.to_numpy(dtype=np.uint8),
+        hour_group,
         args.expected_patches_per_timestamp,
     )
 
     np.save(args.output_dir / "patch_slot_codes.npy", slot_codes)
     np.save(args.output_dir / "patch_month_local.npy", month_patch)
     np.save(args.output_dir / "patch_hour_local.npy", hour_patch)
+
+    calendar_audit = {
+        "source": "phase15 timestamp_split_manifest.parquet",
+        "n_timestamp_groups": int(len(unique_ts)),
+        "unique_months_local": sorted(
+            set(int(x) for x in np.unique(month_group))
+        ),
+        "unique_hours_local": sorted(
+            set(int(x) for x in np.unique(hour_group))
+        ),
+        "first_timestamp_utc": str(unique_ts.min()),
+        "last_timestamp_utc": str(unique_ts.max()),
+    }
+    if len(calendar_audit["unique_months_local"]) != 12:
+        raise RuntimeError(
+            "Calendar audit failed: expected all 12 local months."
+        )
+    if len(calendar_audit["unique_hours_local"]) != 24:
+        raise RuntimeError(
+            "Calendar audit failed: expected all 24 local hours."
+        )
+    (args.output_dir / "calendar_metadata_audit.json").write_text(
+        json.dumps(calendar_audit, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
 
     train_idx = np.load(train_idx_path).astype(np.int64)
     if train_idx.ndim != 1:
