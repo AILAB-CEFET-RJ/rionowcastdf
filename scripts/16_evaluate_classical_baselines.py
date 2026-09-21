@@ -22,7 +22,7 @@ from numpy.lib.stride_tricks import sliding_window_view
 from phase16_common import open_group, zarr_take_first_axis, infer_datetime_unit
 
 
-PHASE_VERSION = "phase16-baselines-v2.1-manifest-calendar-persistence-fix"
+PHASE_VERSION = "phase16-baselines-v2.2-resolution-safe-persistence"
 
 BASELINES = [
     "zero",
@@ -142,13 +142,17 @@ def persistence_prev_patch_map(
             f"{n_groups} * {patches_per_timestamp} != {n_patches}"
         )
 
-    ts_ns = pd.DatetimeIndex(manifest["timestamp_utc"]).asi8
-    lookup = {int(t): i for i, t in enumerate(ts_ns)}
-    hour_ns = int(pd.Timedelta(hours=1).value)
-
-    prev_group = np.full(n_groups, -1, dtype=np.int64)
-    for i, t in enumerate(ts_ns):
-        prev_group[i] = lookup.get(int(t - hour_ns), -1)
+    # IMPORTANT:
+    # Do not use DatetimeIndex.asi8 arithmetic here. With parquet/pyarrow,
+    # pandas may preserve datetime64[us, UTC]. In that case .asi8 is in
+    # microseconds while Timedelta.value is in nanoseconds, which makes
+    # every t-1h lookup fail even though the printed timestamps are correct.
+    #
+    # get_indexer on timezone-aware DatetimeIndex performs timestamp
+    # arithmetic at the datetime level and is independent of storage unit.
+    ts_index = pd.DatetimeIndex(manifest["timestamp_utc"])
+    prev_index = ts_index - pd.Timedelta(hours=1)
+    prev_group = ts_index.get_indexer(prev_index).astype(np.int64)
 
     patch_group = (
         np.arange(n_patches, dtype=np.int64)
@@ -168,6 +172,11 @@ def persistence_prev_patch_map(
 
     audit = {
         "source": "phase15 timestamp_split_manifest.parquet",
+        "timestamp_dtype": str(ts_index.dtype),
+        "timestamp_resolution_note": (
+            "resolution-safe DatetimeIndex.get_indexer(t-1h); "
+            "no asi8/Timedelta.value integer arithmetic"
+        ),
         "n_timestamp_groups": int(n_groups),
         "n_groups_with_exact_t_minus_1h": int(
             (prev_group >= 0).sum()

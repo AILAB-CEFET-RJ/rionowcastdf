@@ -21,7 +21,7 @@ import pandas as pd
 from phase16_common import open_group, zarr_take_first_axis, infer_datetime_unit
 
 
-PHASE_VERSION = "phase16-baselines-v2.1-manifest-calendar-persistence-fix"
+PHASE_VERSION = "phase16-baselines-v2.2-resolution-safe-persistence"
 
 CHANNELS = [
     "tcwv", "t2m", "u10", "v10",

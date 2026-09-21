@@ -16,7 +16,7 @@ import shutil
 from pathlib import Path
 
 
-PHASE_VERSION = "phase16-baselines-v2.1-manifest-calendar-persistence-fix"
+PHASE_VERSION = "phase16-baselines-v2.2-resolution-safe-persistence"
 
 
 def parse_args():
