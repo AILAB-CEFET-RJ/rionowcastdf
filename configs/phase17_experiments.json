@@ -1,0 +1,149 @@
+{
+  "phase_version": "phase17-conditioning-ablations-v1-nvidia-corrdiff-design",
+  "experiments": [
+    {
+      "experiment_id": "C00",
+      "name": "raw12_reference",
+      "tier": "core",
+      "purpose": "Reference conditioning using all 12 raw ERA5 predictors.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [],
+      "interpretation_role": "reference"
+    },
+    {
+      "experiment_id": "C01",
+      "name": "moisture_only",
+      "tier": "sufficiency",
+      "purpose": "Measure how much occurrence/intensity skill is retained by moisture predictors alone.",
+      "raw_families": [
+        "moisture"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_sufficiency"
+    },
+    {
+      "experiment_id": "C02",
+      "name": "thermal_only",
+      "tier": "sufficiency",
+      "purpose": "Measure skill retained by thermal predictors alone, especially at high thresholds.",
+      "raw_families": [
+        "thermal"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_sufficiency"
+    },
+    {
+      "experiment_id": "C03",
+      "name": "dynamics_only",
+      "tier": "sufficiency",
+      "purpose": "Measure skill retained by wind/dynamics predictors alone, including possible spatial-organization signal.",
+      "raw_families": [
+        "dynamics"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_sufficiency"
+    },
+    {
+      "experiment_id": "C04",
+      "name": "no_dynamics",
+      "tier": "necessity",
+      "purpose": "Leave dynamics out while preserving moisture + thermal predictors.",
+      "raw_families": [
+        "moisture",
+        "thermal"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_necessity"
+    },
+    {
+      "experiment_id": "C05",
+      "name": "no_thermal",
+      "tier": "necessity",
+      "purpose": "Leave thermal predictors out while preserving moisture + dynamics.",
+      "raw_families": [
+        "moisture",
+        "dynamics"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_necessity"
+    },
+    {
+      "experiment_id": "C06",
+      "name": "no_moisture",
+      "tier": "necessity",
+      "purpose": "Leave moisture predictors out while preserving thermal + dynamics.",
+      "raw_families": [
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_necessity"
+    },
+    {
+      "experiment_id": "C07",
+      "name": "raw12_plus_all_derived",
+      "tier": "representation",
+      "purpose": "Test whether deterministic derived representations improve optimization/conditioning relative to raw12.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [
+        "moisture_derived",
+        "thermal_derived",
+        "dynamics_derived"
+      ],
+      "interpretation_role": "derived_representation"
+    },
+    {
+      "experiment_id": "C08",
+      "name": "raw12_plus_moisture_derived",
+      "tier": "representation",
+      "purpose": "Isolate representational effect of relative-humidity vertical contrast.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [
+        "moisture_derived"
+      ],
+      "interpretation_role": "derived_family"
+    },
+    {
+      "experiment_id": "C09",
+      "name": "raw12_plus_thermal_derived",
+      "tier": "representation",
+      "purpose": "Isolate representational effect of temperature contrasts.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [
+        "thermal_derived"
+      ],
+      "interpretation_role": "derived_family"
+    },
+    {
+      "experiment_id": "C10",
+      "name": "raw12_plus_dynamics_derived",
+      "tier": "representation",
+      "purpose": "Isolate representational effect of wind speeds and bulk wind differences.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [
+        "dynamics_derived"
+      ],
+      "interpretation_role": "derived_family"
+    }
+  ]
+}

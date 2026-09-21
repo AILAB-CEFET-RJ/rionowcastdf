@@ -1,0 +1,225 @@
+{
+  "phase_version": "phase17-conditioning-ablations-v1-nvidia-corrdiff-design",
+  "scope": "Formal conditioning ablation design for execution inside the native NVIDIA CorrDiff environment.",
+  "frozen_from_phase15_16": {
+    "train": "2011-2020 after ±48 h purge",
+    "validation": "2021-2022 after ±48 h purge",
+    "test_primary": "2023 locked",
+    "test_stress_ood": "2024 locked",
+    "patches_per_timestamp": 12,
+    "raw_input_shape": [
+      12,
+      32,
+      32
+    ],
+    "target_shape": [
+      1,
+      32,
+      32
+    ],
+    "target_space": "log1p(clipped radar dBZ)",
+    "grid_nominal_km": 2.0,
+    "normalization": "fit on training split only",
+    "validation_only_for_ablation_selection": true
+  },
+  "invariants_held_fixed_across_ablations": [
+    "same Phase 15 split indices and temporal purge",
+    "same patch geometry and target definition",
+    "same NVIDIA CorrDiff regression architecture within each ablation stage",
+    "same NVIDIA CorrDiff diffusion architecture within each confirmation stage",
+    "same optimizer family, learning-rate schedule, batch-size policy and training budget",
+    "same checkpoint selection rule",
+    "same random seed set within a comparison stage",
+    "same metric implementation",
+    "same normalization policy: fit separately on train for channels present in that experiment",
+    "same validation timestamps and natural event prevalence",
+    "no target-stratified resampling of validation",
+    "no access to 2023/2024 for model or channel selection"
+  ],
+  "derived_channel_policy": {
+    "compute_from": "raw ERA5 channels inside or immediately before the native NVIDIA CorrDiff data pipeline",
+    "normalization": "each derived channel receives train-only mean/std fitted after derivation",
+    "no_extra_information_claim": true,
+    "do_not_reuse_raw_normalization_for_derived": true
+  },
+  "two_stage_execution": {
+    "stage_R_regression_screen": {
+      "purpose": "Screen all conditioning configurations using the native CorrDiff regression model.",
+      "experiments": [
+        "C00",
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "C08",
+        "C09",
+        "C10"
+      ],
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "evaluation_split": "validation",
+      "tests_locked": true
+    },
+    "stage_D_corrdiff_confirmation": {
+      "purpose": "Confirm conditioning effects in the generative CorrDiff stage after regression screening.",
+      "mandatory_experiments": [
+        "C00",
+        "C04",
+        "C05",
+        "C06",
+        "C07"
+      ],
+      "optional_sufficiency_experiments": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "optional_derived_family_experiments": [
+        "C08",
+        "C09",
+        "C10"
+      ],
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "evaluation_split": "validation",
+      "tests_locked": true,
+      "selection_rule_for_optional_runs": "Optional runs are permitted only according to a predeclared compute budget. If not all optional runs can be executed, prioritize the single-family or derived-family contrasts needed to resolve an ambiguity observed in Stage R; document the choice before training."
+    }
+  },
+  "primary_comparisons": {
+    "family_necessity": [
+      {
+        "reference": "C00",
+        "ablation": "C04",
+        "meaning": "incremental contribution associated with dynamics"
+      },
+      {
+        "reference": "C00",
+        "ablation": "C05",
+        "meaning": "incremental contribution associated with thermal predictors"
+      },
+      {
+        "reference": "C00",
+        "ablation": "C06",
+        "meaning": "incremental contribution associated with moisture predictors"
+      }
+    ],
+    "family_sufficiency": [
+      {
+        "reference": "C00",
+        "ablation": "C01",
+        "meaning": "skill retained by moisture only"
+      },
+      {
+        "reference": "C00",
+        "ablation": "C02",
+        "meaning": "skill retained by thermal only"
+      },
+      {
+        "reference": "C00",
+        "ablation": "C03",
+        "meaning": "skill retained by dynamics only"
+      }
+    ],
+    "derived_representation": [
+      {
+        "reference": "C00",
+        "ablation": "C07",
+        "meaning": "effect of adding all deterministic derived representations"
+      },
+      {
+        "reference": "C00",
+        "ablation": "C08",
+        "meaning": "effect of moisture-derived representation"
+      },
+      {
+        "reference": "C00",
+        "ablation": "C09",
+        "meaning": "effect of thermal-derived representation"
+      },
+      {
+        "reference": "C00",
+        "ablation": "C10",
+        "meaning": "effect of dynamics-derived representation"
+      }
+    ]
+  },
+  "validation_metrics": {
+    "inherited_phase16": {
+      "point_domains": [
+        "stored_log1p",
+        "reconstructed_dBZ"
+      ],
+      "point_metrics": [
+        "RMSE",
+        "MAE",
+        "bias"
+      ],
+      "thresholds_dbz": [
+        20,
+        30,
+        40,
+        45
+      ],
+      "categorical": [
+        "precision",
+        "POD/recall",
+        "FAR",
+        "CSI",
+        "F1",
+        "frequency_bias",
+        "ETS"
+      ],
+      "fss_supports_km": [
+        2,
+        4,
+        8,
+        16
+      ],
+      "patch_max_conditions": [
+        "all",
+        "target_ge30",
+        "target_ge40",
+        "target_ge45"
+      ],
+      "seasonal_groups": [
+        "DJF",
+        "MAM",
+        "JJA",
+        "SON"
+      ]
+    },
+    "corrdiff_ensemble_metrics_to_enable_when_available": [
+      "ensemble-mean point metrics",
+      "Brier score for P(pixel >= threshold) at 20/30/40/45 dBZ",
+      "reliability/ECE for exceedance probabilities",
+      "CRPS or equivalent ensemble distribution score supported by the NVIDIA evaluation stack",
+      "ensemble FSS or FSS of exceedance-probability/ensemble-mean products, with definition frozen before test"
+    ],
+    "selection_principle": "Do not collapse all metrics to a single scalar. Use a Pareto/hierarchical reading: first spatial/event skill (FSS/CSI at >=30 and >=40), then event-conditioned maximum-intensity error, then global RMSE/MAE. >=45 is a critical secondary extreme diagnostic due to rarity."
+  },
+  "hypotheses_to_test_not_assume": [
+    "Moisture-only conditioning may retain more moderate-event occurrence skill than other single families.",
+    "Thermal conditioning may contribute relatively more at the highest thresholds than at moderate thresholds.",
+    "Dynamics may add little scalar pixelwise association yet still help spatial organization.",
+    "Derived variables may improve representation/optimization without adding information beyond raw12.",
+    "Removing one family can reveal conditional value hidden by multicollinearity in the full predictor set."
+  ],
+  "reporting_rules": [
+    "Report all three seeds for every executed configuration; summarize median and spread, never only the best seed.",
+    "Preserve natural validation prevalence.",
+    "Keep regression-stage and CorrDiff-stage conclusions separate.",
+    "Do not claim causality from ablation performance differences.",
+    "Do not interpret deterministic derived channels as independent physical information.",
+    "Do not inspect 2023 or 2024 until Phase 17/18 design and hyperparameters are frozen."
+  ]
+}
