@@ -1,0 +1,40 @@
+{
+  "phase_version": "phase18-nvidia-corrdiff-native-integration-v1-smoke-only",
+  "raw_channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "derived_channels": [
+    "wind_speed_10",
+    "wind_speed_850",
+    "wind_speed_500",
+    "delta_t_500_850",
+    "delta_t_850_surface",
+    "delta_r_500_850",
+    "bulk_wind_diff_10_850",
+    "bulk_wind_diff_850_500"
+  ],
+  "target": {
+    "name": "radar_reflectivity_log1p",
+    "stored_space": "log1p(clipped radar dBZ)",
+    "normalization": "identity during Phase 18 smoke tests"
+  },
+  "locked_splits": [
+    "test_primary",
+    "test_stress_ood"
+  ],
+  "allowed_smoke_splits": [
+    "train",
+    "validation"
+  ]
+}
