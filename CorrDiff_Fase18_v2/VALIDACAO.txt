@@ -1,0 +1,8 @@
+Verificação desta reconstrução (17/10/2026)
+- Base do projeto: cd2f81719df80a08726c2840d14ec7f1d83c3579.
+- NVIDIA fixado: beafeecbd01fcac3c76bc6f3391a6af1872ea6bf; checkout audit PASS.
+- Pytest: 14 passed in 4.58s, CPU, dados sintéticos e interfaces/configs reais NVIDIA.
+- Compilação Python e git diff --check: sucesso.
+- git apply --cached --check sobre índice limpo do commit base: sucesso.
+- Treino nativo GPU, checkpoint reload/generation e Zarr real: NÃO EXECUTADOS.
+- Não se trata de PASS da fase 18 científica/operacional.

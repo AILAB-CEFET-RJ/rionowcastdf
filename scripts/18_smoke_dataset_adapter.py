@@ -18,7 +18,7 @@ import numpy as np
 import torch
 
 
-PHASE_VERSION = "phase18-nvidia-corrdiff-native-integration-v1-smoke-only"
+PHASE_VERSION = "phase18-nvidia-corrdiff-native-integration-v2"
 
 
 def parse_args():
@@ -77,10 +77,12 @@ def import_adapter(adapter_path: Path, corrdiff_dir: Path):
 
 
 def validate_dataset(ds, expected_channels: int, sample_count: int):
+    if sample_count < 1 or len(ds) < 1:
+        raise ValueError("Smoke requires at least one sample")
     n = min(sample_count, len(ds))
     rows = []
 
-    for i in range(n):
+    for i in np.linspace(0, len(ds) - 1, n, dtype=int):
         y, x = ds[i]
 
         if not isinstance(x, torch.Tensor):
@@ -106,7 +108,7 @@ def validate_dataset(ds, expected_channels: int, sample_count: int):
             raise RuntimeError("non-finite target")
 
         rows.append({
-            "idx": i,
+            "idx": int(i),
             "input_mean": float(x.mean()),
             "input_std": float(x.std()),
             "target_min": float(y.min()),
@@ -114,11 +116,15 @@ def validate_dataset(ds, expected_channels: int, sample_count: int):
             "target_mean": float(y.mean()),
         })
 
+    batch = next(iter(torch.utils.data.DataLoader(ds, batch_size=min(2, len(ds)), num_workers=0)))
+    if batch[0].shape[1:] != (1, 32, 32) or batch[1].shape[1:] != (expected_channels, 32, 32):
+        raise RuntimeError("DataLoader collation failed")
     return rows
 
 
 def main():
     args = parse_args()
+    args.output.unlink(missing_ok=True)
 
     corrdiff = args.corrdiff_dir.expanduser().resolve()
     adapter_path = args.adapter_path.expanduser().resolve()
@@ -198,6 +204,11 @@ def main():
                 allow_locked_split=False,
             )
 
+            if experiment_id == "C00":
+                for start in range(0, len(ds), 256):
+                    mask = np.asarray(ds.root["mask"].oindex[ds.indices[start:start+256], :, :, :])
+                    if not np.all(mask == 1):
+                        raise RuntimeError("Invalid radar pixels: native loss cannot mask them. Integration blocked.")
             channel_names = [
                 c.name for c in ds.input_channels()
             ]
@@ -266,6 +277,9 @@ def main():
             "message": message,
         }
 
+    audit["fingerprint"] = module._common.evidence_fingerprint(adapter_path, ablation, args.phase15_dir, args.stats_dir)
+    audit["data_path"] = str(data_path)
+    audit["all_train_validation_masks_valid"] = True
     audit["status"] = "PASS"
 
     args.output.parent.mkdir(

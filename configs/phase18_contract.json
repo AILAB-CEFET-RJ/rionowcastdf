@@ -1,5 +1,5 @@
 {
-  "phase_version": "phase18-nvidia-corrdiff-native-integration-v1-smoke-only",
+  "phase_version": "phase18-nvidia-corrdiff-native-integration-v2",
   "raw_channels": [
     "tcwv",
     "t2m",
@@ -36,5 +36,11 @@
   "allowed_smoke_splits": [
     "train",
     "validation"
-  ]
+  ],
+  "nvidia_commit": "beafeecbd01fcac3c76bc6f3391a6af1872ea6bf",
+  "mask_policy": "require_all_valid; otherwise block native unmasked loss",
+  "location_policy": "no absolute position; retain native within-patch grid embeddings",
+  "geographic_metadata": "unknown at dataset level; NaN (not kilometers disguised as degrees)",
+  "smoke_seed": "42 by default; explicit bridge controls native model and sampler seeds; 42/43/44 supported",
+  "formal_campaign_status": "BLOCKED until real-data and native GPU smoke evidence passes"
 }

@@ -13,7 +13,7 @@ import subprocess
 from pathlib import Path
 
 
-PHASE_VERSION = "phase18-nvidia-corrdiff-native-integration-v1-smoke-only"
+PHASE_VERSION = "phase18-nvidia-corrdiff-native-integration-v2"
 
 
 def parse_args():
@@ -149,10 +149,15 @@ def main():
         ),
     }
 
+    expected_commit = json.loads((Path(__file__).resolve().parents[1] / "configs/phase18_contract.json").read_text())["nvidia_commit"]
+    hook_scan = scan_text(corrdiff / "datasets/dataset.py", ["def register_dataset", 'dataset_spec.split("::")'])
     status = (
         "PASS"
         if not missing
         and base_scan["class DownscalingDataset"]
+        and all(hook_scan.values())
+        and git["commit"] == expected_commit
+        and not any(line and not line.startswith("?? ") for line in (git["status_porcelain"] or "").splitlines())
         else "FAIL"
     )
 
@@ -165,6 +170,8 @@ def main():
         "train_py_feature_scan": train_scan,
         "base_dataset_interface_scan": base_scan,
         "git": git,
+        "expected_commit": expected_commit,
+        "custom_hook_scan": hook_scan,
         "integration_strategy": (
             "Use the official custom-dataset hook "
             "(file.py::Class) and add only new Hydra configs; "
