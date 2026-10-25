@@ -2,7 +2,7 @@
   "phase_version": "phase2-derived-v2-aligned",
   "dataset_dir": "datasets/corrdiff_2011_2024",
   "dataset_shape": [
-    1016208,
+    886116,
     12,
     32,
     32
