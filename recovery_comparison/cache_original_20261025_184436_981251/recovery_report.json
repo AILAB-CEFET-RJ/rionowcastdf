@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "cache_dir": "/home/vsantos/repositories/rionowcastdf/recovery_comparison/cache_original_20261025_184436_981251/cache",
+  "expected_timestamps": 84684,
+  "copied": 73843,
+  "recovered": 10841,
+  "failures": [],
+  "missing_files": [],
+  "extra_files": []
+}
