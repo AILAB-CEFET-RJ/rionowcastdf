@@ -265,3 +265,31 @@
 2026-10-25 17:37:16 | INFO | Output                    : /home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality
 2026-10-25 17:37:16 | INFO | Elapsed                   : 142.23 s
 2026-10-25 17:37:16 | INFO | ========================================================================
+2026-10-25 18:11:29 | INFO | CorrDiff Phase 0 audit phase0-audit-v3-coverage-events
+2026-10-25 18:11:29 | INFO | Dataset directory: /home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024
+2026-10-25 18:11:29 | INFO | Zarr path       : /home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/train.zarr
+2026-10-25 18:11:29 | INFO | Output directory: /home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality
+2026-10-25 18:11:29 | INFO | Radar cache     : /home/vsantos/data/radar_cache
+2026-10-25 18:11:29 | INFO | Mode            : full
+2026-10-25 18:11:29 | INFO | target_transform_log1p: Stored target uses log1p. In the audited builder, the source cache is created from PNG RGB colors mapped to numerical radar-legend values and saved as float32; the builder itself does not declare the physical unit as dBZ. Direct cache -> target validation is performed when --radar-cache-dir is supplied.
+2026-10-25 18:11:29 | INFO | Reading timestamp index...
+2026-10-25 18:11:29 | INFO | temporal_gaps_present: Dataset contains 48893 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters.
+2026-10-25 18:11:29 | INFO | Reading patch positions...
+2026-10-25 18:11:30 | INFO | patch_geometry_uncovered_edges: Patch geometry covers 87.07% of the 70x84 radar grid. This follows directly from patch_size/stride and should be considered when reconstructing full fields.
+2026-10-25 18:11:30 | INFO | Auditing radar cache semantics and target transformation...
+2026-10-25 18:11:30 | INFO | radar_target_mapping_verified: Directly reproduced cache -> Zarr target/mask for 256 sampled patches: isfinite mask + nan_to_num + clip(min=0) + log1p.
+2026-10-25 18:11:30 | INFO | Starting full numerical scan over 886116 samples...
+2026-10-25 18:13:50 | INFO | target_event_rates_patch_weighted: Target threshold rates were computed over valid pixels in the stored patch dataset. Because patches overlap, pixel rates are training-distribution diagnostics rather than de-duplicated full-field climatological frequencies.
+2026-10-25 18:13:50 | INFO | ========================================================================
+2026-10-25 18:13:50 | INFO | PHASE 0 AUDIT COMPLETED
+2026-10-25 18:13:50 | INFO | Samples                  : 886116
+2026-10-25 18:13:50 | INFO | Unique timestamps        : 73843
+2026-10-25 18:13:50 | INFO | Expected timestamps      : 122736
+2026-10-25 18:13:50 | INFO | Temporal coverage        : 60.16%
+2026-10-25 18:13:50 | INFO | Channels                 : 12
+2026-10-25 18:13:50 | INFO | Target event diagnostics : computed
+2026-10-25 18:13:50 | INFO | Warnings                 : 0
+2026-10-25 18:13:50 | INFO | Notes                    : 5
+2026-10-25 18:13:50 | INFO | Output                    : /home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality
+2026-10-25 18:13:50 | INFO | Elapsed                   : 140.89 s
+2026-10-25 18:13:50 | INFO | ========================================================================

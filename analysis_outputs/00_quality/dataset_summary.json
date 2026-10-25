@@ -1,21 +1,21 @@
 {
   "audit_version": "phase0-audit-v3-coverage-events",
   "audit_mode": "full",
-  "audit_started_utc": "2026-10-25T20:34:54.563097+00:00",
-  "audit_finished_utc": "2026-10-25T20:37:16.790122+00:00",
-  "elapsed_seconds": 142.22703032102436,
+  "audit_started_utc": "2026-10-25T21:11:29.654519+00:00",
+  "audit_finished_utc": "2026-10-25T21:13:50.548680+00:00",
+  "elapsed_seconds": 140.89416660397546,
   "system": {
     "hostname": "librae",
     "platform": "Linux-5.15.0-107-generic-x86_64-with-glibc2.35",
     "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
-    "pid": 10419
+    "pid": 10960
   },
   "paths": {
     "dataset_dir": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024",
     "zarr_path": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/train.zarr",
     "metadata_path": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/metadata.json",
     "normalization_path": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/normalization.npz",
-    "radar_cache_dir": "/home/vsantos/repositories/rionowcastdf",
+    "radar_cache_dir": "/home/vsantos/data/radar_cache",
     "output_dir": "/home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality"
   },
   "dataset": {
@@ -480,38 +480,44 @@
       "dbz_confirmed_by_builder_alone": false
     },
     "cache_validation": {
-      "status": "WARN",
+      "status": "PASS",
       "sampling_basis": "distinct timestamps present in Zarr; no full cache-directory enumeration",
       "requested_files": 128,
-      "found_files": 0,
-      "missing_files": 128,
+      "found_files": 128,
+      "missing_files": 0,
       "shape_mismatch_files": 0,
-      "sampled_pixel_count": 0,
+      "sampled_pixel_count": 752640,
       "sampled_nonfinite_count": 0,
-      "sampled_finite_ratio": null,
+      "sampled_finite_ratio": 1.0,
       "sampled_negative_value_count": 0,
       "sampled_below_legend_min_count": 0,
       "sampled_above_legend_max_count": 0,
-      "sampled_min": null,
-      "sampled_max": null,
-      "sampled_mean": null,
-      "sampled_std": null,
-      "sampled_p01": null,
-      "sampled_p05": null,
-      "sampled_p25": null,
-      "sampled_p50": null,
-      "sampled_p75": null,
-      "sampled_p95": null,
-      "sampled_p99": null
+      "sampled_min": 0.0,
+      "sampled_max": 45.0,
+      "sampled_mean": 0.22240024309694056,
+      "sampled_std": 2.373349477596376,
+      "sampled_p01": 0.0,
+      "sampled_p05": 0.0,
+      "sampled_p25": 0.0,
+      "sampled_p50": 0.0,
+      "sampled_p75": 0.0,
+      "sampled_p95": 0.0,
+      "sampled_p99": 0.0
     },
     "target_mapping_validation": {
-      "status": "WARN",
+      "status": "PASS",
       "requested_samples": 256,
-      "compared_samples": 0,
-      "missing_cache_candidates": 1024,
-      "reason": "no shape-compatible cache/Zarr samples were compared"
+      "compared_samples": 256,
+      "shape_compatible_samples": 256,
+      "missing_cache_candidates": 0,
+      "absolute_tolerance": 2e-06,
+      "max_abs_diff_stored_vs_expected_log1p": 0.0,
+      "max_abs_diff_expm1_vs_clipped_cache": 7.62939453125e-06,
+      "total_mask_mismatch_count": 0,
+      "source_negative_values_seen_in_compared_patches": 0,
+      "all_compared_samples_match_builder_transform": true
     },
-    "cache_dir": "/home/vsantos/repositories/rionowcastdf"
+    "cache_dir": "/home/vsantos/data/radar_cache"
   },
   "builder_counters": {
     "timestamps_total": 122736,
@@ -525,6 +531,6 @@
     "patches_written": 886116
   },
   "warnings_count": 0,
-  "notes_count": 4,
+  "notes_count": 5,
   "status": "PASS"
 }
