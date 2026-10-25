@@ -1,0 +1,47 @@
+2026-09-19 19:08:31 | INFO | ========================================================================
+2026-09-19 19:08:31 | INFO | PHASE 5 - RADAR SEASONALITY
+2026-09-19 19:08:31 | INFO | Patches            : 1016208
+2026-09-19 19:08:31 | INFO | Unique timestamps  : 84684
+2026-09-19 19:08:31 | INFO | Blocks             : 3970
+2026-09-19 19:08:31 | INFO | ========================================================================
+2026-09-19 19:08:31 | INFO | Radar: 250/3970 blocks processed
+2026-09-19 19:08:32 | INFO | Radar: 500/3970 blocks processed
+2026-09-19 19:08:33 | INFO | Radar: 750/3970 blocks processed
+2026-09-19 19:08:34 | INFO | Radar: 1000/3970 blocks processed
+2026-09-19 19:08:34 | INFO | Radar: 1250/3970 blocks processed
+2026-09-19 19:08:35 | INFO | Radar: 1500/3970 blocks processed
+2026-09-19 19:08:36 | INFO | Radar: 1750/3970 blocks processed
+2026-09-19 19:08:37 | INFO | Radar: 2000/3970 blocks processed
+2026-09-19 19:08:37 | INFO | Radar: 2250/3970 blocks processed
+2026-09-19 19:08:38 | INFO | Radar: 2500/3970 blocks processed
+2026-09-19 19:08:39 | INFO | Radar: 2750/3970 blocks processed
+2026-09-19 19:08:40 | INFO | Radar: 3000/3970 blocks processed
+2026-09-19 19:08:40 | INFO | Radar: 3250/3970 blocks processed
+2026-09-19 19:08:41 | INFO | Radar: 3500/3970 blocks processed
+2026-09-19 19:08:42 | INFO | Radar: 3750/3970 blocks processed
+2026-09-19 19:08:43 | INFO | Radar: 3970/3970 blocks processed
+2026-09-19 19:08:43 | INFO | ========================================================================
+2026-09-19 19:08:43 | INFO | PHASE 5 - PREDICTOR SEASONALITY
+2026-09-19 19:08:43 | INFO | Input blocks: 3970
+2026-09-19 19:08:43 | INFO | ========================================================================
+2026-09-19 19:08:48 | INFO | Input: 250/3970 blocks processed
+2026-09-19 19:08:53 | INFO | Input: 500/3970 blocks processed
+2026-09-19 19:08:59 | INFO | Input: 750/3970 blocks processed
+2026-09-19 19:09:05 | INFO | Input: 1000/3970 blocks processed
+2026-09-19 19:09:10 | INFO | Input: 1250/3970 blocks processed
+2026-09-19 19:09:15 | INFO | Input: 1500/3970 blocks processed
+2026-09-19 19:09:20 | INFO | Input: 1750/3970 blocks processed
+2026-09-19 19:09:25 | INFO | Input: 2000/3970 blocks processed
+2026-09-19 19:09:30 | INFO | Input: 2250/3970 blocks processed
+2026-09-19 19:09:35 | INFO | Input: 2500/3970 blocks processed
+2026-09-19 19:09:40 | INFO | Input: 2750/3970 blocks processed
+2026-09-19 19:09:45 | INFO | Input: 3000/3970 blocks processed
+2026-09-19 19:09:50 | INFO | Input: 3250/3970 blocks processed
+2026-09-19 19:09:55 | INFO | Input: 3500/3970 blocks processed
+2026-09-19 19:10:00 | INFO | Input: 3750/3970 blocks processed
+2026-09-19 19:10:04 | INFO | Input: 3970/3970 blocks processed
+2026-09-19 19:10:04 | INFO | ========================================================================
+2026-09-19 19:10:04 | INFO | PHASE 5 COMPLETE
+2026-09-19 19:10:04 | INFO | Temporal coverage: 69.00%
+2026-09-19 19:10:04 | INFO | Output: analysis_outputs/05_seasonality
+2026-09-19 19:10:04 | INFO | ========================================================================

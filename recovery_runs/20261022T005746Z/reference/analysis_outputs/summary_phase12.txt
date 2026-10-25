@@ -1,0 +1,402 @@
+============================================================================================================================
+CORRDIFF - FASE 12 - ANÁLISE MULTIVARIADA
+============================================================================================================================
+Versão: phase12-multivariate-v1-forward-temporal-weighted
+Input shape: [1016208, 12, 32, 32]
+Target shape: [1016208, 1, 32, 32]
+Patches: 1016208 | amostrados: 16273 (1.60%)
+Representações: {'means_only': 20, 'means_plus_std': 40}
+Escopo: patch-level multivariate screening on a weighted stratified sample; forward folds are for temporal stability, not final operational skill
+
+ESTRATOS DE INTENSIDADE - SCAN EXATO
+----------------------------------------------------------------------------------------------------------------------------
+ stratum_id   stratum  patch_count  patch_ratio
+          0       dry       712492     0.701128
+          1  gt0_lt20         1273     0.001253
+          2 ge20_lt30       139042     0.136824
+          3 ge30_lt40        86131     0.084757
+          4 ge40_lt45        48650     0.047874
+          5      ge45        28620     0.028164
+
+FOLDS TEMPORAIS FORWARD-CHAINING
+----------------------------------------------------------------------------------------------------------------------------
+fold_id  train_start_year  train_end_year  eval_start_year  eval_end_year  n_train_rows  n_eval_rows  weighted_train_mass  weighted_eval_mass  n_train_timestamps  n_eval_timestamps
+     F1              2011            2014             2015           2016          4863         2311        308128.837000       161455.823333                3796               1909
+     F2              2011            2016             2017           2018          7174         2548        469584.660333       157829.545000                5705               2133
+     F3              2011            2018             2019           2020          9722         2295        627414.205333       136494.407667                7838               1922
+     F4              2011            2020             2021           2022         12017         2355        763908.613000       149694.099000                9760               2045
+     F5              2011            2022             2023           2024         14372         1901        913602.712000       102605.288000               11805               1517
+
+COLINEARIDADE - MAIORES |CORRELAÇÕES| ENTRE PREDITORES MÉDIOS
+----------------------------------------------------------------------------------------------------------------------------
+                   feature_i             feature_j  weighted_correlation
+                 u_500__mean  wind_speed_500__mean              0.855796
+       delta_r_500_850__mean           r_500__mean              0.844215
+bulk_wind_diff_850_500__mean  wind_speed_500__mean              0.817466
+       delta_t_500_850__mean           t_850__mean             -0.780464
+                 r_500__mean            tcwv__mean              0.730819
+bulk_wind_diff_850_500__mean           u_500__mean              0.721145
+ bulk_wind_diff_10_850__mean  wind_speed_850__mean              0.718901
+                   t2m__mean           t_850__mean              0.702052
+                 t_500__mean           t_850__mean              0.561929
+                   v10__mean           v_850__mean              0.550751
+bulk_wind_diff_850_500__mean           t_850__mean             -0.518827
+       delta_t_500_850__mean             t2m__mean             -0.494593
+                 t_850__mean            tcwv__mean              0.485406
+       delta_r_500_850__mean           t_850__mean              0.484397
+       delta_r_500_850__mean            tcwv__mean              0.483636
+bulk_wind_diff_850_500__mean             t2m__mean             -0.479918
+       delta_t_500_850__mean           r_850__mean              0.477401
+ bulk_wind_diff_10_850__mean           u_850__mean              0.475781
+       delta_r_500_850__mean delta_t_500_850__mean             -0.470633
+   delta_t_850_surface__mean           t_850__mean              0.468220
+                   t2m__mean            tcwv__mean              0.465223
+                   t2m__mean           t_500__mean              0.465067
+                 t_500__mean            tcwv__mean              0.447813
+ bulk_wind_diff_10_850__mean           v_850__mean             -0.446950
+                 u_850__mean  wind_speed_850__mean              0.441411
+
+PCA DOS 20 PREDITORES MÉDIOS
+----------------------------------------------------------------------------------------------------------------------------
+component  component_index  eigenvalue  explained_variance_ratio  cumulative_explained_variance_ratio
+      PC1                1    5.010278                  0.250514                             0.250514
+      PC2                2    3.241863                  0.162093                             0.412607
+      PC3                3    2.506599                  0.125330                             0.537937
+      PC4                4    1.729429                  0.086471                             0.624408
+      PC5                5    1.589096                  0.079455                             0.703863
+      PC6                6    1.126505                  0.056325                             0.760188
+      PC7                7    0.910589                  0.045529                             0.805718
+      PC8                8    0.883042                  0.044152                             0.849870
+      PC9                9    0.757975                  0.037899                             0.887769
+     PC10               10    0.666779                  0.033339                             0.921108
+     PC11               11    0.454130                  0.022706                             0.943814
+     PC12               12    0.388167                  0.019408                             0.963223
+
+Resumo PCA: {'components_for_90pct': 10, 'components_for_95pct': 12, 'weighted_correlation_condition_number': 76.11470657244408}
+
+LOADINGS DOMINANTES DOS PRIMEIROS COMPONENTES
+----------------------------------------------------------------------------------------------------------------------------
+[PC1]
+                     feature   loading
+                 t_850__mean -0.402512
+       delta_t_500_850__mean  0.318669
+bulk_wind_diff_850_500__mean  0.303177
+                   t2m__mean -0.294937
+       delta_r_500_850__mean -0.279095
+        wind_speed_500__mean  0.270856
+                 u_500__mean  0.249691
+                  tcwv__mean -0.226333
+                 v_850__mean  0.221136
+                 t_500__mean -0.220198
+
+[PC2]
+                     feature   loading
+                 u_500__mean -0.381152
+        wind_speed_850__mean -0.371445
+        wind_speed_500__mean -0.370179
+                 u_850__mean -0.370007
+ bulk_wind_diff_10_850__mean -0.350657
+                 r_500__mean -0.248435
+       delta_r_500_850__mean -0.240481
+bulk_wind_diff_850_500__mean -0.230332
+                 v_500__mean  0.202226
+                   u10__mean -0.165004
+
+[PC3]
+                    feature   loading
+                 tcwv__mean  0.444993
+                r_850__mean  0.383597
+                r_500__mean  0.351393
+                  v10__mean  0.338924
+                  u10__mean  0.273878
+                v_850__mean  0.247583
+bulk_wind_diff_10_850__mean -0.242985
+                t_500__mean  0.212615
+        wind_speed_10__mean -0.191772
+  delta_t_850_surface__mean -0.184163
+
+[PC4]
+                    feature   loading
+        wind_speed_10__mean -0.469665
+  delta_t_850_surface__mean  0.452774
+                  u10__mean  0.344673
+bulk_wind_diff_10_850__mean -0.306131
+                r_850__mean -0.290471
+       wind_speed_850__mean -0.273880
+                  t2m__mean -0.218812
+      delta_t_500_850__mean -0.186985
+                v_850__mean  0.179774
+                 tcwv__mean -0.140436
+
+[PC5]
+                     feature   loading
+                 u_850__mean -0.459301
+                 r_500__mean  0.337221
+                   u10__mean -0.316106
+                   t2m__mean -0.312723
+                 v_850__mean -0.291572
+                   v10__mean -0.280818
+                 r_850__mean  0.225852
+bulk_wind_diff_850_500__mean  0.222280
+       delta_r_500_850__mean  0.204081
+                 t_500__mean -0.187740
+
+MÉTRICAS BINÁRIAS - MÉDIA DOS FOLDS
+----------------------------------------------------------------------------------------------------------------------------
+event_id                  model     representation  n_folds  brier_mean  brier_skill_vs_climatology_mean  roc_auc_mean  average_precision_mean  ece_10bins_mean
+   ge_20            logistic_l2     means_plus_std        5    0.176160                         0.236997      0.773274                0.636786         0.059140
+   ge_20 hist_gradient_boosting     means_plus_std        5    0.176544                         0.232217      0.784507                0.649835         0.077888
+   ge_20            logistic_l2         means_only        5    0.178127                         0.228350      0.768034                0.632196         0.058838
+   ge_20 climatology_month_hour calendar_reference        5    0.229836                         0.000000      0.580831                0.391473         0.096648
+   ge_30            logistic_l2     means_plus_std        5    0.114878                         0.182667      0.805345                0.455006         0.024729
+   ge_30            logistic_l2         means_only        5    0.115979                         0.174999      0.800110                0.443242         0.022208
+   ge_30 hist_gradient_boosting     means_plus_std        5    0.117336                         0.165923      0.815115                0.477681         0.046786
+   ge_30 climatology_month_hour calendar_reference        5    0.140798                         0.000000      0.630158                0.267076         0.044273
+   ge_40            logistic_l2     means_plus_std        5    0.061025                         0.121392      0.818498                0.327918         0.014209
+   ge_40            logistic_l2         means_only        5    0.061403                         0.116371      0.813938                0.326600         0.016962
+   ge_40 hist_gradient_boosting     means_plus_std        5    0.063418                         0.088093      0.829142                0.340692         0.030372
+   ge_40 climatology_month_hour calendar_reference        5    0.069476                         0.000000      0.685553                0.168616         0.018814
+   ge_45            logistic_l2         means_only        5    0.022742                         0.109141      0.869288                0.254212         0.010802
+   ge_45            logistic_l2     means_plus_std        5    0.022777                         0.107442      0.869375                0.250376         0.010616
+   ge_45 hist_gradient_boosting     means_plus_std        5    0.024997                         0.014038      0.876445                0.250038         0.019466
+   ge_45 climatology_month_hour calendar_reference        5    0.025417                         0.000000      0.752139                0.094937         0.009598
+    gt_0            logistic_l2     means_plus_std        5    0.176419                         0.237458      0.772943                0.637511         0.058068
+    gt_0 hist_gradient_boosting     means_plus_std        5    0.177354                         0.230407      0.783824                0.647544         0.077161
+    gt_0            logistic_l2         means_only        5    0.178378                         0.228881      0.767701                0.633094         0.058872
+    gt_0 climatology_month_hour calendar_reference        5    0.230344                         0.000000      0.580376                0.391871         0.095953
+
+GANHO NÃO LINEAR - HISTGRADIENTBOOSTING vs LOGISTIC L2
+----------------------------------------------------------------------------------------------------------------------------
+event_id  delta_brier_hist_minus_logistic  delta_bss_hist_minus_logistic  delta_ap_hist_minus_logistic  delta_auc_hist_minus_logistic
+   ge_20                         0.000384                      -0.004780                      0.013049                       0.011232
+   ge_30                         0.002458                      -0.016744                      0.022675                       0.009770
+   ge_40                         0.002393                      -0.033300                      0.012774                       0.010644
+   ge_45                         0.002220                      -0.093404                     -0.000337                       0.007070
+    gt_0                         0.000934                      -0.007051                      0.010033                       0.010881
+
+GANHO DE VARIABILIDADE ESPACIAL - MEANS+STD vs MEANS ONLY
+----------------------------------------------------------------------------------------------------------------------------
+event_id  delta_brier_means_std_minus_means  delta_bss_means_std_minus_means  delta_ap_means_std_minus_means
+   ge_20                          -0.001967                         0.008647                        0.004590
+   ge_30                          -0.001101                         0.007668                        0.011765
+   ge_40                          -0.000378                         0.005021                        0.001318
+   ge_45                           0.000035                        -0.001700                       -0.003836
+    gt_0                          -0.001958                         0.008577                        0.004417
+
+COEFICIENTES LOGÍSTICOS ESTÁVEIS - MEANS_PLUS_STD
+----------------------------------------------------------------------------------------------------------------------------
+[gt_0]
+                  feature  n_folds  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+               tcwv__mean        5          0.647829         0.038612              0.647829               1.0
+      wind_speed_10__mean        5         -0.443147         0.055684              0.443147               1.0
+              u_850__mean        5         -0.342135         0.064316              0.342135               1.0
+       wind_speed_10__std        5          0.323369         0.037247              0.323369               1.0
+     wind_speed_500__mean        5          0.302462         0.097071              0.302462               1.0
+              r_850__mean        5          0.295782         0.118427              0.295782               1.0
+              r_500__mean        5          0.290225         0.052729              0.290225               1.0
+                v10__mean        5          0.289388         0.042306              0.289388               1.0
+delta_t_850_surface__mean        5         -0.280689         0.025322              0.280689               1.0
+     wind_speed_850__mean        5          0.270548         0.031547              0.270548               1.0
+
+[ge_20]
+                  feature  n_folds  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+               tcwv__mean        5          0.656131         0.036452              0.656131               1.0
+      wind_speed_10__mean        5         -0.441877         0.055722              0.441877               1.0
+              u_850__mean        5         -0.343589         0.065653              0.343589               1.0
+       wind_speed_10__std        5          0.321400         0.037562              0.321400               1.0
+     wind_speed_500__mean        5          0.305852         0.099047              0.305852               1.0
+              r_850__mean        5          0.294042         0.117959              0.294042               1.0
+                v10__mean        5          0.288861         0.042448              0.288861               1.0
+              r_500__mean        5          0.288131         0.052046              0.288131               1.0
+delta_t_850_surface__mean        5         -0.281864         0.024961              0.281864               1.0
+     wind_speed_850__mean        5          0.267690         0.031226              0.267690               1.0
+
+[ge_30]
+                  feature  n_folds  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+               tcwv__mean        5          0.775240         0.054320              0.775240               1.0
+              r_850__mean        5          0.479963         0.121491              0.479963               1.0
+      wind_speed_10__mean        5         -0.424661         0.024973              0.424661               1.0
+     wind_speed_500__mean        5          0.414637         0.060594              0.414637               1.0
+delta_t_850_surface__mean        5         -0.394063         0.028318              0.394063               1.0
+                t2m__mean        5          0.381654         0.022541              0.381654               1.0
+              u_850__mean        5         -0.378581         0.032523              0.378581               1.0
+              r_500__mean        5          0.290297         0.050952              0.290297               1.0
+      wind_speed_850__std        5         -0.275962         0.042818              0.275962               1.0
+    delta_t_500_850__mean        5         -0.265554         0.047975              0.265554               1.0
+
+[ge_40]
+                  feature  n_folds  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+               tcwv__mean        5          0.593325         0.117499              0.593325               1.0
+                t2m__mean        5          0.558788         0.027096              0.558788               1.0
+              r_850__mean        5          0.551849         0.151532              0.551849               1.0
+      wind_speed_10__mean        5         -0.490830         0.039750              0.490830               1.0
+delta_t_850_surface__mean        5         -0.422417         0.042318              0.422417               1.0
+    delta_t_500_850__mean        5         -0.402224         0.039821              0.402224               1.0
+              u_850__mean        5         -0.337594         0.051282              0.337594               1.0
+                v10__mean        5          0.323474         0.053394              0.323474               1.0
+                u10__mean        5          0.303474         0.043546              0.303474               1.0
+     wind_speed_500__mean        5          0.295939         0.082351              0.295939               1.0
+
+[ge_45]
+                  feature  n_folds  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+                t2m__mean        5          0.803010         0.034285              0.803010               1.0
+              r_850__mean        5          0.787524         0.128372              0.787524               1.0
+    delta_t_500_850__mean        5         -0.691487         0.023355              0.691487               1.0
+              t_850__mean        5          0.480793         0.045266              0.480793               1.0
+      wind_speed_10__mean        5         -0.382471         0.032801              0.382471               1.0
+delta_t_850_surface__mean        5         -0.369820         0.097830              0.369820               1.0
+                v10__mean        5          0.345278         0.021664              0.345278               1.0
+              r_500__mean        5          0.300225         0.087543              0.300225               1.0
+     wind_speed_500__mean        5          0.262838         0.100514              0.262838               1.0
+              u_500__mean        5          0.233936         0.052453              0.233936               1.0
+
+IMPORTÂNCIA AGREGADA POR FAMÍLIA - LOGISTIC L2
+----------------------------------------------------------------------------------------------------------------------------
+target   family  mean_abs_standardized_coefficient  max_abs_standardized_coefficient  mean_sign_consistency  n_features
+ ge_20 moisture                           0.221785                          0.656131               0.950000           8
+ ge_20 dynamics                           0.169377                          0.441877               0.972727          22
+ ge_20  thermal                           0.110651                          0.281864               0.920000          10
+ ge_30 moisture                           0.262233                          0.775240               0.950000           8
+ ge_30 dynamics                           0.182005                          0.424661               0.954545          22
+ ge_30  thermal                           0.161257                          0.394063               0.920000          10
+ ge_40 moisture                           0.263005                          0.593325               1.000000           8
+ ge_40  thermal                           0.210979                          0.558788               0.940000          10
+ ge_40 dynamics                           0.163490                          0.490830               0.927273          22
+ ge_45  thermal                           0.292984                          0.803010               0.920000          10
+ ge_45 moisture                           0.274018                          0.787524               0.975000           8
+ ge_45 dynamics                           0.139206                          0.382471               0.945455          22
+  gt_0 moisture                           0.221320                          0.647829               0.950000           8
+  gt_0 dynamics                           0.169280                          0.443147               0.972727          22
+  gt_0  thermal                           0.110161                          0.280689               0.920000          10
+
+MÉTRICAS CONTÍNUAS - MÉDIA DOS FOLDS
+----------------------------------------------------------------------------------------------------------------------------
+                    target                  model     representation  n_folds  rmse_mean  rmse_skill_vs_climatology_mean  mae_mean  mae_skill_vs_climatology_mean  bias_mean
+event_pixel_fraction_ge_30               ridge_l2         means_only        5   0.031052                        0.052582  0.010088                      -0.051733   0.001181
+event_pixel_fraction_ge_30               ridge_l2     means_plus_std        5   0.031193                        0.045017  0.010298                      -0.076767   0.001154
+event_pixel_fraction_ge_30 climatology_month_hour calendar_reference        5   0.032056                        0.000000  0.009595                       0.000000   0.001298
+event_pixel_fraction_ge_40               ridge_l2         means_only        5   0.012630                        0.122112  0.003018                      -0.126778   0.000534
+event_pixel_fraction_ge_40               ridge_l2     means_plus_std        5   0.012789                        0.092296  0.003164                      -0.189458   0.000511
+event_pixel_fraction_ge_40 climatology_month_hour calendar_reference        5   0.013280                        0.000000  0.002678                       0.000000   0.000640
+event_pixel_fraction_ge_45               ridge_l2         means_only        5   0.009478                        0.251289  0.001955                      -0.303797   0.000392
+event_pixel_fraction_ge_45               ridge_l2     means_plus_std        5   0.009693                        0.185790  0.002125                      -0.439183   0.000363
+event_pixel_fraction_ge_45 climatology_month_hour calendar_reference        5   0.010284                        0.000000  0.001546                       0.000000   0.000478
+          max_target_log1p               ridge_l2     means_plus_std        5   1.439835                        0.120147  1.193233                       0.144490  -0.127073
+          max_target_log1p               ridge_l2         means_only        5   1.449826                        0.114038  1.208335                       0.133633  -0.132792
+          max_target_log1p climatology_month_hour calendar_reference        5   1.635820                        0.000000  1.394083                       0.000000  -0.122315
+   positive_pixel_fraction               ridge_l2     means_plus_std        5   0.056798                        0.051173  0.023999                       0.001818  -0.001034
+   positive_pixel_fraction               ridge_l2         means_only        5   0.057055                        0.046740  0.023798                       0.011407  -0.001050
+   positive_pixel_fraction climatology_month_hour calendar_reference        5   0.059448                        0.000000  0.024106                       0.000000  -0.001254
+
+COEFICIENTES RIDGE ESTÁVEIS - MEANS_PLUS_STD
+----------------------------------------------------------------------------------------------------------------------------
+[max_target_log1p]
+              feature  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+           tcwv__mean          0.289199         0.031815              0.289199               1.0
+          r_500__mean          0.199135         0.019389              0.199135               1.0
+   wind_speed_10__std          0.165888         0.015925              0.165888               1.0
+  wind_speed_10__mean         -0.157527         0.019618              0.157527               1.0
+          v_850__mean          0.156344         0.015817              0.156344               1.0
+          u_850__mean         -0.144439         0.025222              0.144439               1.0
+             u10__std         -0.135770         0.018931              0.135770               1.0
+            v10__mean          0.124643         0.011136              0.124643               1.0
+          r_850__mean          0.122277         0.035142              0.122277               1.0
+delta_r_500_850__mean          0.121661         0.006771              0.121661               1.0
+
+[positive_pixel_fraction]
+                 feature  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+             r_500__mean          0.006632         0.000077              0.006632               1.0
+    wind_speed_500__mean          0.005881         0.001667              0.005881               1.0
+             u_850__mean         -0.005324         0.000660              0.005324               1.0
+                t2m__std         -0.004958         0.000815              0.004958               1.0
+delta_t_850_surface__std          0.004709         0.000786              0.004709               1.0
+               v10__mean          0.004626         0.000698              0.004626               1.0
+   delta_r_500_850__mean          0.004305         0.000282              0.004305               1.0
+             r_850__mean          0.003675         0.000392              0.003675               1.0
+              r_500__std         -0.003298         0.000338              0.003298               1.0
+              u_850__std          0.003294         0.000201              0.003294               1.0
+
+[event_pixel_fraction_ge_30]
+                 feature  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+    wind_speed_500__mean          0.003664         0.001120              0.003664               1.0
+                t2m__std         -0.003193         0.001132              0.003193               1.0
+delta_t_850_surface__std          0.003096         0.000970              0.003096               1.0
+             u_850__mean         -0.003076         0.000839              0.003076               1.0
+               v10__mean          0.003045         0.000929              0.003045               1.0
+              tcwv__mean         -0.002291         0.001426              0.002291               1.0
+                v10__std          0.002217         0.000872              0.002217               1.0
+             t_850__mean          0.002180         0.000883              0.002180               1.0
+             r_500__mean          0.001959         0.000269              0.001959               1.0
+              u_500__std          0.001958         0.000862              0.001958               1.0
+
+[event_pixel_fraction_ge_40]
+                 feature  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+              tcwv__mean         -0.002006         0.000874              0.002006               1.0
+    wind_speed_500__mean          0.001235         0.000396              0.001235               1.0
+                t2m__std         -0.001166         0.000608              0.001166               1.0
+             t_850__mean          0.001078         0.000437              0.001078               1.0
+               v10__mean          0.001077         0.000408              0.001077               1.0
+delta_t_850_surface__std          0.001037         0.000502              0.001037               1.0
+             t_500__mean          0.000981         0.000501              0.000981               1.0
+              u_500__std          0.000944         0.000448              0.000944               1.0
+                v10__std          0.000913         0.000379              0.000913               1.0
+    delta_t_500_850__std          0.000878         0.000368              0.000878               1.0
+
+[event_pixel_fraction_ge_45]
+                 feature  coefficient_mean  coefficient_std  coefficient_abs_mean  sign_consistency
+              tcwv__mean         -0.002001         0.000804              0.002001               1.0
+                t2m__std         -0.000919         0.000546              0.000919               1.0
+             t_850__mean          0.000894         0.000385              0.000894               1.0
+             t_500__mean          0.000877         0.000435              0.000877               1.0
+    wind_speed_500__mean          0.000866         0.000268              0.000866               1.0
+               v10__mean          0.000793         0.000334              0.000793               1.0
+    delta_t_500_850__std          0.000784         0.000346              0.000784               1.0
+delta_t_850_surface__std          0.000767         0.000449              0.000767               1.0
+              u_500__std          0.000759         0.000385              0.000759               1.0
+                v10__std          0.000661         0.000295              0.000661               1.0
+
+DETALHE TEMPORAL - >=45 dBZ
+----------------------------------------------------------------------------------------------------------------------------
+fold_id                  model     representation  weighted_event_rate    brier  brier_skill_vs_climatology  roc_auc  average_precision  ece_10bins
+     F1            logistic_l2     means_plus_std             0.024462 0.021112                    0.105416 0.898404           0.265899    0.019037
+     F1            logistic_l2         means_only             0.024462 0.021118                    0.105168 0.896065           0.278854    0.021139
+     F1 climatology_month_hour calendar_reference             0.024462 0.023599                    0.000000 0.793676           0.094767    0.013166
+     F1 hist_gradient_boosting     means_plus_std             0.024462 0.027715                   -0.174406 0.892274           0.251493    0.038883
+     F2            logistic_l2     means_plus_std             0.032096 0.026123                    0.129255 0.893658           0.304487    0.008448
+     F2            logistic_l2         means_only             0.032096 0.026507                    0.116454 0.892222           0.282478    0.005974
+     F2 hist_gradient_boosting     means_plus_std             0.032096 0.027627                    0.079093 0.897061           0.298822    0.016350
+     F2 climatology_month_hour calendar_reference             0.032096 0.030000                    0.000000 0.775450           0.108681    0.007451
+     F3            logistic_l2         means_only             0.028586 0.023523                    0.128227 0.886274           0.287364    0.008919
+     F3            logistic_l2     means_plus_std             0.028586 0.023584                    0.125988 0.888737           0.285830    0.007878
+     F3 hist_gradient_boosting     means_plus_std             0.028586 0.026260                    0.026816 0.883860           0.249690    0.019462
+     F3 climatology_month_hour calendar_reference             0.028586 0.026983                    0.000000 0.721347           0.099120    0.006185
+     F4            logistic_l2         means_only             0.015932 0.013643                    0.139399 0.927044           0.228497    0.008438
+     F4            logistic_l2     means_plus_std             0.015932 0.013736                    0.133547 0.928401           0.224993    0.009124
+     F4 hist_gradient_boosting     means_plus_std             0.015932 0.014642                    0.076413 0.920914           0.228718    0.014724
+     F4 climatology_month_hour calendar_reference             0.015932 0.015853                    0.000000 0.800992           0.069611    0.015680
+     F5 hist_gradient_boosting     means_plus_std             0.032821 0.028742                    0.062274 0.788115           0.221469    0.007909
+     F5            logistic_l2         means_only             0.032821 0.028920                    0.056459 0.744835           0.193867    0.009539
+     F5            logistic_l2     means_plus_std             0.032821 0.029332                    0.043002 0.737676           0.170670    0.008593
+     F5 climatology_month_hour calendar_reference             0.032821 0.030650                    0.000000 0.669229           0.102506    0.005511
+
+STATUS DOS MODELOS
+----------------------------------------------------------------------------------------------------------------------------
+Registros de status: 125 | não-ok: 0
+
+AVISOS / NOTAS
+----------------------------------------------------------------------------------------------------------------------------
+- WARNING: The multivariate analysis uses a stratified sample containing <5% of all patches. Inverse stratum weights are used.
+- NOTE: All overlapping patches from the same timestamp fall in the same temporal period, but adjacent timestamps can belong to the same weather system.
+- NOTE: Forward folds are provisional. Phase 15 remains responsible for the formal train/validation/test split.
+- NOTE: The month x local-hour climatology is fit using training rows only in each fold.
+- NOTE: Logistic and ridge coefficients use weighted standardized features. Collinearity can redistribute coefficient weight among correlated predictors.
+- NOTE: PCA uses the weighted correlation matrix of the 20 patch-mean predictors and diagnoses redundancy, not supervised importance.
+- NOTE: HistGradientBoosting is only a nonlinear screening model; hyperparameters are fixed rather than tuned.
+- NOTE: means_plus_std adds within-patch variability but is not the formal ablation study planned for Phase 17.
+- NOTE: Metrics are weighted to approximate the original patch distribution. Weighted patch mass is not an independent sample size.
+- NOTE: Pixel fractions remain properties of overlapping patches, not de-duplicated full radar fields.
+- NOTE: All multivariate results are descriptive/predictive screening and do not establish causality.
+
+============================================================================================================================
+FIM DA FASE 12
+============================================================================================================================

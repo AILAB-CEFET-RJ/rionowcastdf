@@ -1,0 +1,249 @@
+{
+  "audit_version": "phase0-audit-v1",
+  "audit_mode": "quick",
+  "audit_started_utc": "2026-09-13T17:45:23.420751+00:00",
+  "audit_finished_utc": "2026-09-13T17:45:36.528906+00:00",
+  "elapsed_seconds": 13.10816143010743,
+  "system": {
+    "hostname": "librae",
+    "platform": "Linux-5.15.0-107-generic-x86_64-with-glibc2.35",
+    "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+    "pid": 443838
+  },
+  "paths": {
+    "dataset_dir": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024",
+    "zarr_path": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/train.zarr",
+    "metadata_path": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/metadata.json",
+    "normalization_path": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_2011_2024/normalization.npz",
+    "output_dir": "/home/vsantos/repositories/rionowcastdf/analysis_outputs/00_quality_quick"
+  },
+  "dataset": {
+    "num_samples": 1132464,
+    "num_channels": 12,
+    "channels": [
+      "tcwv",
+      "t2m",
+      "u10",
+      "v10",
+      "t_850",
+      "r_850",
+      "u_850",
+      "v_850",
+      "t_500",
+      "r_500",
+      "u_500",
+      "v_500"
+    ],
+    "input_shape": [
+      1132464,
+      12,
+      32,
+      32
+    ],
+    "target_shape": [
+      1132464,
+      1,
+      32,
+      32
+    ],
+    "mask_shape": [
+      1132464,
+      1,
+      32,
+      32
+    ],
+    "sample_dimensions": {
+      "input": 1132464,
+      "target": 1132464,
+      "mask": 1132464,
+      "timestamps": 1132464,
+      "patch_row": 1132464,
+      "patch_col": 1132464
+    },
+    "sample_dimension_consistent": true,
+    "zarr_arrays": {
+      "input": {
+        "shape": [
+          1132464,
+          12,
+          32,
+          32
+        ],
+        "chunks": [
+          256,
+          12,
+          32,
+          32
+        ],
+        "dtype": "float32",
+        "compressor": "Blosc(cname='zstd', clevel=3, shuffle=BITSHUFFLE, blocksize=0)"
+      },
+      "mask": {
+        "shape": [
+          1132464,
+          1,
+          32,
+          32
+        ],
+        "chunks": [
+          256,
+          1,
+          32,
+          32
+        ],
+        "dtype": "float32",
+        "compressor": "Blosc(cname='zstd', clevel=3, shuffle=BITSHUFFLE, blocksize=0)"
+      },
+      "patch_col": {
+        "shape": [
+          1132464
+        ],
+        "chunks": [
+          256
+        ],
+        "dtype": "int16",
+        "compressor": "Blosc(cname='zstd', clevel=3, shuffle=BITSHUFFLE, blocksize=0)"
+      },
+      "patch_row": {
+        "shape": [
+          1132464
+        ],
+        "chunks": [
+          256
+        ],
+        "dtype": "int16",
+        "compressor": "Blosc(cname='zstd', clevel=3, shuffle=BITSHUFFLE, blocksize=0)"
+      },
+      "target": {
+        "shape": [
+          1132464,
+          1,
+          32,
+          32
+        ],
+        "chunks": [
+          256,
+          1,
+          32,
+          32
+        ],
+        "dtype": "float32",
+        "compressor": "Blosc(cname='zstd', clevel=3, shuffle=BITSHUFFLE, blocksize=0)"
+      },
+      "timestamps": {
+        "shape": [
+          1132464
+        ],
+        "chunks": [
+          256
+        ],
+        "dtype": "int64",
+        "compressor": "Blosc(cname='zstd', clevel=3, shuffle=BITSHUFFLE, blocksize=0)"
+      }
+    },
+    "zarr_attrs": {
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "patch_size": 32,
+      "pressure_levels_hpa": [
+        850,
+        500
+      ],
+      "pressure_variables": [
+        "t",
+        "r",
+        "u",
+        "v"
+      ],
+      "radar_resolution_km": 2.0,
+      "stride": 16,
+      "surface_variables": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10"
+      ],
+      "target_transform": "log1p"
+    },
+    "target_transform": "log1p"
+  },
+  "configuration": {
+    "start_date": "2011-01-01T00:00:00",
+    "end_date": "2024-12-31T23:00:00",
+    "time_frequency": "1h",
+    "patch_size": 32,
+    "stride": 16,
+    "radar_grid_shape": [
+      70,
+      84
+    ],
+    "radar_resolution_km": 2.0,
+    "surface_variables": [
+      "tcwv",
+      "t2m",
+      "u10",
+      "v10"
+    ],
+    "pressure_variables": [
+      "t",
+      "r",
+      "u",
+      "v"
+    ],
+    "pressure_levels_hpa": [
+      850,
+      500
+    ]
+  },
+  "temporal": {
+    "timestamp_storage_unit_detected": "s",
+    "expected_timestamps": 122736,
+    "available_timestamps": 94372,
+    "missing_timestamps": 28364,
+    "coverage_ratio": 0.7689023595359145,
+    "first_observed_timestamp": "2011-01-17T18:00:00",
+    "last_observed_timestamp": "2024-12-31T23:00:00",
+    "patches_per_timestamp": {
+      "min": 12,
+      "p25": 12.0,
+      "median": 12.0,
+      "mean": 12.0,
+      "p75": 12.0,
+      "max": 12
+    }
+  },
+  "patch_geometry": {
+    "expected_patch_positions_per_full_field": 12,
+    "actual_unique_patch_positions": 12,
+    "expected_spatial_coverage_ratio": 0.8707482993197279,
+    "actual_spatial_coverage_ratio": 0.8707482993197279
+  },
+  "mask": {},
+  "target_integrity": {},
+  "builder_counters": {
+    "timestamps_total": 122736,
+    "timestamps_processed": 94372,
+    "missing_radar": 28361,
+    "invalid_radar": 3,
+    "missing_era5": 0,
+    "shape_mismatch": 0,
+    "patches_rejected_radar": 0,
+    "patches_rejected_input": 0,
+    "patches_written": 1132464
+  },
+  "warnings_count": 0,
+  "notes_count": 3,
+  "status": "PASS"
+}

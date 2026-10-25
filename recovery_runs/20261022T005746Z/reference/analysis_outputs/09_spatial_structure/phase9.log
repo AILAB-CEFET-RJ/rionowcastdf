@@ -1,0 +1,64 @@
+2026-09-20 11:23:31 | INFO | ================================================================================
+2026-09-20 11:23:31 | INFO | CORRDIFF - PHASE 9 - RADAR SPATIAL STRUCTURE
+2026-09-20 11:23:31 | INFO | Dataset            : datasets/corrdiff_2011_2024
+2026-09-20 11:23:31 | INFO | Target shape       : (1016208, 1, 32, 32)
+2026-09-20 11:23:31 | INFO | Patch shape        : (32, 32)
+2026-09-20 11:23:31 | INFO | Spatial steps px   : [1, 2, 4, 8, 16]
+2026-09-20 11:23:31 | INFO | Radar resolution   : 2.000 km/pixel
+2026-09-20 11:23:31 | INFO | Sample/stratum     : 5000
+2026-09-20 11:23:31 | INFO | ================================================================================
+2026-09-20 11:23:31 | INFO | ================================================================================
+2026-09-20 11:23:31 | INFO | PHASE 9 - PASS A - PATCH INTENSITY STRATA
+2026-09-20 11:23:31 | INFO | Target patches      : 1016208
+2026-09-20 11:23:31 | INFO | Target shape        : (1016208, 1, 32, 32)
+2026-09-20 11:23:31 | INFO | First-axis chunk    : 256
+2026-09-20 11:23:31 | INFO | ================================================================================
+2026-09-20 11:23:31 | INFO | PASS A: 51200/1016208 patches
+2026-09-20 11:23:31 | INFO | PASS A: 102400/1016208 patches
+2026-09-20 11:23:31 | INFO | PASS A: 153600/1016208 patches
+2026-09-20 11:23:31 | INFO | PASS A: 204800/1016208 patches
+2026-09-20 11:23:31 | INFO | PASS A: 256000/1016208 patches
+2026-09-20 11:23:31 | INFO | PASS A: 307200/1016208 patches
+2026-09-20 11:23:31 | INFO | PASS A: 358400/1016208 patches
+2026-09-20 11:23:31 | INFO | PASS A: 409600/1016208 patches
+2026-09-20 11:23:31 | INFO | PASS A: 460800/1016208 patches
+2026-09-20 11:23:31 | INFO | PASS A: 512000/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 563200/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 614400/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 665600/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 716800/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 768000/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 819200/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 870400/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 921600/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 972800/1016208 patches
+2026-09-20 11:23:32 | INFO | PASS A: 1016208/1016208 patches
+2026-09-20 11:23:33 | INFO | Sampled patches     : 26273
+2026-09-20 11:23:33 | INFO | ================================================================================
+2026-09-20 11:23:33 | INFO | PHASE 9 - PASS B - SPATIAL + MORPHOLOGY
+2026-09-20 11:23:33 | INFO | Input chunks with sample: 3830
+2026-09-20 11:23:33 | INFO | ================================================================================
+2026-09-20 11:23:36 | INFO | PASS B: chunks 200/3830 | sampled patches 1382/26273
+2026-09-20 11:23:39 | INFO | PASS B: chunks 400/3830 | sampled patches 2471/26273
+2026-09-20 11:23:43 | INFO | PASS B: chunks 600/3830 | sampled patches 4158/26273
+2026-09-20 11:23:46 | INFO | PASS B: chunks 800/3830 | sampled patches 5403/26273
+2026-09-20 11:23:49 | INFO | PASS B: chunks 1000/3830 | sampled patches 6847/26273
+2026-09-20 11:23:52 | INFO | PASS B: chunks 1200/3830 | sampled patches 8124/26273
+2026-09-20 11:23:55 | INFO | PASS B: chunks 1400/3830 | sampled patches 9183/26273
+2026-09-20 11:23:58 | INFO | PASS B: chunks 1600/3830 | sampled patches 10474/26273
+2026-09-20 11:24:02 | INFO | PASS B: chunks 1800/3830 | sampled patches 11941/26273
+2026-09-20 11:24:05 | INFO | PASS B: chunks 2000/3830 | sampled patches 13127/26273
+2026-09-20 11:24:08 | INFO | PASS B: chunks 2200/3830 | sampled patches 14640/26273
+2026-09-20 11:24:12 | INFO | PASS B: chunks 2400/3830 | sampled patches 16130/26273
+2026-09-20 11:24:15 | INFO | PASS B: chunks 2600/3830 | sampled patches 17460/26273
+2026-09-20 11:24:19 | INFO | PASS B: chunks 2800/3830 | sampled patches 18760/26273
+2026-09-20 11:24:22 | INFO | PASS B: chunks 3000/3830 | sampled patches 20243/26273
+2026-09-20 11:24:25 | INFO | PASS B: chunks 3200/3830 | sampled patches 21566/26273
+2026-09-20 11:24:28 | INFO | PASS B: chunks 3400/3830 | sampled patches 22763/26273
+2026-09-20 11:24:32 | INFO | PASS B: chunks 3600/3830 | sampled patches 24305/26273
+2026-09-20 11:24:36 | INFO | PASS B: chunks 3800/3830 | sampled patches 25954/26273
+2026-09-20 11:24:37 | INFO | PASS B: chunks 3830/3830 | sampled patches 26273/26273
+2026-09-20 11:24:37 | INFO | ================================================================================
+2026-09-20 11:24:37 | INFO | PHASE 9 COMPLETE
+2026-09-20 11:24:37 | INFO | Output: analysis_outputs/09_spatial_structure
+2026-09-20 11:24:37 | INFO | ================================================================================

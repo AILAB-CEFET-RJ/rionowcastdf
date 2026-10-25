@@ -1,0 +1,97 @@
+{
+  "phase_version": "phase14-distribution-shift-v1-coverage-regime-conditional",
+  "phase6_dir": "analysis_outputs/06_diurnal",
+  "phase13_dir": "analysis_outputs/13_regimes",
+  "n_predictor_timestamps": 84684,
+  "n_radar_timestamps": 84684,
+  "n_regime_assignment_rows": 169368,
+  "available_predictors": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500",
+    "wind_speed_10",
+    "wind_speed_850",
+    "wind_speed_500",
+    "delta_t_500_850",
+    "delta_t_850_surface",
+    "delta_r_500_850",
+    "bulk_wind_diff_10_850",
+    "bulk_wind_diff_850_500"
+  ],
+  "dataset_start_utc": "2011-01-01 00:00:00+00:00",
+  "dataset_end_utc": "2024-12-31 23:00:00+00:00",
+  "bootstrap_reps": 500,
+  "bootstrap_block": "UTC_day",
+  "psi_bins": 10,
+  "comparisons": [
+    {
+      "comparison_id": "Y2021_vs_pre2021",
+      "reference_start_year": 2011,
+      "reference_end_year": 2020,
+      "evaluation_start_year": 2021,
+      "evaluation_end_year": 2021,
+      "purpose": "year-specific shift"
+    },
+    {
+      "comparison_id": "Y2022_vs_pre2021",
+      "reference_start_year": 2011,
+      "reference_end_year": 2020,
+      "evaluation_start_year": 2022,
+      "evaluation_end_year": 2022,
+      "purpose": "year-specific shift"
+    },
+    {
+      "comparison_id": "Y2023_vs_pre2021",
+      "reference_start_year": 2011,
+      "reference_end_year": 2020,
+      "evaluation_start_year": 2023,
+      "evaluation_end_year": 2023,
+      "purpose": "year-specific shift"
+    },
+    {
+      "comparison_id": "Y2024_vs_pre2021",
+      "reference_start_year": 2011,
+      "reference_end_year": 2020,
+      "evaluation_start_year": 2024,
+      "evaluation_end_year": 2024,
+      "purpose": "year-specific shift"
+    },
+    {
+      "comparison_id": "RECENT_2023_2024_vs_pre2023",
+      "reference_start_year": 2011,
+      "reference_end_year": 2022,
+      "evaluation_start_year": 2023,
+      "evaluation_end_year": 2024,
+      "purpose": "F5-oriented shift"
+    }
+  ],
+  "scope": "coverage, marginal ERA5, regime-composition and within-regime radar shift diagnostics",
+  "warnings": [
+    "All target/radar shift results are conditioned on timestamps with radar availability. Coverage shift is therefore analyzed explicitly and must be considered before interpreting physical change.",
+    "Predictor shift uses timestamp-level ERA5 summaries from Phase 6, not the full native ERA5 fields.",
+    "Absolute predictor shift can include seasonal-composition effects. A reference month x local-hour anomaly representation is reported separately.",
+    "Reference climatologies for anomaly-space comparisons are fit only on the reference period of each comparison.",
+    "Regime shift uses Phase 13 KMeans assignments. Regimes are statistical states, not unique physical weather classes.",
+    "Daily block bootstrap preserves within-day temporal dependence but does not eliminate dependence across adjacent multi-day weather systems.",
+    "Event-rate decomposition is exact for the chosen regime partition and observed radar-available timestamps, but it is not a causal decomposition.",
+    "The 2024 record should be interpreted with particular care if its radar availability differs substantially from earlier years.",
+    "Phase 14 diagnoses dataset/relationship shift. It does not itself define the final train/validation/test split; that is Phase 15."
+  ],
+  "methodological_notes": [
+    "The F5-oriented comparison uses 2011-2022 as reference and 2023-2024 as evaluation because Phase 12 showed its strongest performance degradation in the final forward fold.",
+    "Year-specific comparisons use 2011-2020 as a fixed historical reference to make 2021, 2022, 2023 and 2024 directly comparable.",
+    "Predictor shift reports standardized mean difference, KS, PSI and standardized quantile shifts. No single statistic should be treated as a standalone definition of distribution shift.",
+    "Regime-composition shift reports Jensen-Shannon divergence, total-variation distance and per-regime prevalence deltas.",
+    "Conditional radar shift compares P(event | regime) between reference and evaluation windows with UTC-day block-bootstrap confidence intervals.",
+    "The symmetric Shapley decomposition separates the observed event rate change into regime-composition and within-regime components that sum exactly up to numerical rounding."
+  ]
+}

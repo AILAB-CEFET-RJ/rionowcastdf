@@ -1,0 +1,561 @@
+========================================================================================================================
+CORRDIFF - FASE 10 - RELAÇÕES ESPACIAIS ERA5 × RADAR
+========================================================================================================================
+Versão: phase10-spatial-era5-radar-v1-aligned-centered-offset
+Input shape: [1016208, 12, 32, 32]
+Target shape: [1016208, 1, 32, 32]
+Patches: 1016208 | amostrados: 16273 (1.60%)
+Unidade radar: dBZ
+Resolução da grade CorrDiff: 2.0 km/pixel
+Janelas de suavização: [1, 3, 5, 9, 17]
+Offsets: [2, 4, 8]
+Fonte dos nomes dos canais: cli
+Escopo: aligned overlapping 32x32 training-patch distribution; not de-duplicated full-field radar climatology
+
+ESTRATOS DE INTENSIDADE - SCAN EXATO DO TARGET
+------------------------------------------------------------------------------------------------------------------------
+ stratum_id   stratum  patch_count  patch_ratio
+          0       dry       712492     0.701128
+          1  gt0_lt20         1273     0.001253
+          2 ge20_lt30       139042     0.136824
+          3 ge30_lt40        86131     0.084757
+          4 ge40_lt45        48650     0.047874
+          5      ge45        28620     0.028164
+
+PREDITORES
+------------------------------------------------------------------------------------------------------------------------
+             predictor  source  input_channel_index channel_name_source                              definition
+                  tcwv     raw                  0.0                 cli                                    tcwv
+                   t2m     raw                  1.0                 cli                                     t2m
+                   u10     raw                  2.0                 cli                                     u10
+                   v10     raw                  3.0                 cli                                     v10
+                 t_850     raw                  4.0                 cli                                   t_850
+                 r_850     raw                  5.0                 cli                                   r_850
+                 u_850     raw                  6.0                 cli                                   u_850
+                 v_850     raw                  7.0                 cli                                   v_850
+                 t_500     raw                  8.0                 cli                                   t_500
+                 r_500     raw                  9.0                 cli                                   r_500
+                 u_500     raw                 10.0                 cli                                   u_500
+                 v_500     raw                 11.0                 cli                                   v_500
+         wind_speed_10 derived                  NaN                 cli                     sqrt(u10^2 + v10^2)
+        wind_speed_850 derived                  NaN                 cli                 sqrt(u_850^2 + v_850^2)
+        wind_speed_500 derived                  NaN                 cli                 sqrt(u_500^2 + v_500^2)
+       delta_t_500_850 derived                  NaN                 cli                           t_500 - t_850
+   delta_t_850_surface derived                  NaN                 cli                             t_850 - t2m
+       delta_r_500_850 derived                  NaN                 cli                           r_500 - r_850
+ bulk_wind_diff_10_850 derived                  NaN                 cli     sqrt((u_850-u10)^2 + (v_850-v10)^2)
+bulk_wind_diff_850_500 derived                  NaN                 cli sqrt((u_500-u_850)^2 + (v_500-v_850)^2)
+
+ASSOCIAÇÃO PIXEL A PIXEL - SEM SUAVIZAÇÃO - RAW
+------------------------------------------------------------------------------------------------------------------------
+[target_log1p]
+      predictor  pearson_r  predictor_mean  predictor_std  radar_mean
+          r_500   0.112938       33.851301      31.089339    0.048842
+           tcwv   0.098522       36.219584      11.350060    0.048842
+delta_r_500_850   0.084528      -39.662098      32.104584    0.048842
+          v_500  -0.066103       -0.172738       5.847261    0.048842
+          r_850   0.044515       73.513399      17.913503    0.048842
+          t_850   0.040505      288.793210       3.516848    0.048842
+          t_500   0.039772      265.455764       2.205076    0.048842
+            t2m   0.035433      296.325496       3.390401    0.048842
+            v10   0.029048        0.041678       2.120081    0.048842
+            u10   0.027571       -1.037354       2.700282    0.048842
+
+[gt_0]
+      predictor  pearson_r  predictor_mean  predictor_std  radar_mean
+          r_500   0.117378       33.851301      31.089339    0.014768
+           tcwv   0.101768       36.219584      11.350060    0.014768
+delta_r_500_850   0.087021      -39.662098      32.104584    0.014768
+          v_500  -0.067134       -0.172738       5.847261    0.014768
+          r_850   0.047753       73.513399      17.913503    0.014768
+          t_850   0.038899      288.793210       3.516848    0.014768
+          t_500   0.038354      265.455764       2.205076    0.014768
+            t2m   0.035119      296.325496       3.390401    0.014768
+            v10   0.029778        0.041678       2.120081    0.014768
+            u10   0.027995       -1.037354       2.700282    0.014768
+
+[ge_20]
+      predictor  pearson_r  predictor_mean  predictor_std  radar_mean
+          r_500   0.116373       33.851301      31.089339    0.014592
+           tcwv   0.100814       36.219584      11.350060    0.014592
+delta_r_500_850   0.086378      -39.662098      32.104584    0.014592
+          v_500  -0.066722       -0.172738       5.847261    0.014592
+          r_850   0.047162       73.513399      17.913503    0.014592
+          t_850   0.038663      288.793210       3.516848    0.014592
+          t_500   0.038183      265.455764       2.205076    0.014592
+            t2m   0.034756      296.325496       3.390401    0.014592
+            v10   0.029522        0.041678       2.120081    0.014592
+            u10   0.027714       -1.037354       2.700282    0.014592
+
+[ge_30]
+          predictor  pearson_r  predictor_mean  predictor_std  radar_mean
+               tcwv   0.038670       36.219584      11.350060    0.005243
+              t_850   0.038279      288.793210       3.516848    0.005243
+              r_500   0.037155       33.851301      31.089339    0.005243
+              t_500   0.035588      265.455764       2.205076    0.005243
+    delta_r_500_850   0.033875      -39.662098      32.104584    0.005243
+              v_500  -0.033049       -0.172738       5.847261    0.005243
+                t2m   0.026754      296.325496       3.390401    0.005243
+    delta_t_500_850  -0.019208      -23.337446       2.923063    0.005243
+      wind_speed_10  -0.017230        2.930605       2.067768    0.005243
+delta_t_850_surface   0.015691       -7.532286       2.798770    0.005243
+
+[ge_40]
+          predictor  pearson_r  predictor_mean  predictor_std  radar_mean
+              t_850   0.025356      288.793210       3.516848    0.001351
+              t_500   0.023731      265.455764       2.205076    0.001351
+      wind_speed_10  -0.018703        2.930605       2.067768    0.001351
+delta_t_850_surface   0.014470       -7.532286       2.798770    0.001351
+                t2m   0.014357      296.325496       3.390401    0.001351
+    delta_t_500_850  -0.012605      -23.337446       2.923063    0.001351
+              v_500  -0.012026       -0.172738       5.847261    0.001351
+              r_850  -0.010070       73.513399      17.913503    0.001351
+              v_850  -0.010036       -1.535403       4.020325    0.001351
+                u10   0.009442       -1.037354       2.700282    0.001351
+
+[ge_45]
+          predictor  pearson_r  predictor_mean  predictor_std  radar_mean
+delta_t_850_surface   0.023349       -7.532286       2.798770    0.000724
+              t_500   0.020856      265.455764       2.205076    0.000724
+              t_850   0.019119      288.793210       3.516848    0.000724
+              r_850  -0.017508       73.513399      17.913503    0.000724
+      wind_speed_10  -0.015939        2.930605       2.067768    0.000724
+              r_500  -0.014314       33.851301      31.089339    0.000724
+               tcwv  -0.013699       36.219584      11.350060    0.000724
+              v_850  -0.009824       -1.535403       4.020325    0.000724
+    delta_t_500_850  -0.007270      -23.337446       2.923063    0.000724
+              v_500  -0.007130       -0.172738       5.847261    0.000724
+
+ASSOCIAÇÃO LOCAL - CENTRALIZADA DENTRO DO PATCH - SEM SUAVIZAÇÃO
+------------------------------------------------------------------------------------------------------------------------
+[target_log1p]
+            predictor  pearson_r
+                v_850  -0.021305
+                u_850  -0.020774
+                r_850   0.020134
+        wind_speed_10  -0.019969
+                r_500   0.014017
+                u_500  -0.013110
+bulk_wind_diff_10_850  -0.012664
+                t_500   0.012616
+                  u10   0.012560
+                  v10  -0.009602
+
+[gt_0]
+            predictor  pearson_r
+                v_850  -0.021128
+                u_850  -0.020546
+                r_850   0.019900
+        wind_speed_10  -0.019583
+                r_500   0.014153
+                u_500  -0.012815
+                t_500   0.012550
+                  u10   0.012454
+bulk_wind_diff_10_850  -0.012346
+                  v10  -0.009282
+
+[ge_20]
+            predictor  pearson_r
+                v_850  -0.020992
+                u_850  -0.020356
+                r_850   0.019715
+        wind_speed_10  -0.019397
+                r_500   0.014046
+                u_500  -0.012708
+                t_500   0.012424
+                  u10   0.012343
+bulk_wind_diff_10_850  -0.012236
+                  v10  -0.009240
+
+[ge_30]
+            predictor  pearson_r
+        wind_speed_10  -0.012696
+                v_850  -0.011780
+                r_850   0.011701
+                u_850  -0.011567
+  delta_t_850_surface  -0.010232
+                  t2m   0.010047
+                u_500  -0.007921
+bulk_wind_diff_10_850  -0.007855
+                  v10  -0.007190
+                  u10   0.006382
+
+[ge_40]
+            predictor  pearson_r
+                u_500  -0.013690
+bulk_wind_diff_10_850  -0.012891
+        wind_speed_10  -0.012591
+                u_850  -0.009250
+                  u10   0.008100
+                r_850   0.007325
+       wind_speed_500  -0.007313
+                  v10  -0.006676
+                v_850  -0.005898
+                 tcwv  -0.005522
+
+[ge_45]
+            predictor  pearson_r
+                u_500  -0.017476
+bulk_wind_diff_10_850  -0.013840
+                 tcwv  -0.012882
+        wind_speed_10  -0.011152
+                u_850  -0.010169
+       wind_speed_500  -0.009458
+                  u10   0.007432
+                  v10  -0.006845
+                t_500   0.005849
+      delta_t_500_850   0.005371
+
+EFEITO DA ESCALA LOCAL - TOP PREDITORES POR LIMIAR
+------------------------------------------------------------------------------------------------------------------------
+[ge_30]
+            predictor  smoothing_window_pixels  smoothing_half_width_km  pearson_r
+        wind_speed_10                        1                      0.0  -0.012696
+                v_850                        1                      0.0  -0.011780
+                r_850                        1                      0.0   0.011701
+                u_850                        1                      0.0  -0.011567
+  delta_t_850_surface                        1                      0.0  -0.010232
+                  t2m                        1                      0.0   0.010047
+                u_500                        5                      4.0  -0.008051
+bulk_wind_diff_10_850                        1                      0.0  -0.007855
+                  v10                        1                      0.0  -0.007190
+                  u10                        1                      0.0   0.006382
+
+[ge_40]
+            predictor  smoothing_window_pixels  smoothing_half_width_km  pearson_r
+                u_500                        1                      0.0  -0.013690
+bulk_wind_diff_10_850                        1                      0.0  -0.012891
+        wind_speed_10                        1                      0.0  -0.012591
+                u_850                        1                      0.0  -0.009250
+                  u10                        1                      0.0   0.008100
+                r_850                        1                      0.0   0.007325
+       wind_speed_500                        1                      0.0  -0.007313
+                  v10                        1                      0.0  -0.006676
+                v_850                        1                      0.0  -0.005898
+                 tcwv                        1                      0.0  -0.005522
+
+[ge_45]
+            predictor  smoothing_window_pixels  smoothing_half_width_km  pearson_r
+                u_500                        1                      0.0  -0.017476
+bulk_wind_diff_10_850                        1                      0.0  -0.013840
+                 tcwv                        1                      0.0  -0.012882
+        wind_speed_10                        1                      0.0  -0.011152
+                u_850                        1                      0.0  -0.010169
+       wind_speed_500                        1                      0.0  -0.009458
+                  u10                        1                      0.0   0.007432
+                  v10                        1                      0.0  -0.006845
+                t_500                        1                      0.0   0.005849
+      delta_t_500_850                        1                      0.0   0.005371
+
+CONTRASTE ESPACIAL DENTRO DO PATCH - EVENTO MENOS BACKGROUND
+------------------------------------------------------------------------------------------------------------------------
+[ge_20]
+            predictor  sample_event_patches  mean_event_minus_background  mean_delta_in_patch_sigma  weighted_fraction_positive_delta
+        wind_speed_10                 11820                    -0.252149                  -0.237599                          0.360960
+                r_850                 11820                     0.732623                   0.183305                          0.587793
+                u_850                 11820                    -0.119525                  -0.169230                          0.440778
+                t_500                 11820                     0.017172                   0.128491                          0.549806
+                  u10                 11820                     0.149098                   0.123082                          0.573025
+                u_500                 11820                    -0.056924                  -0.111255                          0.454168
+bulk_wind_diff_10_850                 11820                    -0.127804                  -0.111041                          0.454622
+                  v10                 11820                    -0.080183                  -0.100678                          0.459282
+      delta_t_500_850                 11820                     0.025478                   0.099806                          0.531971
+                r_500                 11820                     0.541285                   0.097294                          0.543969
+
+[ge_30]
+            predictor  sample_event_patches  mean_event_minus_background  mean_delta_in_patch_sigma  weighted_fraction_positive_delta
+        wind_speed_10                  8889                    -0.325939                  -0.321846                          0.322895
+                r_850                  8889                     0.894420                   0.220416                          0.600521
+                u_850                  8889                    -0.138485                  -0.196728                          0.426271
+                  u10                  8889                     0.165358                   0.156375                          0.586268
+bulk_wind_diff_10_850                  8889                    -0.177673                  -0.152845                          0.437251
+                  v10                  8889                    -0.113311                  -0.147038                          0.438237
+                  t2m                  8889                     0.197861                   0.133321                          0.600519
+                t_500                  8889                     0.017281                   0.132529                          0.548622
+                u_500                  8889                    -0.059524                  -0.130591                          0.444798
+  delta_t_850_surface                  8889                    -0.202897                  -0.129799                          0.412999
+
+[ge_40]
+            predictor  sample_event_patches  mean_event_minus_background  mean_delta_in_patch_sigma  weighted_fraction_positive_delta
+        wind_speed_10                  6000                    -0.342169                  -0.350453                          0.308506
+                r_850                  6000                     1.096258                   0.274648                          0.615852
+                u_850                  6000                    -0.173779                  -0.238502                          0.406098
+bulk_wind_diff_10_850                  6000                    -0.255850                  -0.211512                          0.411492
+                u_500                  6000                    -0.098151                  -0.209004                          0.419481
+                  t2m                  6000                     0.278113                   0.202075                          0.636162
+  delta_t_850_surface                  6000                    -0.291169                  -0.197917                          0.370690
+                  v10                  6000                    -0.140917                  -0.190804                          0.419987
+                  u10                  6000                     0.187875                   0.177388                          0.599494
+       wind_speed_500                  6000                    -0.079000                  -0.161913                          0.433074
+
+[ge_45]
+            predictor  sample_event_patches  mean_event_minus_background  mean_delta_in_patch_sigma  weighted_fraction_positive_delta
+        wind_speed_10                  3000                    -0.349347                  -0.358563                          0.316000
+  delta_t_850_surface                  3000                    -0.447502                  -0.327023                          0.320333
+                  t2m                  3000                     0.426917                   0.326756                          0.680667
+bulk_wind_diff_10_850                  3000                    -0.396802                  -0.321692                          0.361333
+                u_850                  3000                    -0.221582                  -0.302220                          0.382667
+                r_850                  3000                     1.276991                   0.281055                          0.623333
+                u_500                  3000                    -0.124421                  -0.250792                          0.397333
+                  v10                  3000                    -0.169325                  -0.231084                          0.406000
+      delta_r_500_850                  3000                    -1.254090                  -0.214906                          0.402000
+                  u10                  3000                     0.218334                   0.198164                          0.599333
+
+CONTRASTE ESPACIAL POR ESTAÇÃO - >=45 dBZ
+------------------------------------------------------------------------------------------------------------------------
+[DJF]
+            predictor  sample_event_patches  mean_delta_in_patch_sigma  weighted_fraction_positive_delta
+  delta_t_850_surface                  1484                  -0.405404                          0.283019
+                  t2m                  1484                   0.393868                          0.715633
+bulk_wind_diff_10_850                  1484                  -0.358209                          0.351078
+        wind_speed_10                  1484                  -0.353472                          0.311321
+                r_850                  1484                   0.322053                          0.646900
+                u_850                  1484                  -0.313839                          0.379380
+                u_500                  1484                  -0.271810                          0.384771
+                  v10                  1484                  -0.269758                          0.398922
+                  u10                  1484                   0.261234                          0.628706
+      delta_r_500_850                  1484                  -0.255894                          0.386119
+
+[MAM]
+            predictor  sample_event_patches  mean_delta_in_patch_sigma  weighted_fraction_positive_delta
+        wind_speed_10                   758                  -0.406050                          0.306069
+                  t2m                   758                   0.361980                          0.711082
+  delta_t_850_surface                   758                  -0.347041                          0.298153
+bulk_wind_diff_10_850                   758                  -0.308191                          0.373351
+                  v10                   758                  -0.285426                          0.375989
+                r_850                   758                   0.246855                          0.596306
+                u_850                   758                  -0.243459                          0.402375
+                t_500                   758                   0.189976                          0.596306
+                u_500                   758                  -0.188399                          0.431398
+       wind_speed_850                   758                  -0.185612                          0.427441
+
+[JJA]
+            predictor  sample_event_patches  mean_delta_in_patch_sigma  weighted_fraction_positive_delta
+        wind_speed_10                   172                  -0.483056                          0.261628
+       wind_speed_500                   172                  -0.388038                          0.337209
+                u_500                   172                  -0.355709                          0.366279
+                u_850                   172                  -0.324652                          0.372093
+  delta_t_850_surface                   172                   0.290677                          0.581395
+bulk_wind_diff_10_850                   172                  -0.283774                          0.377907
+                t_500                   172                   0.283153                          0.604651
+                  u10                   172                   0.222121                          0.558140
+                  t2m                   172                  -0.208928                          0.436047
+                v_850                   172                  -0.173047                          0.401163
+
+[SON]
+            predictor  sample_event_patches  mean_delta_in_patch_sigma  weighted_fraction_positive_delta
+                u_850                   586                  -0.342220                          0.368601
+  delta_t_850_surface                   586                  -0.283940                          0.366894
+        wind_speed_10                   586                  -0.273492                          0.356655
+                  t2m                   586                   0.268466                          0.624573
+                r_850                   586                   0.261589                          0.610922
+bulk_wind_diff_10_850                   586                  -0.257811                          0.366894
+                t_500                   586                   0.252436                          0.621160
+       wind_speed_500                   586                  -0.248755                          0.383959
+                u_500                   586                  -0.247478                          0.394198
+                v_850                   586                  -0.243692                          0.383959
+
+CROSS-OFFSET - MELHOR DESLOCAMENTO POR PREDITOR
+------------------------------------------------------------------------------------------------------------------------
+[target_log1p]
+            predictor offset_direction  offset_step_pixels  offset_distance_km  pearson_r
+                u_850                E                   8                16.0  -0.023690
+                 tcwv                S                   8                16.0   0.023414
+  delta_t_850_surface                S                   8                16.0  -0.022678
+                  t2m                S                   8                16.0   0.022382
+                v_850                S                   2                 4.0  -0.021614
+                r_850                E                   8                16.0   0.020681
+        wind_speed_10                W                   8                16.0  -0.020308
+bulk_wind_diff_10_850                W                   8                16.0  -0.017210
+                r_500                E                   8                16.0   0.017056
+                  u10                W                   8                16.0   0.013928
+
+[ge_30]
+            predictor offset_direction  offset_step_pixels  offset_distance_km  pearson_r
+  delta_t_850_surface                S                   8                16.0  -0.020653
+                  t2m                S                   8                16.0   0.020648
+                 tcwv                S                   8                16.0   0.019564
+                u_850                E                   8                16.0  -0.013853
+        wind_speed_10                W                   4                 8.0  -0.012831
+                v_850                N                   8                16.0  -0.012771
+                r_850                E                   8                16.0   0.012071
+bulk_wind_diff_10_850                W                   8                16.0  -0.009580
+                  v10                N                   8                16.0  -0.008435
+                u_500                W                   4                 8.0  -0.008305
+
+[ge_40]
+            predictor offset_direction  offset_step_pixels  offset_distance_km  pearson_r
+                u_500                E                   8                16.0  -0.014412
+bulk_wind_diff_10_850                W                   8                16.0  -0.013857
+                  t2m                S                   8                16.0   0.013177
+  delta_t_850_surface                S                   8                16.0  -0.013145
+        wind_speed_10                W                   8                16.0  -0.013059
+                 tcwv                N                   8                16.0  -0.011615
+                u_850                E                   8                16.0  -0.010663
+                  u10                W                   8                16.0   0.009015
+                  v10                E                   8                16.0  -0.008375
+       wind_speed_500                E                   8                16.0  -0.008157
+
+[ge_45]
+            predictor offset_direction  offset_step_pixels  offset_distance_km  pearson_r
+                u_500                E                   8                16.0  -0.018966
+                 tcwv                N                   8                16.0  -0.015147
+bulk_wind_diff_10_850                W                   8                16.0  -0.014485
+        wind_speed_10                S                   8                16.0  -0.011972
+                u_850                E                   8                16.0  -0.011158
+       wind_speed_500                E                   8                16.0  -0.010569
+                  t2m                N                   8                16.0  -0.008536
+                  u10                S                   8                16.0   0.008248
+                  v10                E                   8                16.0  -0.008101
+  delta_t_850_surface                N                   8                16.0   0.007821
+
+ASSOCIAÇÃO EM NÍVEL DE PATCH
+------------------------------------------------------------------------------------------------------------------------
+[max_dbz]
+          predictor  pearson_r
+               tcwv   0.361697
+              r_500   0.356015
+              r_850   0.246336
+    delta_r_500_850   0.211099
+                v10   0.190274
+                u10   0.161664
+              v_500  -0.150763
+                t2m   0.147965
+delta_t_850_surface  -0.106655
+      wind_speed_10  -0.104183
+
+[positive_pixel_fraction]
+      predictor  pearson_r
+          r_500   0.223461
+           tcwv   0.196908
+delta_r_500_850   0.170175
+          v_500  -0.128180
+          r_850   0.086324
+          t_850   0.074842
+          t_500   0.072283
+            t2m   0.067828
+            v10   0.064193
+            u10   0.049577
+
+[event_pixel_fraction_ge_30]
+          predictor  pearson_r
+               tcwv   0.061886
+              t_850   0.061621
+              r_500   0.059146
+              t_500   0.056659
+    delta_r_500_850   0.056067
+              v_500  -0.053031
+                t2m   0.040993
+delta_t_850_surface   0.031667
+    delta_t_500_850  -0.031441
+                v10   0.025030
+
+[event_pixel_fraction_ge_40]
+          predictor  pearson_r
+              t_850   0.039623
+              t_500   0.036538
+delta_t_850_surface   0.026336
+      wind_speed_10  -0.024913
+                t2m   0.021545
+    delta_t_500_850  -0.020137
+              v_500  -0.018935
+              r_850  -0.018024
+              v_850  -0.014680
+                u10   0.011992
+
+[event_pixel_fraction_ge_45]
+          predictor  pearson_r
+delta_t_850_surface   0.032243
+              t_500   0.027472
+              t_850   0.025620
+              r_850  -0.024881
+              r_500  -0.019114
+      wind_speed_10  -0.018818
+               tcwv  -0.016836
+              v_850  -0.012720
+    delta_t_500_850  -0.010113
+              v_500  -0.009632
+
+TOP ASSOCIAÇÕES LOCAIS CENTRALIZADAS POR ESTAÇÃO - >=40/45 dBZ
+------------------------------------------------------------------------------------------------------------------------
+[ge_40]
+  DJF
+            predictor  pearson_r
+bulk_wind_diff_10_850  -0.017890
+        wind_speed_10  -0.016770
+                u_500  -0.016139
+                  u10   0.014867
+  delta_t_850_surface  -0.013940
+                r_850   0.013041
+  MAM
+            predictor  pearson_r
+                u_500  -0.012492
+                  v10  -0.011999
+       wind_speed_500  -0.011876
+bulk_wind_diff_10_850  -0.011313
+        wind_speed_10  -0.011205
+                u_850  -0.009256
+  JJA
+            predictor  pearson_r
+                u_500  -0.017799
+       wind_speed_500  -0.017619
+                  t2m  -0.017201
+  delta_t_850_surface   0.016749
+                  u10   0.014113
+bulk_wind_diff_10_850  -0.013438
+  SON
+      predictor  pearson_r
+delta_t_500_850   0.012171
+           tcwv  -0.011325
+          u_500  -0.010942
+          u_850  -0.010524
+  wind_speed_10  -0.010500
+ wind_speed_500  -0.010392
+
+[ge_45]
+  DJF
+            predictor  pearson_r
+                u_500  -0.016974
+                  u10   0.015329
+        wind_speed_10  -0.015293
+bulk_wind_diff_10_850  -0.015043
+                 tcwv  -0.008908
+                r_850   0.008722
+  MAM
+            predictor  pearson_r
+                u_500  -0.020549
+       wind_speed_500  -0.019999
+                t_850   0.016315
+bulk_wind_diff_10_850  -0.015250
+                  v10  -0.014181
+                u_850  -0.013491
+  JJA
+            predictor  pearson_r
+       wind_speed_500  -0.022337
+                u_500  -0.022251
+                  t2m  -0.021983
+  delta_t_850_surface   0.020944
+                  u10   0.014056
+bulk_wind_diff_10_850  -0.013739
+  SON
+      predictor  pearson_r
+           tcwv  -0.020770
+delta_t_500_850   0.017801
+          u_500  -0.013441
+          t_850  -0.012911
+          u_850  -0.012779
+ wind_speed_500  -0.012715
+
+AVISOS / NOTAS
+------------------------------------------------------------------------------------------------------------------------
+- WARNING: The aligned input/target analysis uses a stratified patch sample containing <5% of all patches. Inverse stratum weights are used.
+- NOTE: ERA5 fields have been spatially mapped to the CorrDiff grid. Fine-grid values must not be interpreted as independent meteorological observations below ERA5 native effective resolution.
+- NOTE: Smoothing-window associations are a screening analysis of local context. Formal scale decomposition is deferred to Phase 11.
+- NOTE: Within-patch event contrasts compare predictor means in event pixels against non-event pixels of the same patch, reducing large-scale background and seasonal confounding but not establishing causality.
+- NOTE: Cross-offset associations use predictor(x) versus radar(x+delta). A stronger displaced association can reflect spatial organization, interpolation, advection, or patch geometry and must not be read as causal displacement.
+- NOTE: Overlapping patches duplicate physical pixels and pixel pairs. Weighted observation mass is not an independent sample size.
+- NOTE: bulk_wind_diff variables are vector wind differences in m/s, not height-normalized vertical shear.
+
+========================================================================================================================
+FIM DA FASE 10
+========================================================================================================================

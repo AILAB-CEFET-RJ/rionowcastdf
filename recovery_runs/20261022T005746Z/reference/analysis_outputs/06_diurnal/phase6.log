@@ -1,0 +1,39 @@
+2026-09-20 09:51:06 | INFO | ========================================================================
+2026-09-20 09:51:06 | INFO | PHASE 6 — RADAR DIURNAL CYCLE
+2026-09-20 09:51:06 | INFO | patches=1016208 timestamps=84684 timezone=America/Sao_Paulo
+2026-09-20 09:51:07 | INFO | Radar: 250/3970 blocks
+2026-09-20 09:51:08 | INFO | Radar: 500/3970 blocks
+2026-09-20 09:51:09 | INFO | Radar: 750/3970 blocks
+2026-09-20 09:51:09 | INFO | Radar: 1000/3970 blocks
+2026-09-20 09:51:10 | INFO | Radar: 1250/3970 blocks
+2026-09-20 09:51:11 | INFO | Radar: 1500/3970 blocks
+2026-09-20 09:51:12 | INFO | Radar: 1750/3970 blocks
+2026-09-20 09:51:12 | INFO | Radar: 2000/3970 blocks
+2026-09-20 09:51:13 | INFO | Radar: 2250/3970 blocks
+2026-09-20 09:51:14 | INFO | Radar: 2500/3970 blocks
+2026-09-20 09:51:15 | INFO | Radar: 2750/3970 blocks
+2026-09-20 09:51:15 | INFO | Radar: 3000/3970 blocks
+2026-09-20 09:51:16 | INFO | Radar: 3250/3970 blocks
+2026-09-20 09:51:17 | INFO | Radar: 3500/3970 blocks
+2026-09-20 09:51:18 | INFO | Radar: 3750/3970 blocks
+2026-09-20 09:51:19 | INFO | Radar: 3970/3970 blocks
+2026-09-20 09:51:20 | INFO | ========================================================================
+2026-09-20 09:51:20 | INFO | PHASE 6 — PREDICTOR DIURNAL CYCLE
+2026-09-20 09:51:24 | INFO | Input: 250/3970 blocks
+2026-09-20 09:51:29 | INFO | Input: 500/3970 blocks
+2026-09-20 09:51:34 | INFO | Input: 750/3970 blocks
+2026-09-20 09:51:39 | INFO | Input: 1000/3970 blocks
+2026-09-20 09:51:44 | INFO | Input: 1250/3970 blocks
+2026-09-20 09:51:49 | INFO | Input: 1500/3970 blocks
+2026-09-20 09:51:54 | INFO | Input: 1750/3970 blocks
+2026-09-20 09:51:59 | INFO | Input: 2000/3970 blocks
+2026-09-20 09:52:04 | INFO | Input: 2250/3970 blocks
+2026-09-20 09:52:08 | INFO | Input: 2500/3970 blocks
+2026-09-20 09:52:13 | INFO | Input: 2750/3970 blocks
+2026-09-20 09:52:18 | INFO | Input: 3000/3970 blocks
+2026-09-20 09:52:22 | INFO | Input: 3250/3970 blocks
+2026-09-20 09:52:27 | INFO | Input: 3500/3970 blocks
+2026-09-20 09:52:32 | INFO | Input: 3750/3970 blocks
+2026-09-20 09:52:37 | INFO | Input: 3970/3970 blocks
+2026-09-20 09:52:38 | INFO | ========================================================================
+2026-09-20 09:52:38 | INFO | PHASE 6 COMPLETE — output=analysis_outputs/06_diurnal

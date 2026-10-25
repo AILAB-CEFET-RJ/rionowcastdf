@@ -1,0 +1,128 @@
+{
+  "phase_version": "phase12-multivariate-v1-forward-temporal-weighted",
+  "dataset_dir": "datasets/corrdiff_2011_2024",
+  "input_shape": [
+    1016208,
+    12,
+    32,
+    32
+  ],
+  "target_shape": [
+    1016208,
+    1,
+    32,
+    32
+  ],
+  "total_patches": 1016208,
+  "sampled_patches": 16273,
+  "sample_ratio": 0.01601345393856376,
+  "sample_per_stratum": 3000,
+  "seed": 42,
+  "raw_channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "derived_channels": [
+    "wind_speed_10",
+    "wind_speed_850",
+    "wind_speed_500",
+    "delta_t_500_850",
+    "delta_t_850_surface",
+    "delta_r_500_850",
+    "bulk_wind_diff_10_850",
+    "bulk_wind_diff_850_500"
+  ],
+  "channel_name_source": "cli",
+  "representations": {
+    "means_only": 20,
+    "means_plus_std": 40
+  },
+  "binary_targets": [
+    "gt_0",
+    "ge_20",
+    "ge_30",
+    "ge_40",
+    "ge_45"
+  ],
+  "continuous_targets": [
+    "max_target_log1p",
+    "positive_pixel_fraction",
+    "event_pixel_fraction_ge_30",
+    "event_pixel_fraction_ge_40",
+    "event_pixel_fraction_ge_45"
+  ],
+  "forward_folds": [
+    {
+      "fold_id": "F1",
+      "train_end_year": 2014,
+      "eval_start_year": 2015,
+      "eval_end_year": 2016
+    },
+    {
+      "fold_id": "F2",
+      "train_end_year": 2016,
+      "eval_start_year": 2017,
+      "eval_end_year": 2018
+    },
+    {
+      "fold_id": "F3",
+      "train_end_year": 2018,
+      "eval_start_year": 2019,
+      "eval_end_year": 2020
+    },
+    {
+      "fold_id": "F4",
+      "train_end_year": 2020,
+      "eval_start_year": 2021,
+      "eval_end_year": 2022
+    },
+    {
+      "fold_id": "F5",
+      "train_end_year": 2022,
+      "eval_start_year": 2023,
+      "eval_end_year": 2024
+    }
+  ],
+  "pca_means_only": {
+    "components_for_90pct": 10,
+    "components_for_95pct": 12,
+    "weighted_correlation_condition_number": 76.11470657244408
+  },
+  "models": {
+    "binary": [
+      "climatology_month_hour",
+      "logistic_l2",
+      "hist_gradient_boosting"
+    ],
+    "continuous": [
+      "climatology_month_hour",
+      "ridge_l2"
+    ]
+  },
+  "scope": "patch-level multivariate screening on a weighted stratified sample; forward folds are for temporal stability, not final operational skill",
+  "warnings": [
+    "The multivariate analysis uses a stratified sample containing <5% of all patches. Inverse stratum weights are used."
+  ],
+  "methodological_notes": [
+    "All overlapping patches from the same timestamp fall in the same temporal period, but adjacent timestamps can belong to the same weather system.",
+    "Forward folds are provisional. Phase 15 remains responsible for the formal train/validation/test split.",
+    "The month x local-hour climatology is fit using training rows only in each fold.",
+    "Logistic and ridge coefficients use weighted standardized features. Collinearity can redistribute coefficient weight among correlated predictors.",
+    "PCA uses the weighted correlation matrix of the 20 patch-mean predictors and diagnoses redundancy, not supervised importance.",
+    "HistGradientBoosting is only a nonlinear screening model; hyperparameters are fixed rather than tuned.",
+    "means_plus_std adds within-patch variability but is not the formal ablation study planned for Phase 17.",
+    "Metrics are weighted to approximate the original patch distribution. Weighted patch mass is not an independent sample size.",
+    "Pixel fractions remain properties of overlapping patches, not de-duplicated full radar fields.",
+    "All multivariate results are descriptive/predictive screening and do not establish causality."
+  ]
+}

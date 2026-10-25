@@ -1,0 +1,9 @@
+2026-09-20 10:26:12 | INFO | Available timestamps: 84684 | Expected: 122736 | Lags: [0, 1, 2, 3, 6, 12, 24]
+2026-09-20 10:26:12 | INFO | Lag  0h -> 84684 exact pairs
+2026-09-20 10:26:20 | INFO | Lag  1h -> 73977 exact pairs
+2026-09-20 10:26:24 | INFO | Lag  2h -> 73083 exact pairs
+2026-09-20 10:26:28 | INFO | Lag  3h -> 72417 exact pairs
+2026-09-20 10:26:31 | INFO | Lag  6h -> 70686 exact pairs
+2026-09-20 10:26:35 | INFO | Lag 12h -> 68358 exact pairs
+2026-09-20 10:26:38 | INFO | Lag 24h -> 70459 exact pairs
+2026-09-20 10:26:42 | INFO | Phase 7 complete -> analysis_outputs/07_lags

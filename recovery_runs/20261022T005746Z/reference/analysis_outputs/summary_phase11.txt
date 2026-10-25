@@ -1,0 +1,888 @@
+============================================================================================================================
+CORRDIFF - FASE 11 - ANÁLISE FORMAL DE ESCALAS ESPACIAIS
+============================================================================================================================
+Versão: phase11-spatial-scales-v1-haar-coarsegraining
+Input shape: [1016208, 12, 32, 32]
+Target shape: [1016208, 1, 32, 32]
+Patches: 1016208 | amostrados: 16273 (1.60%)
+Unidade radar: dBZ
+Resolução nominal da grade CorrDiff: 2.0 km/pixel
+Níveis Haar: 5
+Suportes Haar nominais: [{'haar_level': 1, 'nominal_support_pixels': 2, 'nominal_support_km': 4.0}, {'haar_level': 2, 'nominal_support_pixels': 4, 'nominal_support_km': 8.0}, {'haar_level': 3, 'nominal_support_pixels': 8, 'nominal_support_km': 16.0}, {'haar_level': 4, 'nominal_support_pixels': 16, 'nominal_support_km': 32.0}, {'haar_level': 5, 'nominal_support_pixels': 32, 'nominal_support_km': 64.0}]
+Blocos coarse graining: [2.0, 4.0, 8.0, 16.0, 32.0] km
+Escopo: aligned overlapping 32x32 training-patch scale distribution; not de-duplicated full-field climatology
+
+ESTRATOS DE INTENSIDADE - SCAN EXATO DO TARGET
+----------------------------------------------------------------------------------------------------------------------------
+ stratum_id   stratum  patch_count  patch_ratio
+          0       dry       712492     0.701128
+          1  gt0_lt20         1273     0.001253
+          2 ge20_lt30       139042     0.136824
+          3 ge30_lt40        86131     0.084757
+          4 ge40_lt45        48650     0.047874
+          5      ge45        28620     0.028164
+
+ENERGIA ESPACIAL HAAR DO RADAR
+----------------------------------------------------------------------------------------------------------------------------
+       field  haar_level  nominal_support_km  detail_energy_fraction  rms_coefficient
+       ge_20           1                 4.0                0.294225         0.064076
+       ge_20           2                 8.0                0.200335         0.105747
+       ge_20           3                16.0                0.181946         0.201553
+       ge_20           4                32.0                0.168931         0.388422
+       ge_20           5                64.0                0.154562         0.743069
+       ge_30           1                 4.0                0.374006         0.039852
+       ge_30           2                 8.0                0.221752         0.061373
+       ge_30           3                16.0                0.169575         0.107338
+       ge_30           4                32.0                0.135200         0.191686
+       ge_30           5                64.0                0.099467         0.328830
+       ge_40           1                 4.0                0.424945         0.021153
+       ge_40           2                 8.0                0.222061         0.030583
+       ge_40           3                16.0                0.145634         0.049534
+       ge_40           4                32.0                0.082599         0.074608
+       ge_40           5                64.0                0.124760         0.183386
+       ge_45           1                 4.0                0.395671         0.012876
+       ge_45           2                 8.0                0.166673         0.016714
+       ge_45           3                16.0                0.127147         0.029197
+       ge_45           4                32.0                0.079226         0.046094
+       ge_45           5                64.0                0.231284         0.157512
+        gt_0           1                 4.0                0.287881         0.063716
+        gt_0           2                 8.0                0.200059         0.106231
+        gt_0           3                16.0                0.183624         0.203547
+        gt_0           4                32.0                0.171212         0.393094
+        gt_0           5                64.0                0.157224         0.753389
+target_log1p           1                 4.0                0.273414         0.201751
+target_log1p           2                 8.0                0.200132         0.345219
+target_log1p           3                16.0                0.187920         0.669042
+target_log1p           4                32.0                0.176579         1.297076
+target_log1p           5                64.0                0.161955         2.484412
+
+DISTRIBUIÇÃO DE ENERGIA ESPACIAL DOS PREDITORES
+----------------------------------------------------------------------------------------------------------------------------
+             predictor  fine_energy_fraction_le_8km  energy_fraction_16km  coarse_energy_fraction_ge_32km  peak_nominal_support_km  peak_energy_fraction
+                 t_850                     0.019533              0.061011                        0.919456                     64.0              0.712126
+                 r_850                     0.019278              0.059244                        0.921478                     64.0              0.713622
+ bulk_wind_diff_10_850                     0.019041              0.058650                        0.922309                     64.0              0.706888
+                   t2m                     0.019002              0.058567                        0.922431                     64.0              0.708555
+   delta_t_850_surface                     0.018974              0.058264                        0.922762                     64.0              0.707643
+       delta_t_500_850                     0.018856              0.059054                        0.922091                     64.0              0.718065
+                   v10                     0.018740              0.057639                        0.923621                     64.0              0.696795
+        wind_speed_850                     0.018464              0.057737                        0.923799                     64.0              0.722290
+       delta_r_500_850                     0.018407              0.056820                        0.924773                     64.0              0.718634
+                 v_850                     0.018179              0.056889                        0.924931                     64.0              0.724106
+bulk_wind_diff_850_500                     0.017913              0.055965                        0.926122                     64.0              0.724157
+                  tcwv                     0.017719              0.057133                        0.925148                     64.0              0.737083
+         wind_speed_10                     0.017369              0.053385                        0.929246                     64.0              0.715453
+                 u_850                     0.017285              0.054450                        0.928265                     64.0              0.734882
+                 r_500                     0.017036              0.053155                        0.929809                     64.0              0.729310
+                   u10                     0.016614              0.051108                        0.932278                     64.0              0.721933
+        wind_speed_500                     0.016322              0.051454                        0.932223                     64.0              0.736652
+                 v_500                     0.016266              0.051231                        0.932503                     64.0              0.736283
+                 u_500                     0.016106              0.050844                        0.933050                     64.0              0.738579
+                 t_500                     0.015990              0.050435                        0.933575                     64.0              0.739001
+
+ASSOCIAÇÃO HAAR NA MESMA ESCALA - ALL_DETAIL
+----------------------------------------------------------------------------------------------------------------------------
+[target_log1p]
+  suporte nominal = 4 km
+            predictor  pearson_r
+                v_850  -0.001788
+                r_500   0.001765
+                r_850   0.001492
+                u_850  -0.001320
+                 tcwv   0.001095
+bulk_wind_diff_10_850  -0.001010
+                u_500  -0.000855
+                  u10   0.000764
+  suporte nominal = 8 km
+      predictor  pearson_r
+          u_850  -0.004319
+          r_850   0.004225
+          v_850  -0.004161
+          r_500   0.003947
+          u_500  -0.002882
+delta_t_500_850   0.002009
+          v_500  -0.001912
+ wind_speed_500  -0.001741
+  suporte nominal = 16 km
+            predictor  pearson_r
+                u_850  -0.010107
+                r_850   0.008968
+                r_500   0.008173
+                v_850  -0.007555
+bulk_wind_diff_10_850  -0.006254
+                u_500  -0.005559
+      delta_t_500_850   0.004108
+                  t2m  -0.003779
+  suporte nominal = 32 km
+     predictor  pearson_r
+ wind_speed_10  -0.027886
+         r_850   0.021016
+         v_850  -0.020897
+         u_850  -0.020501
+         r_500   0.015256
+           u10   0.014639
+           v10  -0.013621
+wind_speed_500  -0.012814
+  suporte nominal = 64 km
+            predictor  pearson_r
+                v_850  -0.046361
+                u_850  -0.038537
+                r_850   0.036184
+                r_500   0.029267
+        wind_speed_10  -0.026131
+bulk_wind_diff_10_850  -0.021245
+                u_500  -0.018932
+                  u10   0.018078
+
+[gt_0]
+  suporte nominal = 4 km
+            predictor  pearson_r
+                v_850  -0.001748
+                r_500   0.001740
+                r_850   0.001437
+                u_850  -0.001260
+                 tcwv   0.001058
+bulk_wind_diff_10_850  -0.000939
+                u_500  -0.000770
+                  u10   0.000746
+  suporte nominal = 8 km
+      predictor  pearson_r
+          u_850  -0.004194
+          v_850  -0.004180
+          r_850   0.004142
+          r_500   0.003956
+          u_500  -0.002789
+          v_500  -0.001989
+delta_t_500_850   0.001923
+ wind_speed_500  -0.001694
+  suporte nominal = 16 km
+            predictor  pearson_r
+                u_850  -0.010092
+                r_850   0.008956
+                r_500   0.008299
+                v_850  -0.007527
+bulk_wind_diff_10_850  -0.006092
+                u_500  -0.005498
+      delta_t_500_850   0.004196
+                  t2m  -0.004044
+  suporte nominal = 32 km
+    predictor  pearson_r
+wind_speed_10  -0.027685
+        v_850  -0.021102
+        r_850   0.020873
+        u_850  -0.020397
+        r_500   0.015413
+          u10   0.014839
+          v10  -0.013090
+        t_500   0.013064
+  suporte nominal = 64 km
+            predictor  pearson_r
+                v_850  -0.046624
+                u_850  -0.038715
+                r_850   0.036326
+                r_500   0.030137
+        wind_speed_10  -0.025777
+bulk_wind_diff_10_850  -0.020981
+                u_500  -0.018591
+                  u10   0.018062
+
+[ge_20]
+  suporte nominal = 4 km
+            predictor  pearson_r
+                r_500   0.001720
+                v_850  -0.001693
+                r_850   0.001399
+                u_850  -0.001287
+                 tcwv   0.000954
+bulk_wind_diff_10_850  -0.000911
+                  u10   0.000717
+                u_500  -0.000674
+  suporte nominal = 8 km
+      predictor  pearson_r
+          v_850  -0.004138
+          u_850  -0.004094
+          r_850   0.004070
+          r_500   0.003946
+          u_500  -0.002700
+          v_500  -0.001939
+delta_t_500_850   0.001882
+ wind_speed_500  -0.001673
+  suporte nominal = 16 km
+            predictor  pearson_r
+                u_850  -0.010007
+                r_850   0.008880
+                r_500   0.008276
+                v_850  -0.007583
+bulk_wind_diff_10_850  -0.006016
+                u_500  -0.005427
+      delta_t_500_850   0.004169
+                  t2m  -0.004067
+  suporte nominal = 32 km
+    predictor  pearson_r
+wind_speed_10  -0.027671
+        v_850  -0.021141
+        r_850   0.020798
+        u_850  -0.020476
+        r_500   0.015376
+          u10   0.014899
+        t_500   0.013080
+          v10  -0.013074
+  suporte nominal = 64 km
+            predictor  pearson_r
+                v_850  -0.046687
+                u_850  -0.038604
+                r_850   0.036297
+                r_500   0.030173
+        wind_speed_10  -0.025673
+bulk_wind_diff_10_850  -0.020948
+                u_500  -0.018586
+                  u10   0.017977
+
+[ge_30]
+  suporte nominal = 4 km
+            predictor  pearson_r
+  delta_t_850_surface  -0.000959
+                  t2m   0.000928
+bulk_wind_diff_10_850  -0.000919
+                u_850  -0.000903
+                v_850  -0.000844
+        wind_speed_10  -0.000772
+                 tcwv   0.000761
+                r_850   0.000732
+  suporte nominal = 8 km
+          predictor  pearson_r
+              u_850  -0.003067
+              r_850   0.002903
+              v_850  -0.001750
+    delta_t_500_850   0.001736
+              r_500   0.001602
+delta_t_850_surface  -0.001572
+              u_500  -0.001511
+               tcwv   0.001490
+  suporte nominal = 16 km
+            predictor  pearson_r
+                u_850  -0.006506
+                r_850   0.005638
+bulk_wind_diff_10_850  -0.005022
+                v_850  -0.004557
+                r_500   0.004107
+        wind_speed_10  -0.003932
+                u_500  -0.002899
+       wind_speed_850  -0.002665
+  suporte nominal = 32 km
+          predictor  pearson_r
+      wind_speed_10  -0.022594
+delta_t_850_surface  -0.018753
+                t2m   0.018482
+              r_850   0.017156
+                v10  -0.015035
+              u_850  -0.015002
+               tcwv   0.014604
+              v_850  -0.013182
+  suporte nominal = 64 km
+            predictor  pearson_r
+                v_850  -0.032924
+  delta_t_850_surface  -0.029313
+                  t2m   0.029155
+                u_850  -0.026911
+                r_850   0.026103
+        wind_speed_10  -0.023244
+bulk_wind_diff_10_850  -0.015987
+                u_500  -0.015765
+
+[ge_40]
+  suporte nominal = 4 km
+            predictor  pearson_r
+bulk_wind_diff_10_850  -0.001076
+                u_500  -0.001076
+        wind_speed_10  -0.000722
+  delta_t_850_surface  -0.000656
+                  t2m   0.000604
+                  v10  -0.000562
+                r_850   0.000492
+       wind_speed_500  -0.000470
+  suporte nominal = 8 km
+            predictor  pearson_r
+                u_500  -0.003663
+                u_850  -0.002973
+bulk_wind_diff_10_850  -0.002621
+                 tcwv  -0.002186
+                  v10  -0.002179
+        wind_speed_10  -0.001985
+       wind_speed_500  -0.001657
+                r_850   0.001465
+  suporte nominal = 16 km
+            predictor  pearson_r
+bulk_wind_diff_10_850  -0.008485
+        wind_speed_10  -0.007681
+                u_500  -0.007389
+                u_850  -0.005439
+                  u10   0.004369
+                r_850   0.003993
+       wind_speed_500  -0.003609
+       wind_speed_850  -0.003213
+  suporte nominal = 32 km
+            predictor  pearson_r
+bulk_wind_diff_10_850  -0.014975
+                  v10  -0.014789
+        wind_speed_10  -0.014662
+                u_850  -0.014102
+  delta_t_850_surface  -0.013431
+                  t2m   0.013081
+                u_500  -0.013048
+                r_850   0.012050
+  suporte nominal = 64 km
+            predictor  pearson_r
+                u_500  -0.031512
+bulk_wind_diff_10_850  -0.028725
+        wind_speed_10  -0.024420
+                u_850  -0.018431
+                  u10   0.017039
+  delta_t_850_surface  -0.014563
+                v_850  -0.014479
+       wind_speed_500  -0.014435
+
+[ge_45]
+  suporte nominal = 4 km
+            predictor  pearson_r
+                u_500  -0.001609
+bulk_wind_diff_10_850  -0.001038
+                  v10  -0.001028
+                u_850  -0.000864
+       wind_speed_500  -0.000758
+                 tcwv  -0.000694
+                v_850  -0.000535
+        wind_speed_10  -0.000521
+  suporte nominal = 8 km
+            predictor  pearson_r
+                u_500  -0.006338
+                 tcwv  -0.004219
+                u_850  -0.003589
+bulk_wind_diff_10_850  -0.003459
+       wind_speed_500  -0.003095
+                  v10  -0.002988
+        wind_speed_10  -0.002528
+                  t2m  -0.002272
+  suporte nominal = 16 km
+            predictor  pearson_r
+                u_500  -0.011905
+bulk_wind_diff_10_850  -0.009301
+        wind_speed_10  -0.007904
+                 tcwv  -0.006096
+                u_850  -0.006050
+       wind_speed_500  -0.005405
+                  u10   0.005215
+                  v10  -0.004535
+  suporte nominal = 32 km
+            predictor  pearson_r
+                u_500  -0.017259
+                 tcwv  -0.014537
+bulk_wind_diff_10_850  -0.014202
+                u_850  -0.010714
+                  v10  -0.009830
+        wind_speed_10  -0.009380
+       wind_speed_500  -0.009331
+                r_850   0.006651
+  suporte nominal = 64 km
+            predictor  pearson_r
+                u_500  -0.029921
+bulk_wind_diff_10_850  -0.023451
+                 tcwv  -0.019546
+                u_850  -0.016562
+        wind_speed_10  -0.015444
+       wind_speed_500  -0.015096
+                  u10   0.010824
+                  v10  -0.010596
+
+ASSOCIAÇÃO HAAR ORIENTADA - >=40/45 dBZ
+----------------------------------------------------------------------------------------------------------------------------
+[ge_40]
+  suporte nominal = 4 km
+    orientation             predictor  pearson_r
+      NS_DETAIL bulk_wind_diff_10_850  -0.001631
+      NS_DETAIL                 u_500  -0.001446
+      NS_DETAIL   delta_t_850_surface  -0.001076
+      NS_DETAIL                   t2m   0.000980
+      NS_DETAIL        wind_speed_850  -0.000961
+DIAGONAL_DETAIL                 u_850   0.000877
+  suporte nominal = 8 km
+orientation             predictor  pearson_r
+  NS_DETAIL                 u_500  -0.004534
+  NS_DETAIL                   v10  -0.003436
+  NS_DETAIL bulk_wind_diff_10_850  -0.003385
+  NS_DETAIL                 u_850  -0.003313
+  NS_DETAIL        wind_speed_850  -0.002916
+  EW_DETAIL                  tcwv   0.002480
+  suporte nominal = 16 km
+orientation             predictor  pearson_r
+  NS_DETAIL bulk_wind_diff_10_850  -0.010718
+  NS_DETAIL                 u_500  -0.007787
+  EW_DETAIL                   t2m   0.007403
+  EW_DETAIL   delta_t_850_surface  -0.007170
+  NS_DETAIL        wind_speed_850  -0.006748
+  EW_DETAIL                  tcwv   0.005843
+  suporte nominal = 32 km
+orientation             predictor  pearson_r
+  NS_DETAIL   delta_t_850_surface  -0.024349
+  NS_DETAIL                   t2m   0.023180
+  NS_DETAIL                   v10  -0.022289
+  NS_DETAIL bulk_wind_diff_10_850  -0.018317
+  NS_DETAIL                 u_850  -0.014622
+  NS_DETAIL                 v_500   0.013443
+  suporte nominal = 64 km
+orientation             predictor  pearson_r
+  EW_DETAIL                   t2m   0.064994
+  EW_DETAIL   delta_t_850_surface  -0.062205
+  EW_DETAIL                  tcwv   0.037988
+  EW_DETAIL                 v_850  -0.032347
+  NS_DETAIL                 u_500  -0.026665
+  NS_DETAIL bulk_wind_diff_10_850  -0.025556
+
+[ge_45]
+  suporte nominal = 4 km
+orientation             predictor  pearson_r
+  NS_DETAIL                 u_500  -0.002361
+  NS_DETAIL                   v10  -0.001460
+  NS_DETAIL bulk_wind_diff_10_850  -0.001447
+  NS_DETAIL                 u_850  -0.000869
+  NS_DETAIL        wind_speed_500  -0.000833
+  EW_DETAIL                   v10  -0.000778
+  suporte nominal = 8 km
+orientation             predictor  pearson_r
+  NS_DETAIL                 u_500  -0.008483
+  NS_DETAIL                   v10  -0.004410
+  NS_DETAIL bulk_wind_diff_10_850  -0.003237
+  NS_DETAIL        wind_speed_500  -0.003175
+  NS_DETAIL                 u_850  -0.003154
+  NS_DETAIL                  tcwv  -0.003093
+  suporte nominal = 16 km
+orientation             predictor  pearson_r
+  NS_DETAIL                 u_500  -0.013252
+  NS_DETAIL bulk_wind_diff_10_850  -0.009083
+  NS_DETAIL                   v10  -0.005740
+  NS_DETAIL        wind_speed_500  -0.004215
+  NS_DETAIL                 t_500  -0.003804
+  NS_DETAIL                 u_850  -0.003301
+  suporte nominal = 32 km
+orientation             predictor  pearson_r
+  NS_DETAIL                 u_500  -0.019841
+  NS_DETAIL                   v10  -0.014876
+  NS_DETAIL bulk_wind_diff_10_850  -0.013740
+  NS_DETAIL                  tcwv  -0.008755
+  NS_DETAIL                 t_850  -0.008750
+  NS_DETAIL                 u_850  -0.007907
+  suporte nominal = 64 km
+orientation             predictor  pearson_r
+  NS_DETAIL                 u_500  -0.029204
+  NS_DETAIL bulk_wind_diff_10_850  -0.018779
+  EW_DETAIL                   t2m   0.017725
+  EW_DETAIL   delta_t_850_surface  -0.015391
+  NS_DETAIL                   v10  -0.011786
+  NS_DETAIL        wind_speed_500  -0.010482
+
+COARSE GRAINING - ASSOCIAÇÃO CENTRALIZADA DENTRO DO PATCH
+----------------------------------------------------------------------------------------------------------------------------
+[target_log1p]
+  bloco = 2 km
+            predictor  pearson_r
+                v_850  -0.021305
+                u_850  -0.020774
+                r_850   0.020134
+        wind_speed_10  -0.019969
+                r_500   0.014017
+                u_500  -0.013110
+bulk_wind_diff_10_850  -0.012664
+                t_500   0.012616
+  bloco = 4 km
+            predictor  pearson_r
+                v_850  -0.024973
+                u_850  -0.024358
+                r_850   0.023600
+        wind_speed_10  -0.023436
+                r_500   0.016409
+                u_500  -0.015363
+bulk_wind_diff_10_850  -0.014835
+                t_500   0.014809
+  bloco = 8 km
+            predictor  pearson_r
+                v_850  -0.029237
+                u_850  -0.028473
+        wind_speed_10  -0.027609
+                r_850   0.027584
+                r_500   0.019124
+                u_500  -0.017921
+bulk_wind_diff_10_850  -0.017409
+                t_500   0.017393
+  bloco = 16 km
+    predictor  pearson_r
+        v_850  -0.036142
+wind_speed_10  -0.034752
+        u_850  -0.034564
+        r_850   0.033630
+        r_500   0.023066
+        u_500  -0.021760
+        t_500   0.021729
+          u10   0.021414
+  bloco = 32 km
+            predictor  pearson_r
+                v_850  -0.047182
+                u_850  -0.043648
+                r_850   0.041534
+        wind_speed_10  -0.037520
+                r_500   0.029304
+bulk_wind_diff_10_850  -0.027514
+                u_500  -0.026136
+                t_500   0.025348
+
+[ge_30]
+  bloco = 2 km
+            predictor  pearson_r
+        wind_speed_10  -0.012696
+                v_850  -0.011780
+                r_850   0.011701
+                u_850  -0.011567
+  delta_t_850_surface  -0.010232
+                  t2m   0.010047
+                u_500  -0.007921
+bulk_wind_diff_10_850  -0.007855
+  bloco = 4 km
+            predictor  pearson_r
+        wind_speed_10  -0.016030
+                v_850  -0.014875
+                r_850   0.014778
+                u_850  -0.014599
+  delta_t_850_surface  -0.012916
+                  t2m   0.012683
+                u_500  -0.009994
+bulk_wind_diff_10_850  -0.009898
+  bloco = 8 km
+            predictor  pearson_r
+        wind_speed_10  -0.019941
+                v_850  -0.018488
+                r_850   0.018252
+                u_850  -0.018015
+  delta_t_850_surface  -0.016062
+                  t2m   0.015800
+                u_500  -0.012373
+bulk_wind_diff_10_850  -0.012289
+  bloco = 16 km
+            predictor  pearson_r
+        wind_speed_10  -0.025972
+                v_850  -0.024028
+                r_850   0.023428
+                u_850  -0.022926
+  delta_t_850_surface  -0.021645
+                  t2m   0.021367
+                u_500  -0.016002
+bulk_wind_diff_10_850  -0.015474
+  bloco = 32 km
+            predictor  pearson_r
+                v_850  -0.033394
+                u_850  -0.029734
+        wind_speed_10  -0.029118
+                r_850   0.029048
+  delta_t_850_surface  -0.026591
+                  t2m   0.026315
+                u_500  -0.019711
+bulk_wind_diff_10_850  -0.019451
+
+[ge_40]
+  bloco = 2 km
+            predictor  pearson_r
+                u_500  -0.013690
+bulk_wind_diff_10_850  -0.012891
+        wind_speed_10  -0.012591
+                u_850  -0.009250
+                  u10   0.008100
+                r_850   0.007325
+       wind_speed_500  -0.007313
+                  v10  -0.006676
+  bloco = 4 km
+            predictor  pearson_r
+                u_500  -0.018020
+bulk_wind_diff_10_850  -0.016965
+        wind_speed_10  -0.016580
+                u_850  -0.012190
+                  u10   0.010668
+                r_850   0.009645
+       wind_speed_500  -0.009629
+                  v10  -0.008787
+  bloco = 8 km
+            predictor  pearson_r
+                u_500  -0.022786
+bulk_wind_diff_10_850  -0.021531
+        wind_speed_10  -0.021068
+                u_850  -0.015366
+                  u10   0.013580
+                r_850   0.012234
+       wind_speed_500  -0.012191
+                  v10  -0.011077
+  bloco = 16 km
+            predictor  pearson_r
+                u_500  -0.028867
+bulk_wind_diff_10_850  -0.026983
+        wind_speed_10  -0.026400
+                u_850  -0.019371
+                  u10   0.017142
+                r_850   0.015445
+       wind_speed_500  -0.015443
+                  v10  -0.014175
+  bloco = 32 km
+            predictor  pearson_r
+                u_500  -0.035470
+bulk_wind_diff_10_850  -0.032285
+        wind_speed_10  -0.030807
+                u_850  -0.021599
+                  u10   0.020822
+       wind_speed_500  -0.017891
+                r_850   0.016616
+                v_850  -0.014997
+
+[ge_45]
+  bloco = 2 km
+            predictor  pearson_r
+                u_500  -0.017476
+bulk_wind_diff_10_850  -0.013840
+                 tcwv  -0.012882
+        wind_speed_10  -0.011152
+                u_850  -0.010169
+       wind_speed_500  -0.009458
+                  u10   0.007432
+                  v10  -0.006845
+  bloco = 4 km
+            predictor  pearson_r
+                u_500  -0.022431
+bulk_wind_diff_10_850  -0.017774
+                 tcwv  -0.016552
+        wind_speed_10  -0.014326
+                u_850  -0.013055
+       wind_speed_500  -0.012141
+                  u10   0.009552
+                  v10  -0.008766
+  bloco = 8 km
+            predictor  pearson_r
+                u_500  -0.026054
+bulk_wind_diff_10_850  -0.020752
+                 tcwv  -0.019237
+        wind_speed_10  -0.016714
+                u_850  -0.015164
+       wind_speed_500  -0.014115
+                  u10   0.011173
+                  v10  -0.010142
+  bloco = 16 km
+            predictor  pearson_r
+                u_500  -0.029787
+bulk_wind_diff_10_850  -0.023720
+                 tcwv  -0.022275
+        wind_speed_10  -0.018874
+                u_850  -0.017439
+       wind_speed_500  -0.016227
+                  u10   0.012654
+                  v10  -0.011618
+  bloco = 32 km
+            predictor  pearson_r
+                u_500  -0.032979
+bulk_wind_diff_10_850  -0.026283
+                 tcwv  -0.023869
+        wind_speed_10  -0.020787
+                u_850  -0.019069
+       wind_speed_500  -0.017806
+                  u10   0.013886
+                  v10  -0.012004
+
+RAW vs CENTRALIZADO POR ESCALA - PREDITORES DE MAIOR |r|
+----------------------------------------------------------------------------------------------------------------------------
+[target_log1p]
+  2 km | raw: r_500=+0.1129, tcwv=+0.0985, delta_r_500_850=+0.0845
+  2 km | within_patch_centered: v_850=-0.0213, u_850=-0.0208, r_850=+0.0201
+  4 km | raw: r_500=+0.1255, tcwv=+0.1095, delta_r_500_850=+0.0940
+  4 km | within_patch_centered: v_850=-0.0250, u_850=-0.0244, r_850=+0.0236
+  8 km | raw: r_500=+0.1380, tcwv=+0.1204, delta_r_500_850=+0.1033
+  8 km | within_patch_centered: v_850=-0.0292, u_850=-0.0285, wind_speed_10=-0.0276
+  16 km | raw: r_500=+0.1537, tcwv=+0.1343, delta_r_500_850=+0.1153
+  16 km | within_patch_centered: v_850=-0.0361, wind_speed_10=-0.0348, u_850=-0.0346
+  32 km | raw: r_500=+0.1748, tcwv=+0.1530, delta_r_500_850=+0.1319
+  32 km | within_patch_centered: v_850=-0.0472, u_850=-0.0436, r_850=+0.0415
+
+[ge_30]
+  2 km | raw: tcwv=+0.0387, t_850=+0.0383, r_500=+0.0372
+  2 km | within_patch_centered: wind_speed_10=-0.0127, v_850=-0.0118, r_850=+0.0117
+  4 km | raw: tcwv=+0.0440, t_850=+0.0436, r_500=+0.0423
+  4 km | within_patch_centered: wind_speed_10=-0.0160, v_850=-0.0149, r_850=+0.0148
+  8 km | raw: tcwv=+0.0485, t_850=+0.0480, r_500=+0.0466
+  8 km | within_patch_centered: wind_speed_10=-0.0199, v_850=-0.0185, r_850=+0.0183
+  16 km | raw: tcwv=+0.0530, t_850=+0.0525, r_500=+0.0509
+  16 km | within_patch_centered: wind_speed_10=-0.0260, v_850=-0.0240, r_850=+0.0234
+  32 km | raw: tcwv=+0.0575, t_850=+0.0572, r_500=+0.0552
+  32 km | within_patch_centered: v_850=-0.0334, u_850=-0.0297, wind_speed_10=-0.0291
+
+[ge_40]
+  2 km | raw: t_850=+0.0254, t_500=+0.0237, wind_speed_10=-0.0187
+  2 km | within_patch_centered: u_500=-0.0137, bulk_wind_diff_10_850=-0.0129, wind_speed_10=-0.0126
+  4 km | raw: t_850=+0.0293, t_500=+0.0274, wind_speed_10=-0.0216
+  4 km | within_patch_centered: u_500=-0.0180, bulk_wind_diff_10_850=-0.0170, wind_speed_10=-0.0166
+  8 km | raw: t_850=+0.0322, t_500=+0.0301, wind_speed_10=-0.0237
+  8 km | within_patch_centered: u_500=-0.0228, bulk_wind_diff_10_850=-0.0215, wind_speed_10=-0.0211
+  16 km | raw: t_850=+0.0347, t_500=+0.0324, wind_speed_10=-0.0253
+  16 km | within_patch_centered: u_500=-0.0289, bulk_wind_diff_10_850=-0.0270, wind_speed_10=-0.0264
+  32 km | raw: t_850=+0.0364, t_500=+0.0339, wind_speed_10=-0.0259
+  32 km | within_patch_centered: u_500=-0.0355, bulk_wind_diff_10_850=-0.0323, wind_speed_10=-0.0308
+
+[ge_45]
+  2 km | raw: delta_t_850_surface=+0.0233, t_500=+0.0209, t_850=+0.0191
+  2 km | within_patch_centered: u_500=-0.0175, bulk_wind_diff_10_850=-0.0138, tcwv=-0.0129
+  4 km | raw: delta_t_850_surface=+0.0257, t_500=+0.0229, t_850=+0.0210
+  4 km | within_patch_centered: u_500=-0.0224, bulk_wind_diff_10_850=-0.0178, tcwv=-0.0166
+  8 km | raw: delta_t_850_surface=+0.0269, t_500=+0.0240, t_850=+0.0220
+  8 km | within_patch_centered: u_500=-0.0261, bulk_wind_diff_10_850=-0.0208, tcwv=-0.0192
+  16 km | raw: delta_t_850_surface=+0.0279, t_500=+0.0249, t_850=+0.0229
+  16 km | within_patch_centered: u_500=-0.0298, bulk_wind_diff_10_850=-0.0237, tcwv=-0.0223
+  32 km | raw: delta_t_850_surface=+0.0290, t_500=+0.0255, t_850=+0.0235
+  32 km | within_patch_centered: u_500=-0.0330, bulk_wind_diff_10_850=-0.0263, tcwv=-0.0239
+
+CORRELAÇÃO ENTRE ENERGIA DE ESCALAS - TOP PARES
+----------------------------------------------------------------------------------------------------------------------------
+[target_log1p]
+     predictor  predictor_nominal_support_km  radar_nominal_support_km  pearson_r
+         v_500                           4.0                       4.0   0.206510
+         v_500                           8.0                       4.0   0.205075
+         v_500                          16.0                       4.0   0.203489
+         v_500                           4.0                       8.0   0.197800
+         v_500                           8.0                       8.0   0.196410
+         v_500                          16.0                       8.0   0.194813
+         v_500                          32.0                       4.0   0.194219
+wind_speed_500                           4.0                       4.0   0.188017
+
+[ge_30]
+predictor  predictor_nominal_support_km  radar_nominal_support_km  pearson_r
+     tcwv                           4.0                       4.0   0.166511
+     tcwv                          16.0                       4.0   0.165345
+     tcwv                           4.0                       8.0   0.164157
+     tcwv                           8.0                       4.0   0.163117
+     tcwv                          16.0                       8.0   0.162904
+     tcwv                           8.0                       8.0   0.160906
+    r_500                           4.0                       4.0   0.156853
+    r_500                           8.0                       4.0   0.155210
+
+[ge_40]
+predictor  predictor_nominal_support_km  radar_nominal_support_km  pearson_r
+     tcwv                           4.0                       4.0   0.141841
+     tcwv                          16.0                       4.0   0.140449
+     tcwv                           8.0                       4.0   0.138880
+     tcwv                           4.0                       8.0   0.134316
+     tcwv                          16.0                       8.0   0.132899
+     tcwv                           8.0                       8.0   0.131531
+     tcwv                          32.0                       4.0   0.120079
+     tcwv                           4.0                      16.0   0.119410
+
+[ge_45]
+          predictor  predictor_nominal_support_km  radar_nominal_support_km  pearson_r
+               tcwv                           4.0                       4.0   0.078142
+               tcwv                          16.0                       4.0   0.077537
+               tcwv                           8.0                       4.0   0.076753
+               tcwv                           4.0                       8.0   0.073132
+               tcwv                          16.0                       8.0   0.072592
+               tcwv                           8.0                       8.0   0.071850
+delta_t_850_surface                           4.0                       4.0   0.069711
+delta_t_850_surface                           4.0                       8.0   0.068204
+
+SAZONALIDADE DA ENERGIA DO RADAR - >=45 dBZ
+----------------------------------------------------------------------------------------------------------------------------
+season_code  nominal_support_km  detail_energy_fraction  rms_coefficient
+        DJF                 4.0                0.434839         0.015798
+        DJF                 8.0                0.182617         0.020475
+        DJF                16.0                0.126333         0.034060
+        DJF                32.0                0.067354         0.049739
+        DJF                64.0                0.188857         0.166577
+        JJA                 4.0                0.352685         0.010439
+        JJA                 8.0                0.148502         0.013548
+        JJA                16.0                0.126266         0.024984
+        JJA                32.0                0.096924         0.043780
+        JJA                64.0                0.275623         0.147654
+        MAM                 4.0                0.409173         0.010970
+        MAM                 8.0                0.164920         0.013929
+        MAM                16.0                0.124646         0.024219
+        MAM                32.0                0.069610         0.036198
+        MAM                64.0                0.231652         0.132067
+        SON                 4.0                0.361089         0.013124
+        SON                 8.0                0.157546         0.017338
+        SON                16.0                0.130212         0.031525
+        SON                32.0                0.090737         0.052633
+        SON                64.0                0.260415         0.178331
+
+SAZONALIDADE DA ASSOCIAÇÃO HAAR - >=45 dBZ
+----------------------------------------------------------------------------------------------------------------------------
+[DJF]
+  4 km: u_500=-0.0015, u10=+0.0013, bulk_wind_diff_10_850=-0.0012, wind_speed_500=+0.0011, wind_speed_10=-0.0011
+  8 km: u_500=-0.0058, wind_speed_500=+0.0037, wind_speed_10=-0.0037, u10=+0.0036, v_850=-0.0025
+  16 km: u10=+0.0120, wind_speed_10=-0.0119, u_500=-0.0106, bulk_wind_diff_10_850=-0.0103, wind_speed_500=+0.0087
+  32 km: u_500=-0.0211, bulk_wind_diff_10_850=-0.0188, wind_speed_10=-0.0179, u10=+0.0169, r_850=+0.0142
+  64 km: u_500=-0.0306, bulk_wind_diff_10_850=-0.0278, u10=+0.0278, wind_speed_10=-0.0253, wind_speed_500=+0.0212
+
+[MAM]
+  4 km: u_500=-0.0018, wind_speed_500=-0.0018, delta_t_500_850=-0.0011, t_850=+0.0011, u_850=-0.0010
+  8 km: u_500=-0.0073, wind_speed_500=-0.0072, u_850=-0.0056, tcwv=-0.0053, v10=-0.0051
+  16 km: u_500=-0.0158, wind_speed_500=-0.0147, v10=-0.0134, bulk_wind_diff_10_850=-0.0125, t_850=+0.0113
+  32 km: u_500=-0.0187, wind_speed_500=-0.0186, v10=-0.0168, bulk_wind_diff_10_850=-0.0154, tcwv=-0.0132
+  64 km: u_500=-0.0378, wind_speed_500=-0.0371, t_850=+0.0324, bulk_wind_diff_10_850=-0.0274, v10=-0.0254
+
+[JJA]
+  4 km: u_500=-0.0025, wind_speed_500=-0.0025, delta_t_850_surface=+0.0023, t2m=-0.0023, bulk_wind_diff_10_850=-0.0014
+  8 km: wind_speed_500=-0.0099, u_500=-0.0097, t2m=-0.0085, delta_t_850_surface=+0.0081, u10=+0.0049
+  16 km: wind_speed_500=-0.0167, t2m=-0.0166, u_500=-0.0166, delta_t_850_surface=+0.0161, u10=+0.0112
+  32 km: t2m=-0.0219, delta_t_850_surface=+0.0203, u_500=-0.0201, wind_speed_500=-0.0198, u10=+0.0128
+  64 km: wind_speed_500=-0.0368, u_500=-0.0364, t2m=-0.0353, delta_t_850_surface=+0.0336, bulk_wind_diff_10_850=-0.0229
+
+[SON]
+  4 km: v10=-0.0020, delta_t_500_850=+0.0020, t_850=-0.0016, tcwv=-0.0014, u_850=-0.0012
+  8 km: tcwv=-0.0071, delta_t_500_850=+0.0070, v10=-0.0056, t_850=-0.0055, u_850=-0.0050
+  16 km: tcwv=-0.0113, delta_t_500_850=+0.0095, u_500=-0.0079, t_500=+0.0072, wind_speed_500=-0.0071
+  32 km: tcwv=-0.0224, delta_t_500_850=+0.0176, t_850=-0.0130, bulk_wind_diff_10_850=-0.0127, v10=-0.0123
+  64 km: tcwv=-0.0321, delta_t_500_850=+0.0297, t_850=-0.0235, u_500=-0.0200, u_850=-0.0198
+
+SAZONALIDADE DO COARSE GRAINING CENTRALIZADO - >=45 dBZ
+----------------------------------------------------------------------------------------------------------------------------
+[DJF]
+  2 km: u_500=-0.0170, u10=+0.0153, wind_speed_10=-0.0153, bulk_wind_diff_10_850=-0.0150, tcwv=-0.0089
+  4 km: u_500=-0.0225, u10=+0.0203, wind_speed_10=-0.0203, bulk_wind_diff_10_850=-0.0200, tcwv=-0.0118
+  8 km: u_500=-0.0271, u10=+0.0246, wind_speed_10=-0.0245, bulk_wind_diff_10_850=-0.0242, tcwv=-0.0143
+  16 km: u_500=-0.0320, u10=+0.0287, bulk_wind_diff_10_850=-0.0285, wind_speed_10=-0.0285, tcwv=-0.0171
+  32 km: u_500=-0.0345, u10=+0.0315, bulk_wind_diff_10_850=-0.0310, wind_speed_10=-0.0306, wind_speed_500=+0.0188
+
+[MAM]
+  2 km: u_500=-0.0205, wind_speed_500=-0.0200, t_850=+0.0163, bulk_wind_diff_10_850=-0.0153, v10=-0.0142
+  4 km: u_500=-0.0267, wind_speed_500=-0.0260, t_850=+0.0212, bulk_wind_diff_10_850=-0.0198, v10=-0.0184
+  8 km: u_500=-0.0311, wind_speed_500=-0.0303, t_850=+0.0248, bulk_wind_diff_10_850=-0.0231, v10=-0.0215
+  16 km: u_500=-0.0354, wind_speed_500=-0.0346, t_850=+0.0285, bulk_wind_diff_10_850=-0.0262, v10=-0.0241
+  32 km: u_500=-0.0398, wind_speed_500=-0.0388, t_850=+0.0331, bulk_wind_diff_10_850=-0.0293, v10=-0.0263
+
+[JJA]
+  2 km: wind_speed_500=-0.0223, u_500=-0.0223, t2m=-0.0220, delta_t_850_surface=+0.0209, u10=+0.0141
+  4 km: wind_speed_500=-0.0277, u_500=-0.0276, t2m=-0.0273, delta_t_850_surface=+0.0260, u10=+0.0174
+  8 km: wind_speed_500=-0.0311, u_500=-0.0310, t2m=-0.0307, delta_t_850_surface=+0.0292, u10=+0.0197
+  16 km: wind_speed_500=-0.0346, u_500=-0.0344, t2m=-0.0340, delta_t_850_surface=+0.0324, u10=+0.0217
+  32 km: wind_speed_500=-0.0387, u_500=-0.0384, t2m=-0.0375, delta_t_850_surface=+0.0358, bulk_wind_diff_10_850=-0.0252
+
+[SON]
+  2 km: tcwv=-0.0208, delta_t_500_850=+0.0178, u_500=-0.0134, t_850=-0.0129, u_850=-0.0128
+  4 km: tcwv=-0.0259, delta_t_500_850=+0.0222, u_500=-0.0168, t_850=-0.0161, u_850=-0.0160
+  8 km: tcwv=-0.0296, delta_t_500_850=+0.0253, u_500=-0.0191, t_850=-0.0183, u_850=-0.0181
+  16 km: tcwv=-0.0337, delta_t_500_850=+0.0289, u_500=-0.0216, t_850=-0.0210, u_850=-0.0207
+  32 km: tcwv=-0.0365, delta_t_500_850=+0.0321, u_500=-0.0240, t_850=-0.0236, u_850=-0.0231
+
+AVISOS / NOTAS
+----------------------------------------------------------------------------------------------------------------------------
+- WARNING: The scale analysis uses a stratified sample containing <5% of all patches. Inverse stratum weights are used.
+- NOTE: Haar nominal support is a dyadic spatial support on the 2-km CorrDiff grid. It is not the physical/native resolution of ERA5 and must not be interpreted as such.
+- NOTE: The orthonormal Haar detail-energy fractions quantify how spatial variance presented to the model is distributed over dyadic supports. They are not a Fourier power spectrum.
+- NOTE: Fine-scale variation in interpolated ERA5 channels can be generated by interpolation of broad gradients. It does not represent independent meteorological observations at 2 km.
+- NOTE: Coarse-grain correlations aggregate both predictor and radar before association. within_patch_centered mode removes each coarse patch mean and emphasizes spatial co-variation.
+- NOTE: The 64-km Haar level spans the complete 32x32 patch and is especially sensitive to patch boundaries and patch placement.
+- NOTE: Overlapping patches duplicate physical structures. Weighted coefficient/observation mass is not an independent sample size.
+- NOTE: The continuous radar decomposition uses stored log1p target values; event masks use fixed stored-domain dBZ thresholds.
+- NOTE: bulk_wind_diff variables are vector wind differences in m/s, not height-normalized vertical shear.
+- NOTE: All associations are descriptive and do not establish causal meteorological relationships.
+
+============================================================================================================================
+FIM DA FASE 11
+============================================================================================================================
