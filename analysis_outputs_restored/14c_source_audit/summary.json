@@ -1,0 +1,26 @@
+{
+  "version": "14c-source-audit-v1",
+  "arguments": {
+    "dataset_dir": "datasets/corrdiff_2011_2024_restored",
+    "audit14b_dir": "analysis_outputs_restored/14b_extreme_episodes",
+    "radar_dir": "/home/vsantos/data/radar_sumare",
+    "radar_cache_dir": "/home/vsantos/repositories/rionowcastdf/data/radar_cache",
+    "builder_file": "src/corrdiff/builder/dataset_builder.py",
+    "output_dir": "analysis_outputs_restored/14c_source_audit",
+    "candidate_fraction": "0.1",
+    "controls_per_year": "2",
+    "max_panels": "40",
+    "lat_range": "[-23.5, -22.25]",
+    "lon_range": "[-44, -42.5]",
+    "resolution_km": "2",
+    "image_height": "654",
+    "image_width": "656"
+  },
+  "builder_sha256": "a59de63f422f3abeaf83f1bd14fbe08b1773fbb2ba02021676b34ae9f9bc0ebe",
+  "selected_frames": 224,
+  "candidate_frames": 138,
+  "errors": 0,
+  "missing_png": 0,
+  "panels": 40,
+  "conclusion": "Pending source review; no timestamps excluded; repeated masks and RGB distances are diagnostics, not proof of artifacts."
+}

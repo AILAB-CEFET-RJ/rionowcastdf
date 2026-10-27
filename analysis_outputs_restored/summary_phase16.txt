@@ -212,6 +212,12 @@ climatology_month_hour_slot validation full_split         SON      39756     17.
             train_slot_mean validation full_split         SON      39756     17.348778    10.504480    -10.287319                       0.389828                          0.0                       0.092791                          0.0                       0.031241                          0.0                       0.014639                          0.0
                        zero validation full_split         SON      39756     17.472054    10.476428    -10.476428                       0.389828                          0.0                       0.092791                          0.0                       0.031241                          0.0                       0.014639                          0.0
 
+HANDOFF NVIDIA
+----------------------------------------------------------------------------------------------------------------------------------------
+Diretório: analysis_outputs_restored/16_baselines/nvidia_handoff
+Próximo ambiente: NVIDIA CorrDiff environment
+Próxima ação: consume split indices + train-only normalization in the native CorrDiff data pipeline; do not train neural baselines in Phase 16
+
 INTERPRETAÇÃO
 ----------------------------------------------------------------------------------------------------------------------------------------
 - zero/global/slot/climatology medem o piso não aprendido.

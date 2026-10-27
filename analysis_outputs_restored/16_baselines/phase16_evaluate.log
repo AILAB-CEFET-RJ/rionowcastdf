@@ -116,3 +116,13 @@
 2026-10-27 12:26:31 | INFO | validation | persistence_common | climatology_month_hour_slot | 1/542
 2026-10-27 12:27:13 | INFO | validation | persistence_common | climatology_month_hour_slot | 101/542
 2026-10-27 12:27:55 | INFO | validation | persistence_common | climatology_month_hour_slot | 201/542
+2026-10-27 12:28:37 | INFO | validation | persistence_common | climatology_month_hour_slot | 301/542
+2026-10-27 12:29:19 | INFO | validation | persistence_common | climatology_month_hour_slot | 401/542
+2026-10-27 12:30:01 | INFO | validation | persistence_common | climatology_month_hour_slot | 501/542
+2026-10-27 12:30:18 | INFO | validation | persistence_common | persistence_1h_radar_reference | 1/542
+2026-10-27 12:31:00 | INFO | validation | persistence_common | persistence_1h_radar_reference | 101/542
+2026-10-27 12:31:42 | INFO | validation | persistence_common | persistence_1h_radar_reference | 201/542
+2026-10-27 12:32:24 | INFO | validation | persistence_common | persistence_1h_radar_reference | 301/542
+2026-10-27 12:33:06 | INFO | validation | persistence_common | persistence_1h_radar_reference | 401/542
+2026-10-27 12:33:48 | INFO | validation | persistence_common | persistence_1h_radar_reference | 501/542
+2026-10-27 12:34:05 | INFO | Evaluation complete.

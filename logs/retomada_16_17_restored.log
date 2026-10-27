@@ -52,3 +52,53 @@
 2026-10-27 12:26:31 | INFO | validation | persistence_common | climatology_month_hour_slot | 1/542
 2026-10-27 12:27:13 | INFO | validation | persistence_common | climatology_month_hour_slot | 101/542
 2026-10-27 12:27:55 | INFO | validation | persistence_common | climatology_month_hour_slot | 201/542
+2026-10-27 12:28:37 | INFO | validation | persistence_common | climatology_month_hour_slot | 301/542
+2026-10-27 12:29:19 | INFO | validation | persistence_common | climatology_month_hour_slot | 401/542
+2026-10-27 12:30:01 | INFO | validation | persistence_common | climatology_month_hour_slot | 501/542
+2026-10-27 12:30:18 | INFO | validation | persistence_common | persistence_1h_radar_reference | 1/542
+2026-10-27 12:31:00 | INFO | validation | persistence_common | persistence_1h_radar_reference | 101/542
+2026-10-27 12:31:42 | INFO | validation | persistence_common | persistence_1h_radar_reference | 201/542
+2026-10-27 12:32:24 | INFO | validation | persistence_common | persistence_1h_radar_reference | 301/542
+2026-10-27 12:33:06 | INFO | validation | persistence_common | persistence_1h_radar_reference | 401/542
+2026-10-27 12:33:48 | INFO | validation | persistence_common | persistence_1h_radar_reference | 501/542
+2026-10-27 12:34:05 | INFO | Evaluation complete.
+analysis_outputs_restored/summary_phase16.txt
+analysis_outputs_restored/16_baselines/nvidia_handoff
+files: 12
+==========================================================================================
+CORRDIFF PHASE 17 - DESIGN VALIDATION
+==========================================================================================
+experiments: 11
+raw channels: 12
+derived channels: 8
+errors: 0
+warnings: 0
+STATUS: PASS
+analysis_outputs_restored/17_conditioning_ablations
+{
+  "phase_version": "phase17-conditioning-ablations-v1-nvidia-corrdiff-design",
+  "n_experiments": 11,
+  "n_stage_R_runs": 33,
+  "n_stage_D_mandatory_runs": 15,
+  "n_stage_D_optional_experiments": 6,
+  "stage_R_seeds": [
+    42,
+    43,
+    44
+  ],
+  "stage_D_seeds": [
+    42,
+    43,
+    44
+  ],
+  "tests_locked": true,
+  "phase16_handoff": {
+    "checked": true,
+    "valid": true,
+    "data_contract": "analysis_outputs_restored/16_baselines/nvidia_handoff/corrdiff_data_contract.json",
+    "data_contract_sha256": "be77c9d77da4c43387dafd29e13138d33cb617f1382abb54bd6d202dba48ac8f"
+  },
+  "next_phase": "Phase 18: map this contract to the actual NVIDIA CorrDiff repository/configs and smoke-test native regression + diffusion data pipelines."
+}
+analysis_outputs_restored/summary_phase17.txt
+Retomada das fases 16–17 concluída.
