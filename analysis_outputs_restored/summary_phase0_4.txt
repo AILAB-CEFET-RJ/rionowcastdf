@@ -1,0 +1,160 @@
+========================================================================================
+CORRDIFF — CONSOLIDAÇÃO DOS RESULTADOS DAS FASES 0 A 4
+========================================================================================
+Relatório composto somente por estatísticas agregadas dos analysis_outputs.
+O script não lê o Zarr, caches do radar ou arquivos NPZ com amostras.
+
+Fase 0: analysis_outputs_restored/00_quality
+Fase 1: analysis_outputs_restored/01_univariate
+Fase 2: analysis_outputs_restored/02_derived
+Fase 3: analysis_outputs_restored/03_joint
+Fase 4: analysis_outputs_restored/04_extremes
+
+========================================================================================
+FASE 0 — QUALIDADE, COBERTURA E INTEGRIDADE
+========================================================================================
+
+Estrutura do dataset
+----------------------------------------------------------------------------------------
+Status da auditoria                       : PASS
+Amostras / patches                        : 1,016,208
+Canais de entrada                         : 12.0000
+Canais                                    : tcwv, t2m, u10, v10, t_850, r_850, u_850, v_850, t_500, r_500, u_500, v_500
+Shape input                               : [1016208, 12, 32, 32]
+Shape target                              : [1016208, 1, 32, 32]
+Shape mask                                : [1016208, 1, 32, 32]
+Dimensão amostral consistente             : True
+Transformação do target                   : log1p
+Período configurado                       : 2011-01-01T00:00:00 → 2024-12-31T23:00:00
+Frequência temporal                       : 1h
+Grade do radar                            : [70, 84]
+Resolução radar (km)                      : 2.0000
+Patch / stride                            : 32 / 16
+
+Cobertura temporal
+----------------------------------------------------------------------------------------
+Timestamps esperados                      : 122,736.00
+Timestamps disponíveis                    : 84,684.00
+Timestamps ausentes                       : 38,052.00
+Cobertura temporal                        : 69.00%
+Primeiro timestamp observado              : 2011-01-17T19:00:00
+Último timestamp observado                : 2024-12-31T23:00:00
+Patches por timestamp                     : {'min': 12, 'p25': 12.0, 'median': 12.0, 'mean': 12.0, 'p75': 12.0, 'max': 12}
+
+Cobertura por ano
+----------------------------------------------------------------------------------------
+ year  expected_timestamps  available_timestamps  samples  missing_timestamps  coverage_ratio  mean_patches_per_available_timestamp
+ 2011                 8760                  4270    51240                4490        0.487443                                  12.0
+ 2012                 8784                  7333    87996                1451        0.834813                                  12.0
+ 2013                 8760                  6968    83616                1792        0.795434                                  12.0
+ 2014                 8760                  7046    84552                1714        0.804338                                  12.0
+ 2015                 8760                  6577    78924                2183        0.750799                                  12.0
+ 2016                 8784                  6727    80724                2057        0.765824                                  12.0
+ 2017                 8760                  6585    79020                2175        0.751712                                  12.0
+ 2018                 8760                  6713    80556                2047        0.766324                                  12.0
+ 2019                 8760                  6007    72084                2753        0.685731                                  12.0
+ 2020                 8784                  5406    64872                3378        0.615437                                  12.0
+ 2021                 8760                  6764    81168                1996        0.772146                                  12.0
+ 2022                 8760                  6151    73812                2609        0.702169                                  12.0
+ 2023                 8760                  5006    60072                3754        0.571461                                  12.0
+ 2024                 8784                  3131    37572                5653        0.356444                                  12.0
+
+Horas UTC com menor cobertura
+----------------------------------------------------------------------------------------
+ hour_utc  expected_timestamps  available_timestamps  coverage_ratio  mean_patches_per_available_timestamp
+       11                 5114                  3135        0.613023                                  12.0
+       15                 5114                  3165        0.618889                                  12.0
+       10                 5114                  3193        0.624364                                  12.0
+       14                 5114                  3198        0.625342                                  12.0
+       12                 5114                  3214        0.628471                                  12.0
+       16                 5114                  3237        0.632968                                  12.0
+
+Horas UTC com maior cobertura
+ hour_utc  expected_timestamps  available_timestamps  coverage_ratio  mean_patches_per_available_timestamp
+        1                 5114                  3992        0.780602                                  12.0
+        0                 5114                  3872        0.757137                                  12.0
+        2                 5114                  3828        0.748533                                  12.0
+       23                 5114                  3787        0.740516                                  12.0
+        5                 5114                  3782        0.739539                                  12.0
+       22                 5114                  3779        0.738952                                  12.0
+
+Geometria dos patches
+----------------------------------------------------------------------------------------
+Posições esperadas por campo              : 12.0000
+Posições efetivamente observadas          : 12.0000
+Cobertura espacial geométrica esperada    : 87.07%
+Cobertura espacial observada              : 87.07%
+
+Integridade de máscara e target
+----------------------------------------------------------------------------------------
+Pixels válidos na máscara                 : 1,040,596,992
+Razão de pixels válidos                   : 100.00%
+Violações de máscara binária              : 0
+negative_finite_value_count               : 0
+invalid_mask_region_nonzero_count         : 0
+nan_count_all_stored_target_pixels        : 0
+posinf_count_all_stored_target_pixels     : 0
+neginf_count_all_stored_target_pixels     : 0
+
+Validação cache radar → target Zarr
+----------------------------------------------------------------------------------------
+Status                                    : PASS
+Patches comparados                        : 256.000
+Shapes compatíveis                        : 256.000
+Maior erro target vs transformação esperada: 0
+Maior erro expm1(target) vs cache clipado : 7.629e-06
+Mismatches de máscara                     : 0
+Valores negativos na origem observados    : 0
+
+Desbalanceamento global do radar — distribuição de treinamento
+----------------------------------------------------------------------------------------
+threshold condition  legend_value_threshold  event_pixel_ratio  event_patch_ratio  event_pixel_count  event_patch_count
+     gt_0       > 0                     0.0       1.466204e-02           0.298872           15257278             303716
+    ge_20     >= 20                    20.0       1.448884e-02           0.297619           15077040             302443
+    ge_25     >= 25                    25.0       8.676803e-03           0.217845            9029055             221376
+    ge_30     >= 30                    30.0       5.048298e-03           0.160795            5253244             163401
+    ge_35     >= 35                    35.0       3.357717e-03           0.122381            3494030             124365
+    ge_40     >= 40                    40.0       1.319269e-03           0.076038            1372827              77270
+    ge_45     >= 45                    45.0       6.995398e-04           0.028164             727939              28620
+    ge_50     >= 50                    50.0       1.566409e-07           0.000070                163                 71
+
+Avisos e notas do auditor
+----------------------------------------------------------------------------------------
+AVISOS: nenhum
+NOTAS:
+  - target_transform_log1p: Stored target uses log1p. In the audited builder, the source cache is created from PNG RGB colors mapped to numerical radar-legend values and saved as float32; the builder itself does not declare the physical unit as dBZ. Direct cache -> target validation is performed when --radar-cache-dir is supplied.
+  - temporal_gaps_present: Dataset contains 38052 expected timestamps with no written patch; inspect temporal_coverage.parquet and builder counters.
+  - patch_geometry_uncovered_edges: Patch geometry covers 87.07% of the 70x84 radar grid. This follows directly from patch_size/stride and should be considered when reconstructing full fields.
+  - radar_target_mapping_verified: Directly reproduced cache -> Zarr target/mask for 256 sampled patches: isfinite mask + nan_to_num + clip(min=0) + log1p.
+  - target_event_rates_patch_weighted: Target threshold rates were computed over valid pixels in the stored patch dataset. Because patches overlap, pixel rates are training-distribution diagnostics rather than de-duplicated full-field climatological frequencies.
+
+========================================================================================
+FASE 1 — CARACTERIZAÇÃO ESTATÍSTICA UNIVARIADA
+========================================================================================
+[AUSENTE] analysis_outputs_restored/01_univariate/analysis_summary.json
+
+========================================================================================
+FASE 2 — VARIÁVEIS DERIVADAS
+========================================================================================
+[AUSENTE] resultados da Fase 2 em analysis_outputs_restored/02_derived
+
+========================================================================================
+FASE 3 — RELAÇÕES ERA5 × RADAR
+========================================================================================
+[AUSENTE] resultados da Fase 3 em analysis_outputs_restored/03_joint
+
+========================================================================================
+FASE 4 — EVENTOS INTENSOS E EXTREMOS
+========================================================================================
+[AUSENTE] resultados da Fase 4 em analysis_outputs_restored/04_extremes
+
+========================================================================================
+SÍNTESE CRUZADA AUTOMÁTICA — FASES 0 A 4
+========================================================================================
+Esta seção não substitui interpretação científica; ela apenas cruza métricas agregadas produzidas pelos scripts anteriores.
+
+========================================================================================
+FIM DA CONSOLIDAÇÃO
+========================================================================================
+Para revisão externa, copie o conteúdo deste relatório textual.
+Evite compartilhar train.zarr, caches, NPZ de amostras ou dados brutos se a política corporativa não permitir.
