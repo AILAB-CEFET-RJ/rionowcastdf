@@ -1,0 +1,129 @@
+{
+  "phase_version": "phase5-seasonality-v1-availability-conditioned",
+  "dataset_patches": 1016208,
+  "available_unique_timestamps": 84684,
+  "expected_timestamps": 122736,
+  "temporal_coverage_ratio": 0.6899687133359406,
+  "period_start": "2011-01-01 00:00:00",
+  "period_end": "2024-12-31 23:00:00",
+  "time_frequency": "1h",
+  "patches_per_timestamp_min": 12,
+  "patches_per_timestamp_median": 12.0,
+  "patches_per_timestamp_max": 12,
+  "season_definition": {
+    "DJF": "DJF_verao",
+    "MAM": "MAM_outono",
+    "JJA": "JJA_inverno",
+    "SON": "SON_primavera"
+  },
+  "seasonal_climatology_complete_season_years_only": true,
+  "fixed_threshold_comparison_domain": "stored_log1p_float32",
+  "radar_continuous_domain": "expm1(stored_target): post-clip numerical radar-legend values; physical unit not assumed",
+  "predictor_seasonality_computed": true,
+  "monthly_lowest_coverage": [
+    {
+      "month": 8,
+      "expected_timestamps": 10416,
+      "available_timestamps": 5603,
+      "missing_timestamps": 4813,
+      "coverage_ratio": 0.5379224270353302
+    },
+    {
+      "month": 7,
+      "expected_timestamps": 10416,
+      "available_timestamps": 5758,
+      "missing_timestamps": 4658,
+      "coverage_ratio": 0.5528033794162827
+    },
+    {
+      "month": 6,
+      "expected_timestamps": 10080,
+      "available_timestamps": 6473,
+      "missing_timestamps": 3607,
+      "coverage_ratio": 0.6421626984126985
+    }
+  ],
+  "monthly_highest_coverage": [
+    {
+      "month": 10,
+      "expected_timestamps": 10416,
+      "available_timestamps": 8194,
+      "missing_timestamps": 2222,
+      "coverage_ratio": 0.7866743471582182
+    },
+    {
+      "month": 12,
+      "expected_timestamps": 10416,
+      "available_timestamps": 7961,
+      "missing_timestamps": 2455,
+      "coverage_ratio": 0.7643049155145929
+    },
+    {
+      "month": 11,
+      "expected_timestamps": 10080,
+      "available_timestamps": 7585,
+      "missing_timestamps": 2495,
+      "coverage_ratio": 0.7524801587301587
+    }
+  ],
+  "months_highest_positive_pixel_rate": [
+    {
+      "month": 2,
+      "pixel_event_rate": 0.024862417267091153,
+      "coverage_ratio": 0.7456860269360269
+    },
+    {
+      "month": 1,
+      "pixel_event_rate": 0.023213505924317996,
+      "coverage_ratio": 0.6592741935483871
+    },
+    {
+      "month": 12,
+      "pixel_event_rate": 0.019651270729310596,
+      "coverage_ratio": 0.7643049155145929
+    }
+  ],
+  "months_highest_ge40_pixel_rate": [
+    {
+      "month": 9,
+      "pixel_event_rate": 0.0029258040330063626,
+      "coverage_ratio": 0.6548611111111111
+    },
+    {
+      "month": 2,
+      "pixel_event_rate": 0.0029069625906883497,
+      "coverage_ratio": 0.7456860269360269
+    },
+    {
+      "month": 5,
+      "pixel_event_rate": 0.0019253045216814544,
+      "coverage_ratio": 0.7357910906298003
+    }
+  ],
+  "months_highest_ge45_pixel_rate": [
+    {
+      "month": 9,
+      "pixel_event_rate": 0.0022216636604933597,
+      "coverage_ratio": 0.6548611111111111
+    },
+    {
+      "month": 2,
+      "pixel_event_rate": 0.0016149958036428202,
+      "coverage_ratio": 0.7456860269360269
+    },
+    {
+      "month": 5,
+      "pixel_event_rate": 0.0014716395920320112,
+      "coverage_ratio": 0.7357910906298003
+    }
+  ],
+  "warnings": [
+    "At least one year-month has <25% temporal coverage; inspect year_month_coverage.parquet before interpreting anomalies."
+  ],
+  "methodological_notes": [
+    "Event frequencies are conditioned on available radar timestamps; raw monthly event counts should not be used as climatological frequencies.",
+    "Pixel event rates remain diagnostics of the stored overlapping patch distribution, not de-duplicated full-field climatology.",
+    "Timestamp_any_event_rate is the preferred temporal occurrence metric when the question is whether an event was present at an available timestamp.",
+    "Predictor statistics are computed from one spatial mean per available timestamp, preventing months with more patches from receiving extra temporal weight."
+  ]
+}
