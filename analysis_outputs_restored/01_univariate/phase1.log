@@ -1,0 +1,19 @@
+2026-10-26 21:15:24 | INFO | ========================================================================
+2026-10-26 21:15:24 | INFO | CORRDIFF PHASE 1 - UNIVARIATE ANALYSIS
+2026-10-26 21:15:24 | INFO | Version              : phase1-univariate-v1
+2026-10-26 21:15:24 | INFO | Zarr                 : datasets/corrdiff_2011_2024_restored/train.zarr
+2026-10-26 21:15:24 | INFO | Samples              : 1016208
+2026-10-26 21:15:24 | INFO | Channels             : 12
+2026-10-26 21:15:24 | INFO | Patch                : 32x32
+2026-10-26 21:15:24 | INFO | Sampling block       : 256 patches
+2026-10-26 21:15:24 | INFO | Selected blocks      : 128
+2026-10-26 21:15:24 | INFO | Approx sampled patch : 32768
+2026-10-26 21:15:24 | INFO | Reservoir/channel    : 300000
+2026-10-26 21:15:24 | INFO | ========================================================================
+2026-10-26 21:15:32 | INFO | Phase 1 completed in 7.7 s
+2026-10-26 21:15:32 | INFO | Sampled patches       : 32768
+2026-10-26 21:15:32 | INFO | Output                : analysis_outputs_restored/01_univariate
+2026-10-26 21:15:32 | INFO | Warnings              : 3
+2026-10-26 21:15:32 | INFO |   - sample_mean_shift_vs_phase0: At least one sampled channel mean differs from the Phase 0 exact mean by more than 0.10 standard deviations (max=0.1614).
+2026-10-26 21:15:32 | INFO |   - r_850_outside_0_100: Sampled r_850 contains 1.193976% of values outside [0,100]. Values were measured, not clipped.
+2026-10-26 21:15:32 | INFO |   - r_500_outside_0_100: Sampled r_500 contains 0.491500% of values outside [0,100]. Values were measured, not clipped.
