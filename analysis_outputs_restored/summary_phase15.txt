@@ -1,0 +1,227 @@
+====================================================================================================================================
+CORRDIFF - FASE 15 - SPLIT FORMAL DE TREINO / VALIDAÇÃO / TESTE / STRESS-OOD
+====================================================================================================================================
+Versão: phase15-formal-splits-v1-purged-temporal-ood2024
+Timestamps disponíveis: 84684
+Patches totais: 1016208
+Purge simétrico: 48 h de cada lado
+Escopo: formal chronological split protocol for CorrDiff training/model-selection/primary-test/stress-OOD
+
+PROTOCOLO CONGELADO
+------------------------------------------------------------------------------------------------------------------------------------
+train            | 2011-01-01 00:00:00+00:00 -> 2020-12-31 23:00:00+00:00 | locked=False | model_selection=True | role=parameter fitting
+validation       | 2021-01-01 00:00:00+00:00 -> 2022-12-31 23:00:00+00:00 | locked=False | model_selection=True | role=hyperparameter/model selection
+test_primary     | 2023-01-01 00:00:00+00:00 -> 2023-12-31 23:00:00+00:00 | locked=True | model_selection=False | role=primary chronological generalization test
+test_stress_ood  | 2024-01-01 00:00:00+00:00 -> 2024-12-31 23:00:00+00:00 | locked=True | model_selection=False | role=stress/OOD test
+
+RESUMO DOS SPLITS
+------------------------------------------------------------------------------------------------------------------------------------
+          split  split_code  n_timestamps       first_timestamp_utc        last_timestamp_utc  n_years_present  model_selection_access  locked  final_refit_eligible_pre_primary_test  n_patches  n_unique_timestamps  mean_patches_per_timestamp
+          train           1         63587 2011-01-17 19:00:00+00:00 2020-12-29 23:00:00+00:00               10                    True   False                                   True     763044                63587                        12.0
+     validation           2         12828 2021-01-03 01:00:00+00:00 2022-12-29 23:00:00+00:00                2                    True   False                                   True     153936                12828                        12.0
+   test_primary           3          4966 2023-01-03 00:00:00+00:00 2023-12-23 15:00:00+00:00                1                   False    True                                  False      59592                 4966                        12.0
+test_stress_ood           4          3108 2024-01-03 00:00:00+00:00 2024-12-31 23:00:00+00:00                1                   False    True                                  False      37296                 3108                        12.0
+ excluded_purge           0           195 2020-12-30 00:00:00+00:00 2024-01-02 23:00:00+00:00                5                   False    True                                  False       2340                  195                        12.0
+
+COVERAGE POR SPLIT
+------------------------------------------------------------------------------------------------------------------------------------
+          split         nominal_start_utc           nominal_end_utc  expected_hours_nominal  available_hours_before_purge  purged_available_hours  retained_available_hours  availability_ratio_before_purge  retained_ratio_vs_nominal_expected  purge_hours_each_side_of_boundary
+          train 2011-01-01 00:00:00+00:00 2020-12-31 23:00:00+00:00                   87672                         63632                      45                     63587                         0.725796                            0.725283                                 48
+     validation 2021-01-01 00:00:00+00:00 2022-12-31 23:00:00+00:00                   17520                         12915                      87                     12828                         0.737158                            0.732192                                 48
+   test_primary 2023-01-01 00:00:00+00:00 2023-12-31 23:00:00+00:00                    8760                          5006                      40                      4966                         0.571461                            0.566895                                 48
+test_stress_ood 2024-01-01 00:00:00+00:00 2024-12-31 23:00:00+00:00                    8784                          3131                      23                      3108                         0.356444                            0.353825                                 48
+
+AUDITORIA DAS FRONTEIRAS / PURGE
+------------------------------------------------------------------------------------------------------------------------------------
+                  boundary_id   left_split     right_split              boundary_utc  purge_hours_each_side last_retained_left_timestamp first_retained_right_timestamp  retained_separation_hours  purged_available_timestamps  passes_temporal_order  passes_at_least_requested_radius_gap
+            train__validation        train      validation 2021-01-01 00:00:00+00:00                     48    2020-12-29 23:00:00+00:00      2021-01-03 01:00:00+00:00                       98.0                           87                   True                                  True
+     validation__test_primary   validation    test_primary 2023-01-01 00:00:00+00:00                     48    2022-12-29 23:00:00+00:00      2023-01-03 00:00:00+00:00                       97.0                           85                   True                                  True
+test_primary__test_stress_ood test_primary test_stress_ood 2024-01-01 00:00:00+00:00                     48    2023-12-23 15:00:00+00:00      2024-01-03 00:00:00+00:00                      249.0                           23                   True                                  True
+
+PARTIÇÃO DE PATCHES
+------------------------------------------------------------------------------------------------------------------------------------
+          split  split_code  n_patches  n_unique_timestamps  mean_patches_per_timestamp
+          train           1     763044                63587                        12.0
+     validation           2     153936                12828                        12.0
+   test_primary           3      59592                 4966                        12.0
+test_stress_ood           4      37296                 3108                        12.0
+ excluded_purge           0       2340                  195                        12.0
+
+BALANÇO DE EVENTOS RADAR
+------------------------------------------------------------------------------------------------------------------------------------
+          split  n_timestamps  timestamp_event_rate_gt_0  timestamp_event_rate_ge_20  timestamp_event_rate_ge_30  timestamp_event_rate_ge_40  timestamp_event_rate_ge_45  mean_max_dbz  max_dbz_p50  max_dbz_p90  max_dbz_p99  mean_positive_pixel_fraction  mean_event_pixel_fraction_ge_30  mean_event_pixel_fraction_ge_40  mean_event_pixel_fraction_ge_45
+          train         63587                   0.511441                    0.509271                    0.269583                    0.188576                    0.083162     16.819954    20.000002    42.499062    45.000000                      0.013008                         0.004668                         0.001160                         0.000540
+     validation         12828                   0.816495                    0.816495                    0.253274                    0.150530                    0.053399     22.920916    20.143297    40.164257    45.000000                      0.015565                         0.002513                         0.000344                         0.000043
+   test_primary          4966                   0.645590                    0.641160                    0.279501                    0.190697                    0.089005     20.456219    24.999998    43.825165    45.000000                      0.017749                         0.004123                         0.000657                         0.000095
+test_stress_ood          3108                   0.717181                    0.710103                    0.299228                    0.199485                    0.093308     22.694132    27.576483    41.367003    47.938271                      0.038329                         0.024441                         0.009671                         0.007682
+ excluded_purge           195                   0.830769                    0.830769                    0.502564                    0.410256                    0.179487     28.877714    35.000000    45.000000    45.000000                      0.038937                         0.010195                         0.001308                         0.000160
+
+EVENTOS POR ESTAÇÃO
+------------------------------------------------------------------------------------------------------------------------------------
+[train]
+split season_code  n_timestamps  fraction_of_split  timestamp_event_rate_gt_0  timestamp_event_rate_ge_20  timestamp_event_rate_ge_30  timestamp_event_rate_ge_40  timestamp_event_rate_ge_45
+train         DJF         15987           0.251419                   0.622193                    0.619879                    0.389379                    0.298430                    0.161756
+train         MAM         16711           0.262805                   0.508527                    0.505655                    0.282868                    0.197355                    0.079409
+train         JJA         13688           0.215264                   0.337157                    0.335622                    0.135739                    0.082992                    0.023305
+train         SON         17201           0.270511                   0.550026                    0.548166                    0.251846                    0.161967                    0.061392
+
+[validation]
+     split season_code  n_timestamps  fraction_of_split  timestamp_event_rate_gt_0  timestamp_event_rate_ge_20  timestamp_event_rate_ge_30  timestamp_event_rate_ge_40  timestamp_event_rate_ge_45
+validation         DJF          3452           0.269099                   0.872827                    0.872827                    0.384994                    0.240730                    0.090672
+validation         MAM          3487           0.271827                   0.739317                    0.739317                    0.270720                    0.167479                    0.055635
+validation         JJA          2576           0.200811                   0.830357                    0.830357                    0.098602                    0.038432                    0.006599
+validation         SON          3313           0.258263                   0.828252                    0.828252                    0.217929                    0.125868                    0.048596
+
+[test_primary]
+       split season_code  n_timestamps  fraction_of_split  timestamp_event_rate_gt_0  timestamp_event_rate_ge_20  timestamp_event_rate_ge_30  timestamp_event_rate_ge_40  timestamp_event_rate_ge_45
+test_primary         DJF          1255           0.252718                   0.810359                    0.810359                    0.435857                    0.317131                    0.164940
+test_primary         MAM          1536           0.309303                   0.553385                    0.552734                    0.271484                    0.165365                    0.062500
+test_primary         JJA          1163           0.234193                   0.571797                    0.566638                    0.137575                    0.071367                    0.025795
+test_primary         SON          1012           0.203786                   0.666008                    0.651186                    0.260870                    0.209486                    0.107708
+
+[test_stress_ood]
+          split season_code  n_timestamps  fraction_of_split  timestamp_event_rate_gt_0  timestamp_event_rate_ge_20  timestamp_event_rate_ge_30  timestamp_event_rate_ge_40  timestamp_event_rate_ge_45
+test_stress_ood         DJF          1037           0.333655                   0.845709                    0.841851                    0.488910                    0.324012                    0.139826
+test_stress_ood         MAM           821           0.264157                   0.593179                    0.580999                    0.181486                    0.119367                    0.068210
+test_stress_ood         JJA           404           0.129987                   0.665842                    0.658416                    0.173267                    0.116337                    0.069307
+test_stress_ood         SON           846           0.272201                   0.704492                    0.698582                    0.241135                    0.164303                    0.072104
+
+SHIFT DE REGIMES VS TRAIN
+------------------------------------------------------------------------------------------------------------------------------------
+      regime_space reference_split evaluation_split  jensen_shannon_divergence  total_variation_distance  max_absolute_prevalence_delta
+          absolute           train       validation                   0.004786                  0.077477                       0.059834
+          absolute           train     test_primary                   0.004511                  0.087314                       0.068229
+          absolute           train  test_stress_ood                   0.009620                  0.098022                       0.098022
+anomaly_month_hour           train       validation                   0.008560                  0.091000                       0.090168
+anomaly_month_hour           train     test_primary                   0.010294                  0.110792                       0.095900
+anomaly_month_hour           train  test_stress_ood                   0.011614                  0.117385                       0.117385
+
+PREVALÊNCIA DOS REGIMES POR SPLIT
+------------------------------------------------------------------------------------------------------------------------------------
+[absolute]
+split   excluded_purge  test_primary  test_stress_ood     train  validation
+regime                                                                     
+R1            0.025641      0.122030         0.180502  0.155425    0.142813
+R2            0.107692      0.159283         0.101673  0.199695    0.217337
+R3            0.000000      0.178615         0.185650  0.159529    0.219364
+R4            0.117949      0.213049         0.247748  0.226556    0.169473
+R5            0.748718      0.327024         0.284427  0.258795    0.251013
+
+[anomaly_month_hour]
+split   excluded_purge  test_primary  test_stress_ood     train  validation
+regime                                                                     
+R1            0.097436      0.123439         0.147683  0.133093    0.223262
+R2            0.041026      0.154450         0.304376  0.250350    0.184596
+R3            0.435897      0.247282         0.135135  0.252520    0.253352
+R4            0.210256      0.264801         0.221364  0.180572    0.161210
+R5            0.215385      0.210028         0.191441  0.183465    0.177580
+
+TOP SHIFTS DE PREDICTORS VS TRAIN
+------------------------------------------------------------------------------------------------------------------------------------
+[validation]
+             predictor  standardized_mean_difference  ks_statistic  reference_mean  evaluation_mean
+                 u_500                      0.232024      0.107470        7.663992         9.444290
+bulk_wind_diff_850_500                      0.224135      0.116055        9.972832        11.227074
+        wind_speed_500                      0.221974      0.117987       10.556114        11.939922
+                   t2m                     -0.217393      0.083368      296.366418       295.695013
+                 t_850                     -0.190903      0.077010      288.818360       288.149357
+       delta_t_500_850                      0.170991      0.085824      -23.393896       -22.897391
+                 v_850                      0.145957      0.068820       -1.533222        -0.981093
+                 t_500                     -0.080248      0.047846      265.424463       265.251965
+                 r_850                      0.065760      0.045981       73.534429        74.648607
+                  tcwv                     -0.061811      0.037920       36.122502        35.444381
+                   v10                      0.047295      0.024081        0.055574         0.143670
+        wind_speed_850                      0.041003      0.020104        4.858952         4.966412
+
+[test_primary]
+      predictor  standardized_mean_difference  ks_statistic  reference_mean  evaluation_mean
+           tcwv                      0.203722      0.101992       36.122502        38.357522
+          r_500                      0.197777      0.080442       33.765780        39.761750
+          t_500                      0.144304      0.114954      265.424463       265.734654
+delta_t_500_850                      0.137402      0.055358      -23.393896       -22.994926
+delta_r_500_850                      0.128043      0.061189      -39.768649       -35.824971
+          r_850                      0.121128      0.070398       73.534429        75.586721
+          u_850                      0.097671      0.036165        1.027539         1.361832
+            v10                     -0.087362      0.057461        0.055574        -0.107153
+          v_850                      0.085510      0.043267       -1.533222        -1.209754
+          u_500                      0.085448      0.036540        7.663992         8.319630
+ wind_speed_500                      0.077143      0.042568       10.556114        11.037030
+          v_500                      0.035014      0.027538       -0.142404         0.055637
+
+[test_stress_ood]
+            predictor  standardized_mean_difference  ks_statistic  reference_mean  evaluation_mean
+                t_500                      0.649847      0.277551      265.424463       266.821353
+                t_850                      0.284330      0.155576      288.818360       289.814771
+  delta_t_850_surface                      0.231422      0.091118       -7.548058        -6.999613
+                u_850                      0.179807      0.091560        1.027539         1.642957
+                u_500                      0.174759      0.092445        7.663992         9.004902
+                 tcwv                      0.160228      0.084016       36.122502        37.880353
+bulk_wind_diff_10_850                      0.145222      0.061951        4.799275         5.147529
+                  t2m                      0.145046      0.109341      296.366418       296.814383
+      delta_t_500_850                      0.137921      0.113863      -23.393896       -22.993418
+        wind_speed_10                      0.127220      0.064239        2.925486         3.084476
+                r_850                     -0.106421      0.051421       73.534429        71.731320
+       wind_speed_850                      0.099735      0.048550        4.858952         5.120339
+
+SNAPSHOT DA JUSTIFICATIVA DA FASE 14
+------------------------------------------------------------------------------------------------------------------------------------
+Coverage recente: {'2023': 0.5714611872146119, '2024': 0.35644353369763204}
+Shift de composição recente:
+      regime_space  jensen_shannon_divergence  total_variation_distance  max_absolute_prevalence_delta
+          absolute                   0.004368                  0.072691                       0.063681
+anomaly_month_hour                   0.004725                  0.087608                       0.069016
+
+Top shifts ERA5 em anomalias mês×hora:
+          predictor  standardized_mean_difference  ks_statistic      psi
+              t_500                      0.387931      0.131191 0.175565
+               tcwv                      0.234066      0.100674 0.057749
+    delta_t_500_850                      0.134690      0.076287 0.028489
+              u_850                      0.132853      0.057800 0.018947
+              u_500                      0.130966      0.070285 0.028285
+              r_500                      0.119653      0.052256 0.025444
+              t_850                      0.102845      0.033741 0.011938
+delta_t_850_surface                      0.092178      0.047759 0.013106
+
+Decomposição >=45 dBZ recente:
+      regime_space  total_event_rate_change  composition_component  within_regime_component  composition_fraction_of_abs_components  within_regime_fraction_of_abs_components
+          absolute                 0.012831               0.008851                  0.00398                                0.689812                                  0.310188
+anomaly_month_hour                 0.012831               0.008261                  0.00457                                0.643802                                  0.356198
+
+INTEGRIDADE
+------------------------------------------------------------------------------------------------------------------------------------
+unique_timestamp_rows: 84684
+manifest_rows: 84684
+timestamps_unique: True
+all_timestamps_assigned: True
+boundary_audit_all_pass_temporal_order: True
+boundary_audit_all_pass_requested_radius_gap: True
+patch_count_summary: {'n_patch_rows': 1016208, 'n_unique_patch_timestamps': 84684, 'patches_per_timestamp_min': 12, 'patches_per_timestamp_median': 12.0, 'patches_per_timestamp_max': 12, 'patches_per_timestamp_mean': 12.0, 'expected_patches_per_timestamp': 12, 'all_timestamps_match_expected_patch_count': True}
+
+POLÍTICA DE USO
+------------------------------------------------------------------------------------------------------------------------------------
+- train: fit parameters and data-dependent preprocessing
+- validation: hyperparameter/model selection only
+- test_primary: locked 2023 chronological test; no model selection
+- test_stress_ood: locked 2024 stress/OOD test; report coverage explicitly
+- final_refit_before_primary_test: after freezing design, train+validation (<=2022) may be combined for one final refit evaluated once on 2023
+- stress_test_policy: 2024 remains locked and separate
+- event_balance_policy: do not rebalance timestamps across temporal splits
+
+AVISOS / NOTAS
+------------------------------------------------------------------------------------------------------------------------------------
+- WARNING: Temporal split is intentionally not stratified by target; natural event-rate differences are part of the generalization test.
+- WARNING: Symmetric purge removes available timestamps on both sides of each boundary.
+- WARNING: 2024 is a stress/OOD test because Phase 14 identified severe radar coverage loss and material covariate shift.
+- WARNING: Regime/predictor diagnostics do not reshuffle timestamps across chronological splits.
+- WARNING: All 32x32 patches sharing a timestamp inherit the same split.
+- WARNING: Rare-event sampling/class weighting must be applied only inside training.
+- WARNING: Normalization or any data-dependent transform must be fit on train only, except for an explicitly declared final-refit protocol after design freeze.
+- NOTE: train=2011-2020; validation=2021-2022; test_primary=2023; test_stress_ood=2024.
+- NOTE: test_primary and test_stress_ood are locked.
+- NOTE: After design freeze, an explicit final-refit may combine train+validation through 2022 and evaluate once on 2023.
+- NOTE: 2024 remains separate after final refit.
+- NOTE: Split balance diagnostics are descriptive and never override chronological ordering.
+
+====================================================================================================================================
+FIM DA FASE 15
+====================================================================================================================================

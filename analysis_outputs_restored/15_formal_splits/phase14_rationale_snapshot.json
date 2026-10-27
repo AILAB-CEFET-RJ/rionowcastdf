@@ -1,0 +1,90 @@
+{
+  "source_phase14_dir": "analysis_outputs_restored/14_distribution_shift",
+  "available": true,
+  "coverage_ratio": {
+    "2023": 0.5714611872146119,
+    "2024": 0.35644353369763204
+  },
+  "recent_regime_shift": [
+    {
+      "regime_space": "absolute",
+      "jensen_shannon_divergence": 0.004368490896631544,
+      "total_variation_distance": 0.0726908508518597,
+      "max_absolute_prevalence_delta": 0.06368105006164126
+    },
+    {
+      "regime_space": "anomaly_month_hour",
+      "jensen_shannon_divergence": 0.004724566297574845,
+      "total_variation_distance": 0.08760776502067658,
+      "max_absolute_prevalence_delta": 0.06901634903662168
+    }
+  ],
+  "top_recent_anomaly_predictor_shifts": [
+    {
+      "predictor": "t_500",
+      "standardized_mean_difference": 0.3879310179337048,
+      "ks_statistic": 0.13119109820724145,
+      "psi": 0.17556464035150077
+    },
+    {
+      "predictor": "tcwv",
+      "standardized_mean_difference": 0.2340660813069423,
+      "ks_statistic": 0.100673535177215,
+      "psi": 0.05774912079749202
+    },
+    {
+      "predictor": "delta_t_500_850",
+      "standardized_mean_difference": 0.13468977928597936,
+      "ks_statistic": 0.07628666601401374,
+      "psi": 0.028489197379336084
+    },
+    {
+      "predictor": "u_850",
+      "standardized_mean_difference": 0.13285274714343823,
+      "ks_statistic": 0.057799826809088684,
+      "psi": 0.018946685426255157
+    },
+    {
+      "predictor": "u_500",
+      "standardized_mean_difference": 0.1309655187083397,
+      "ks_statistic": 0.07028488012191719,
+      "psi": 0.028285413115532218
+    },
+    {
+      "predictor": "r_500",
+      "standardized_mean_difference": 0.11965322528128622,
+      "ks_statistic": 0.052256488485663444,
+      "psi": 0.02544422417572329
+    },
+    {
+      "predictor": "t_850",
+      "standardized_mean_difference": 0.10284530227675538,
+      "ks_statistic": 0.03374133004885682,
+      "psi": 0.011937735827137603
+    },
+    {
+      "predictor": "delta_t_850_surface",
+      "standardized_mean_difference": 0.09217796018755006,
+      "ks_statistic": 0.0477589757511645,
+      "psi": 0.013106145034869465
+    }
+  ],
+  "recent_ge45_decomposition": [
+    {
+      "regime_space": "absolute",
+      "total_event_rate_change": 0.012831310870464227,
+      "composition_component": 0.008851192685139427,
+      "within_regime_component": 0.003980118185324797,
+      "composition_fraction_of_abs_components": 0.6898120367041812,
+      "within_regime_fraction_of_abs_components": 0.31018796329581877
+    },
+    {
+      "regime_space": "anomaly_month_hour",
+      "total_event_rate_change": 0.012831310870464227,
+      "composition_component": 0.008260824296369294,
+      "within_regime_component": 0.004570486574094939,
+      "composition_fraction_of_abs_components": 0.6438020541910867,
+      "within_regime_fraction_of_abs_components": 0.3561979458089133
+    }
+  ]
+}

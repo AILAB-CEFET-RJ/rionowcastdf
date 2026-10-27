@@ -1,0 +1,56 @@
+{
+  "phase_version": "phase15-formal-splits-v1-purged-temporal-ood2024",
+  "n_available_timestamps": 84684,
+  "n_total_patches": 1016208,
+  "purge_hours_each_side_of_boundary": 48,
+  "split_counts_timestamps": {
+    "train": 63587,
+    "validation": 12828,
+    "test_primary": 4966,
+    "test_stress_ood": 3108,
+    "excluded_purge": 195
+  },
+  "split_counts_patches": {
+    "train": 763044,
+    "validation": 153936,
+    "test_primary": 59592,
+    "test_stress_ood": 37296,
+    "excluded_purge": 2340
+  },
+  "integrity": {
+    "unique_timestamp_rows": 84684,
+    "manifest_rows": 84684,
+    "timestamps_unique": true,
+    "all_timestamps_assigned": true,
+    "boundary_audit_all_pass_temporal_order": true,
+    "boundary_audit_all_pass_requested_radius_gap": true,
+    "patch_count_summary": {
+      "n_patch_rows": 1016208,
+      "n_unique_patch_timestamps": 84684,
+      "patches_per_timestamp_min": 12,
+      "patches_per_timestamp_median": 12.0,
+      "patches_per_timestamp_max": 12,
+      "patches_per_timestamp_mean": 12.0,
+      "expected_patches_per_timestamp": 12,
+      "all_timestamps_match_expected_patch_count": true
+    }
+  },
+  "phase14_rationale_available": true,
+  "scope": "formal chronological split protocol for CorrDiff training/model-selection/primary-test/stress-OOD",
+  "warnings": [
+    "Temporal split is intentionally not stratified by target; natural event-rate differences are part of the generalization test.",
+    "Symmetric purge removes available timestamps on both sides of each boundary.",
+    "2024 is a stress/OOD test because Phase 14 identified severe radar coverage loss and material covariate shift.",
+    "Regime/predictor diagnostics do not reshuffle timestamps across chronological splits.",
+    "All 32x32 patches sharing a timestamp inherit the same split.",
+    "Rare-event sampling/class weighting must be applied only inside training.",
+    "Normalization or any data-dependent transform must be fit on train only, except for an explicitly declared final-refit protocol after design freeze."
+  ],
+  "methodological_notes": [
+    "train=2011-2020; validation=2021-2022; test_primary=2023; test_stress_ood=2024.",
+    "test_primary and test_stress_ood are locked.",
+    "After design freeze, an explicit final-refit may combine train+validation through 2022 and evaluate once on 2023.",
+    "2024 remains separate after final refit.",
+    "Split balance diagnostics are descriptive and never override chronological ordering."
+  ]
+}

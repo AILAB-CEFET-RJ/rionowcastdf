@@ -1,0 +1,13 @@
+{
+  "phase_version": "phase15-formal-splits-v1-purged-temporal-ood2024",
+  "codes": {
+    "0": "excluded_purge",
+    "1": "train",
+    "2": "validation",
+    "3": "test_primary",
+    "4": "test_stress_ood"
+  },
+  "array": "patch_split_codes.npy",
+  "dtype": "uint8",
+  "semantics": "one code per train.zarr patch row"
+}
