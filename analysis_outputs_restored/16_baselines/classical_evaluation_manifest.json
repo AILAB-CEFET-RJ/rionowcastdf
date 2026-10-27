@@ -1,0 +1,17 @@
+{
+  "phase_version": "phase16-baselines-v2.2-resolution-safe-persistence",
+  "evaluated_splits": [
+    "validation"
+  ],
+  "baselines": [
+    "zero",
+    "train_global_mean_field",
+    "train_slot_mean",
+    "climatology_month_hour_slot",
+    "persistence_1h_radar_reference"
+  ],
+  "locked_split_override_used": false,
+  "with_persistence_common": true,
+  "persistence_note": "Persistence uses observed radar t-1h and is not input-equivalent to ERA5-only CorrDiff.",
+  "no_neural_training": true
+}

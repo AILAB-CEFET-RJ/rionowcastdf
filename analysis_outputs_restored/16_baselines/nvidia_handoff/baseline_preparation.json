@@ -1,0 +1,43 @@
+{
+  "phase_version": "phase16-baselines-v2.2-resolution-safe-persistence",
+  "fit_split": "train",
+  "fit_split_policy": "train-only",
+  "n_train_patches": 763044,
+  "n_unique_timestamps_total": 84684,
+  "channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "input_shape": [
+    1016208,
+    12,
+    32,
+    32
+  ],
+  "target_shape": [
+    1016208,
+    1,
+    32,
+    32
+  ],
+  "patches_per_timestamp": 12,
+  "local_timezone": "America/Sao_Paulo",
+  "classical_baselines": [
+    "zero",
+    "train_global_mean_field",
+    "train_slot_mean",
+    "climatology_month_hour_slot",
+    "persistence_1h_radar_reference"
+  ],
+  "no_neural_training_in_phase16": true
+}

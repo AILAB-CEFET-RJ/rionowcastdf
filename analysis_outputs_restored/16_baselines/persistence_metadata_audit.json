@@ -1,0 +1,9 @@
+{
+  "source": "phase15 timestamp_split_manifest.parquet",
+  "timestamp_dtype": "datetime64[ms, UTC]",
+  "timestamp_resolution_note": "resolution-safe DatetimeIndex.get_indexer(t-1h); no asi8/Timedelta.value integer arithmetic",
+  "n_timestamp_groups": 84684,
+  "n_groups_with_exact_t_minus_1h": 73977,
+  "fraction_groups_with_exact_t_minus_1h": 0.8735652543573756,
+  "n_patches_with_exact_t_minus_1h": 887724
+}

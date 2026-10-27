@@ -1,0 +1,25 @@
+{
+  "phase_version": "phase17-conditioning-ablations-v1-nvidia-corrdiff-design",
+  "n_experiments": 11,
+  "n_stage_R_runs": 33,
+  "n_stage_D_mandatory_runs": 15,
+  "n_stage_D_optional_experiments": 6,
+  "stage_R_seeds": [
+    42,
+    43,
+    44
+  ],
+  "stage_D_seeds": [
+    42,
+    43,
+    44
+  ],
+  "tests_locked": true,
+  "phase16_handoff": {
+    "checked": true,
+    "valid": true,
+    "data_contract": "analysis_outputs_restored/16_baselines/nvidia_handoff/corrdiff_data_contract.json",
+    "data_contract_sha256": "be77c9d77da4c43387dafd29e13138d33cb617f1382abb54bd6d202dba48ac8f"
+  },
+  "next_phase": "Phase 18: map this contract to the actual NVIDIA CorrDiff repository/configs and smoke-test native regression + diffusion data pipelines."
+}

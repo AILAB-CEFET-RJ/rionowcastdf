@@ -1,0 +1,47 @@
+{
+  "phase_version": "phase16-baselines-v2.2-resolution-safe-persistence",
+  "development_evaluation_split": "validation",
+  "locked_primary_test": "test_primary",
+  "locked_stress_ood_test": "test_stress_ood",
+  "thresholds_dbz": [
+    20,
+    30,
+    40,
+    45
+  ],
+  "point_metrics": [
+    "RMSE",
+    "MAE",
+    "bias"
+  ],
+  "point_domains": [
+    "stored_log1p",
+    "reconstructed_dBZ"
+  ],
+  "categorical_metrics": [
+    "precision",
+    "POD/recall",
+    "FAR",
+    "CSI",
+    "F1",
+    "frequency_bias",
+    "ETS",
+    "deterministic_Brier"
+  ],
+  "fss_nominal_support_km": [
+    2,
+    4,
+    8,
+    16
+  ],
+  "patch_intensity_metrics": [
+    "RMSE/MAE/bias of patch maximum dBZ",
+    "event-conditioned max >=30/40/45"
+  ],
+  "reporting_groups": [
+    "overall",
+    "season",
+    "persistence_common"
+  ],
+  "selection_policy": "No learned-model selection is performed in Phase 16 v2. 2023/2024 remain locked for future NVIDIA CorrDiff experiments."
+}

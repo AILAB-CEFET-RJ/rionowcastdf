@@ -1,0 +1,16 @@
+run_id,stage,experiment_id,experiment_name,seed,split_train,split_selection,test_primary_access,test_stress_ood_access,n_channels,channels,status
+D001,corrdiff_confirmation_mandatory,C00,raw12_reference,42,train,validation,False,False,12,tcwv|t2m|u10|v10|t_850|r_850|u_850|v_850|t_500|r_500|u_500|v_500,planned
+D002,corrdiff_confirmation_mandatory,C00,raw12_reference,43,train,validation,False,False,12,tcwv|t2m|u10|v10|t_850|r_850|u_850|v_850|t_500|r_500|u_500|v_500,planned
+D003,corrdiff_confirmation_mandatory,C00,raw12_reference,44,train,validation,False,False,12,tcwv|t2m|u10|v10|t_850|r_850|u_850|v_850|t_500|r_500|u_500|v_500,planned
+D004,corrdiff_confirmation_mandatory,C04,no_dynamics,42,train,validation,False,False,6,tcwv|t2m|t_850|r_850|t_500|r_500,planned
+D005,corrdiff_confirmation_mandatory,C04,no_dynamics,43,train,validation,False,False,6,tcwv|t2m|t_850|r_850|t_500|r_500,planned
+D006,corrdiff_confirmation_mandatory,C04,no_dynamics,44,train,validation,False,False,6,tcwv|t2m|t_850|r_850|t_500|r_500,planned
+D007,corrdiff_confirmation_mandatory,C05,no_thermal,42,train,validation,False,False,9,tcwv|u10|v10|r_850|u_850|v_850|r_500|u_500|v_500,planned
+D008,corrdiff_confirmation_mandatory,C05,no_thermal,43,train,validation,False,False,9,tcwv|u10|v10|r_850|u_850|v_850|r_500|u_500|v_500,planned
+D009,corrdiff_confirmation_mandatory,C05,no_thermal,44,train,validation,False,False,9,tcwv|u10|v10|r_850|u_850|v_850|r_500|u_500|v_500,planned
+D010,corrdiff_confirmation_mandatory,C06,no_moisture,42,train,validation,False,False,9,t2m|u10|v10|t_850|u_850|v_850|t_500|u_500|v_500,planned
+D011,corrdiff_confirmation_mandatory,C06,no_moisture,43,train,validation,False,False,9,t2m|u10|v10|t_850|u_850|v_850|t_500|u_500|v_500,planned
+D012,corrdiff_confirmation_mandatory,C06,no_moisture,44,train,validation,False,False,9,t2m|u10|v10|t_850|u_850|v_850|t_500|u_500|v_500,planned
+D013,corrdiff_confirmation_mandatory,C07,raw12_plus_all_derived,42,train,validation,False,False,20,tcwv|t2m|u10|v10|t_850|r_850|u_850|v_850|t_500|r_500|u_500|v_500|wind_speed_10|wind_speed_850|wind_speed_500|delta_t_500_850|delta_t_850_surface|delta_r_500_850|bulk_wind_diff_10_850|bulk_wind_diff_850_500,planned
+D014,corrdiff_confirmation_mandatory,C07,raw12_plus_all_derived,43,train,validation,False,False,20,tcwv|t2m|u10|v10|t_850|r_850|u_850|v_850|t_500|r_500|u_500|v_500|wind_speed_10|wind_speed_850|wind_speed_500|delta_t_500_850|delta_t_850_surface|delta_r_500_850|bulk_wind_diff_10_850|bulk_wind_diff_850_500,planned
+D015,corrdiff_confirmation_mandatory,C07,raw12_plus_all_derived,44,train,validation,False,False,20,tcwv|t2m|u10|v10|t_850|r_850|u_850|v_850|t_500|r_500|u_500|v_500|wind_speed_10|wind_speed_850|wind_speed_500|delta_t_500_850|delta_t_850_surface|delta_r_500_850|bulk_wind_diff_10_850|bulk_wind_diff_850_500,planned

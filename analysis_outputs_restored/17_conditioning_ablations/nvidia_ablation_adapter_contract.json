@@ -1,0 +1,254 @@
+{
+  "phase_version": "phase17-conditioning-ablations-v1-nvidia-corrdiff-design",
+  "purpose": "Input contract to be consumed by the native NVIDIA CorrDiff dataset/config adapter in Phase 18.",
+  "raw_channel_order": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "derived_channel_order": [
+    "wind_speed_10",
+    "wind_speed_850",
+    "wind_speed_500",
+    "delta_t_500_850",
+    "delta_t_850_surface",
+    "delta_r_500_850",
+    "bulk_wind_diff_10_850",
+    "bulk_wind_diff_850_500"
+  ],
+  "experiments": {
+    "C00": {
+      "name": "raw12_reference",
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "n_channels": 12,
+      "derived_channels": [],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C01": {
+      "name": "moisture_only",
+      "channels": [
+        "tcwv",
+        "r_850",
+        "r_500"
+      ],
+      "n_channels": 3,
+      "derived_channels": [],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C02": {
+      "name": "thermal_only",
+      "channels": [
+        "t2m",
+        "t_850",
+        "t_500"
+      ],
+      "n_channels": 3,
+      "derived_channels": [],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C03": {
+      "name": "dynamics_only",
+      "channels": [
+        "u10",
+        "v10",
+        "u_850",
+        "v_850",
+        "u_500",
+        "v_500"
+      ],
+      "n_channels": 6,
+      "derived_channels": [],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C04": {
+      "name": "no_dynamics",
+      "channels": [
+        "tcwv",
+        "t2m",
+        "t_850",
+        "r_850",
+        "t_500",
+        "r_500"
+      ],
+      "n_channels": 6,
+      "derived_channels": [],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C05": {
+      "name": "no_thermal",
+      "channels": [
+        "tcwv",
+        "u10",
+        "v10",
+        "r_850",
+        "u_850",
+        "v_850",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "n_channels": 9,
+      "derived_channels": [],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C06": {
+      "name": "no_moisture",
+      "channels": [
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "u_500",
+        "v_500"
+      ],
+      "n_channels": 9,
+      "derived_channels": [],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C07": {
+      "name": "raw12_plus_all_derived",
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500",
+        "wind_speed_10",
+        "wind_speed_850",
+        "wind_speed_500",
+        "delta_t_500_850",
+        "delta_t_850_surface",
+        "delta_r_500_850",
+        "bulk_wind_diff_10_850",
+        "bulk_wind_diff_850_500"
+      ],
+      "n_channels": 20,
+      "derived_channels": [
+        "wind_speed_10",
+        "wind_speed_850",
+        "wind_speed_500",
+        "delta_t_500_850",
+        "delta_t_850_surface",
+        "delta_r_500_850",
+        "bulk_wind_diff_10_850",
+        "bulk_wind_diff_850_500"
+      ],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C08": {
+      "name": "raw12_plus_moisture_derived",
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500",
+        "delta_r_500_850"
+      ],
+      "n_channels": 13,
+      "derived_channels": [
+        "delta_r_500_850"
+      ],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C09": {
+      "name": "raw12_plus_thermal_derived",
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500",
+        "delta_t_500_850",
+        "delta_t_850_surface"
+      ],
+      "n_channels": 14,
+      "derived_channels": [
+        "delta_t_500_850",
+        "delta_t_850_surface"
+      ],
+      "normalization": "train-only, fit separately per experiment channel set"
+    },
+    "C10": {
+      "name": "raw12_plus_dynamics_derived",
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500",
+        "wind_speed_10",
+        "wind_speed_850",
+        "wind_speed_500",
+        "bulk_wind_diff_10_850",
+        "bulk_wind_diff_850_500"
+      ],
+      "n_channels": 17,
+      "derived_channels": [
+        "wind_speed_10",
+        "wind_speed_850",
+        "wind_speed_500",
+        "bulk_wind_diff_10_850",
+        "bulk_wind_diff_850_500"
+      ],
+      "normalization": "train-only, fit separately per experiment channel set"
+    }
+  },
+  "split_indices_source": "Phase 16 NVIDIA handoff / Phase 15 split arrays",
+  "target_is_unchanged": true,
+  "test_splits_must_remain_locked": true,
+  "implementation_note": "Do not assume a particular Hydra config path or NVIDIA class name here; Phase 18 maps this contract to the actual checked-out CorrDiff repository."
+}

@@ -1,0 +1,129 @@
+2026-10-27 11:34:34 | INFO | Timestamp split counts:
+split
+train              63587
+validation         12828
+test_primary        4966
+test_stress_ood     3108
+excluded_purge       195
+2026-10-27 11:34:35 | INFO | Patch partition: 1016208 patches | 84684 timestamps | patches/timestamp 12..12
+2026-10-27 11:34:35 | INFO | PHASE 15 COMPLETE | output=analysis_outputs_restored/15_formal_splits
+analysis_outputs_restored/summary_phase15.txt
+2026-10-27 11:34:36 | INFO | ========================================================================================
+2026-10-27 11:34:36 | INFO | CORRDIFF PHASE 16 v2 - PREPARE CLASSICAL BASELINES
+2026-10-27 11:34:36 | INFO | Train patches: 763044
+2026-10-27 11:34:36 | INFO | Input shape: (1016208, 12, 32, 32)
+2026-10-27 11:34:36 | INFO | Target shape: (1016208, 1, 32, 32)
+2026-10-27 11:34:36 | INFO | ========================================================================================
+2026-10-27 11:34:36 | INFO | Processed 2048 / 763044 train patches
+2026-10-27 11:34:47 | INFO | Processed 104448 / 763044 train patches
+2026-10-27 11:34:58 | INFO | Processed 206848 / 763044 train patches
+2026-10-27 11:35:09 | INFO | Processed 309248 / 763044 train patches
+2026-10-27 11:35:20 | INFO | Processed 411648 / 763044 train patches
+2026-10-27 11:35:32 | INFO | Processed 514048 / 763044 train patches
+2026-10-27 11:35:43 | INFO | Processed 616448 / 763044 train patches
+2026-10-27 11:35:54 | INFO | Processed 718848 / 763044 train patches
+2026-10-27 11:35:59 | INFO | Preparation complete: analysis_outputs_restored/16_baselines
+2026-10-27 11:35:59 | INFO | ========================================================================================
+2026-10-27 11:35:59 | INFO | CORRDIFF PHASE 16 v2 - CLASSICAL BASELINE EVALUATION
+2026-10-27 11:35:59 | INFO | Splits: ['validation']
+2026-10-27 11:35:59 | INFO | Baselines: ['zero', 'train_global_mean_field', 'train_slot_mean', 'climatology_month_hour_slot', 'persistence_1h_radar_reference']
+2026-10-27 11:35:59 | INFO | ========================================================================================
+2026-10-27 11:36:00 | INFO | validation | full_split | zero | 1/602
+2026-10-27 11:36:42 | INFO | validation | full_split | zero | 101/602
+2026-10-27 11:37:23 | INFO | validation | full_split | zero | 201/602
+2026-10-27 11:38:05 | INFO | validation | full_split | zero | 301/602
+2026-10-27 11:38:47 | INFO | validation | full_split | zero | 401/602
+2026-10-27 11:39:29 | INFO | validation | full_split | zero | 501/602
+2026-10-27 11:40:11 | INFO | validation | full_split | zero | 601/602
+2026-10-27 11:40:11 | INFO | validation | persistence_common | zero | 1/542
+2026-10-27 11:40:53 | INFO | validation | persistence_common | zero | 101/542
+2026-10-27 11:41:35 | INFO | validation | persistence_common | zero | 201/542
+2026-10-27 11:42:16 | INFO | validation | persistence_common | zero | 301/542
+2026-10-27 11:42:58 | INFO | validation | persistence_common | zero | 401/542
+2026-10-27 11:43:40 | INFO | validation | persistence_common | zero | 501/542
+2026-10-27 11:43:57 | INFO | validation | full_split | train_global_mean_field | 1/602
+2026-10-27 11:44:39 | INFO | validation | full_split | train_global_mean_field | 101/602
+2026-10-27 11:45:21 | INFO | validation | full_split | train_global_mean_field | 201/602
+2026-10-27 11:46:02 | INFO | validation | full_split | train_global_mean_field | 301/602
+2026-10-27 11:46:44 | INFO | validation | full_split | train_global_mean_field | 401/602
+2026-10-27 11:47:26 | INFO | validation | full_split | train_global_mean_field | 501/602
+2026-10-27 11:48:08 | INFO | validation | full_split | train_global_mean_field | 601/602
+2026-10-27 11:48:09 | INFO | validation | persistence_common | train_global_mean_field | 1/542
+2026-10-27 11:48:51 | INFO | validation | persistence_common | train_global_mean_field | 101/542
+2026-10-27 11:49:33 | INFO | validation | persistence_common | train_global_mean_field | 201/542
+2026-10-27 11:50:15 | INFO | validation | persistence_common | train_global_mean_field | 301/542
+2026-10-27 11:50:57 | INFO | validation | persistence_common | train_global_mean_field | 401/542
+2026-10-27 11:51:39 | INFO | validation | persistence_common | train_global_mean_field | 501/542
+2026-10-27 11:51:56 | INFO | validation | full_split | train_slot_mean | 1/602
+2026-10-27 11:52:38 | INFO | validation | full_split | train_slot_mean | 101/602
+2026-10-27 11:53:20 | INFO | validation | full_split | train_slot_mean | 201/602
+2026-10-27 11:54:02 | INFO | validation | full_split | train_slot_mean | 301/602
+2026-10-27 11:54:44 | INFO | validation | full_split | train_slot_mean | 401/602
+2026-10-27 11:55:26 | INFO | validation | full_split | train_slot_mean | 501/602
+2026-10-27 11:56:08 | INFO | validation | full_split | train_slot_mean | 601/602
+2026-10-27 11:56:08 | INFO | validation | persistence_common | train_slot_mean | 1/542
+2026-10-27 11:56:50 | INFO | validation | persistence_common | train_slot_mean | 101/542
+2026-10-27 11:57:32 | INFO | validation | persistence_common | train_slot_mean | 201/542
+2026-10-27 11:58:14 | INFO | validation | persistence_common | train_slot_mean | 301/542
+2026-10-27 11:58:57 | INFO | validation | persistence_common | train_slot_mean | 401/542
+2026-10-27 11:59:39 | INFO | validation | persistence_common | train_slot_mean | 501/542
+2026-10-27 11:59:57 | INFO | validation | full_split | climatology_month_hour_slot | 1/602
+2026-10-27 12:00:40 | INFO | validation | full_split | climatology_month_hour_slot | 101/602
+2026-10-27 12:01:22 | INFO | validation | full_split | climatology_month_hour_slot | 201/602
+2026-10-27 12:02:05 | INFO | validation | full_split | climatology_month_hour_slot | 301/602
+2026-10-27 12:02:47 | INFO | validation | full_split | climatology_month_hour_slot | 401/602
+2026-10-27 12:03:30 | INFO | validation | full_split | climatology_month_hour_slot | 501/602
+2026-10-27 12:04:12 | INFO | validation | full_split | climatology_month_hour_slot | 601/602
+2026-10-27 12:04:13 | INFO | validation | persistence_common | climatology_month_hour_slot | 1/542
+2026-10-27 12:04:55 | INFO | validation | persistence_common | climatology_month_hour_slot | 101/542
+2026-10-27 12:05:38 | INFO | validation | persistence_common | climatology_month_hour_slot | 201/542
+2026-10-27 12:06:20 | INFO | validation | persistence_common | climatology_month_hour_slot | 301/542
+2026-10-27 12:07:03 | INFO | validation | persistence_common | climatology_month_hour_slot | 401/542
+2026-10-27 12:07:45 | INFO | validation | persistence_common | climatology_month_hour_slot | 501/542
+2026-10-27 12:08:03 | INFO | validation | persistence_common | persistence_1h_radar_reference | 1/542
+2026-10-27 12:08:45 | INFO | validation | persistence_common | persistence_1h_radar_reference | 101/542
+2026-10-27 12:09:28 | INFO | validation | persistence_common | persistence_1h_radar_reference | 201/542
+2026-10-27 12:10:10 | INFO | validation | persistence_common | persistence_1h_radar_reference | 301/542
+2026-10-27 12:10:53 | INFO | validation | persistence_common | persistence_1h_radar_reference | 401/542
+2026-10-27 12:11:35 | INFO | validation | persistence_common | persistence_1h_radar_reference | 501/542
+2026-10-27 12:11:52 | INFO | Evaluation complete.
+analysis_outputs_restored/summary_phase16.txt
+analysis_outputs_restored/16_baselines/nvidia_handoff
+files: 12
+==========================================================================================
+CORRDIFF PHASE 17 - DESIGN VALIDATION
+==========================================================================================
+experiments: 11
+raw channels: 12
+derived channels: 8
+errors: 0
+warnings: 0
+STATUS: PASS
+analysis_outputs_restored/17_conditioning_ablations
+{
+  "phase_version": "phase17-conditioning-ablations-v1-nvidia-corrdiff-design",
+  "n_experiments": 11,
+  "n_stage_R_runs": 33,
+  "n_stage_D_mandatory_runs": 15,
+  "n_stage_D_optional_experiments": 6,
+  "stage_R_seeds": [
+    42,
+    43,
+    44
+  ],
+  "stage_D_seeds": [
+    42,
+    43,
+    44
+  ],
+  "tests_locked": true,
+  "phase16_handoff": {
+    "checked": true,
+    "valid": true,
+    "data_contract": "analysis_outputs_restored/16_baselines/nvidia_handoff/corrdiff_data_contract.json",
+    "data_contract_sha256": "be77c9d77da4c43387dafd29e13138d33cb617f1382abb54bd6d202dba48ac8f"
+  },
+  "next_phase": "Phase 18: map this contract to the actual NVIDIA CorrDiff repository/configs and smoke-test native regression + diffusion data pipelines."
+}
+analysis_outputs_restored/summary_phase17.txt
+Fases 15, 16 e 17 concluídas.

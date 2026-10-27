@@ -1,0 +1,7 @@
+experiment_id,experiment_name,tier,n_channels,channels,activation_rule
+C01,moisture_only,sufficiency,3,tcwv|r_850|r_500,execute only if compute budget permits or if required to resolve an ambiguity from Stage R; document before run
+C02,thermal_only,sufficiency,3,t2m|t_850|t_500,execute only if compute budget permits or if required to resolve an ambiguity from Stage R; document before run
+C03,dynamics_only,sufficiency,6,u10|v10|u_850|v_850|u_500|v_500,execute only if compute budget permits or if required to resolve an ambiguity from Stage R; document before run
+C08,raw12_plus_moisture_derived,representation,13,tcwv|t2m|u10|v10|t_850|r_850|u_850|v_850|t_500|r_500|u_500|v_500|delta_r_500_850,execute only if compute budget permits or if required to resolve an ambiguity from Stage R; document before run
+C09,raw12_plus_thermal_derived,representation,14,tcwv|t2m|u10|v10|t_850|r_850|u_850|v_850|t_500|r_500|u_500|v_500|delta_t_500_850|delta_t_850_surface,execute only if compute budget permits or if required to resolve an ambiguity from Stage R; document before run
+C10,raw12_plus_dynamics_derived,representation,17,tcwv|t2m|u10|v10|t_850|r_850|u_850|v_850|t_500|r_500|u_500|v_500|wind_speed_10|wind_speed_850|wind_speed_500|bulk_wind_diff_10_850|bulk_wind_diff_850_500,execute only if compute budget permits or if required to resolve an ambiguity from Stage R; document before run

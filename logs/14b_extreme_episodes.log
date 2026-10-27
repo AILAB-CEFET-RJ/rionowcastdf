@@ -1,0 +1,45 @@
+nohup: ignoring input
+Scanned 512/1016208 patches
+Scanned 51712/1016208 patches
+Scanned 102912/1016208 patches
+Scanned 154112/1016208 patches
+Scanned 205312/1016208 patches
+Scanned 256512/1016208 patches
+Scanned 307712/1016208 patches
+Scanned 358912/1016208 patches
+Scanned 410112/1016208 patches
+Scanned 461312/1016208 patches
+Scanned 512512/1016208 patches
+Scanned 563712/1016208 patches
+Scanned 614912/1016208 patches
+Scanned 666112/1016208 patches
+Scanned 717312/1016208 patches
+Scanned 768512/1016208 patches
+Scanned 819712/1016208 patches
+Scanned 870912/1016208 patches
+Scanned 922112/1016208 patches
+Scanned 973312/1016208 patches
+{
+  "version": "14b-extreme-episodes-v1",
+  "arguments": {
+    "dataset_dir": "datasets/corrdiff_2011_2024_restored",
+    "output_dir": "analysis_outputs_restored/14b_extreme_episodes",
+    "radar_cache_dir": "/home/vsantos/repositories/rionowcastdf/data/radar_cache",
+    "threshold_dbz": 45,
+    "batch_samples": 512,
+    "pixel_km": 2.0,
+    "focus_year": 2024,
+    "top_episodes": 10,
+    "historical_episodes": 5
+  },
+  "n_timestamps": 84684,
+  "n_patches": 1016208,
+  "n_episodes": 2957,
+  "identical_extreme_1h_transitions": 39,
+  "threshold_rule": "float32 target >= float32(log1p(threshold_dBZ)) with mask == 1",
+  "scope": "Unique metrics cover stored anchors only, not the complete radar domain.",
+  "episode_rule": "At least one covered valid event pixel; exact 1h UTC pairs only; gaps/dry hours split episodes. Not storm tracking.",
+  "sensitivity_rule": "Diagnostic removal of whole ranked episodes; no dataset modification; rankings use unique pixel-hours.",
+  "cache_scope": "Selected peak +/-2h frames only; no claim of full cache validation.",
+  "script_sha256": "d90253b2faf45d6ee246bfe8be15b676530eb757a606aea77fc2f2012cba23b5"
+}

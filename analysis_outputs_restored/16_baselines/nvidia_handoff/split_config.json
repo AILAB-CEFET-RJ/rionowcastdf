@@ -1,0 +1,53 @@
+{
+  "phase_version": "phase15-formal-splits-v1-purged-temporal-ood2024",
+  "dataset_dir": "datasets/corrdiff_2011_2024_restored",
+  "split_definition": [
+    {
+      "split": "train",
+      "start_utc": "2011-01-01 00:00:00+00:00",
+      "end_utc": "2020-12-31 23:00:00+00:00",
+      "model_selection_access": true,
+      "locked": false,
+      "final_refit_eligible_pre_primary_test": true,
+      "role": "parameter fitting"
+    },
+    {
+      "split": "validation",
+      "start_utc": "2021-01-01 00:00:00+00:00",
+      "end_utc": "2022-12-31 23:00:00+00:00",
+      "model_selection_access": true,
+      "locked": false,
+      "final_refit_eligible_pre_primary_test": true,
+      "role": "hyperparameter/model selection"
+    },
+    {
+      "split": "test_primary",
+      "start_utc": "2023-01-01 00:00:00+00:00",
+      "end_utc": "2023-12-31 23:00:00+00:00",
+      "model_selection_access": false,
+      "locked": true,
+      "final_refit_eligible_pre_primary_test": false,
+      "role": "primary chronological generalization test"
+    },
+    {
+      "split": "test_stress_ood",
+      "start_utc": "2024-01-01 00:00:00+00:00",
+      "end_utc": "2024-12-31 23:00:00+00:00",
+      "model_selection_access": false,
+      "locked": true,
+      "final_refit_eligible_pre_primary_test": false,
+      "role": "stress/OOD test"
+    }
+  ],
+  "purge_hours_each_side_of_boundary": 48,
+  "local_timezone": "America/Sao_Paulo",
+  "policy": {
+    "train": "fit parameters and data-dependent preprocessing",
+    "validation": "hyperparameter/model selection only",
+    "test_primary": "locked 2023 chronological test; no model selection",
+    "test_stress_ood": "locked 2024 stress/OOD test; report coverage explicitly",
+    "final_refit_before_primary_test": "after freezing design, train+validation (<=2022) may be combined for one final refit evaluated once on 2023",
+    "stress_test_policy": "2024 remains locked and separate",
+    "event_balance_policy": "do not rebalance timestamps across temporal splits"
+  }
+}

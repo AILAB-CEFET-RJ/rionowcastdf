@@ -1,0 +1,15 @@
+2026-10-27 11:34:36 | INFO | ========================================================================================
+2026-10-27 11:34:36 | INFO | CORRDIFF PHASE 16 v2 - PREPARE CLASSICAL BASELINES
+2026-10-27 11:34:36 | INFO | Train patches: 763044
+2026-10-27 11:34:36 | INFO | Input shape: (1016208, 12, 32, 32)
+2026-10-27 11:34:36 | INFO | Target shape: (1016208, 1, 32, 32)
+2026-10-27 11:34:36 | INFO | ========================================================================================
+2026-10-27 11:34:36 | INFO | Processed 2048 / 763044 train patches
+2026-10-27 11:34:47 | INFO | Processed 104448 / 763044 train patches
+2026-10-27 11:34:58 | INFO | Processed 206848 / 763044 train patches
+2026-10-27 11:35:09 | INFO | Processed 309248 / 763044 train patches
+2026-10-27 11:35:20 | INFO | Processed 411648 / 763044 train patches
+2026-10-27 11:35:32 | INFO | Processed 514048 / 763044 train patches
+2026-10-27 11:35:43 | INFO | Processed 616448 / 763044 train patches
+2026-10-27 11:35:54 | INFO | Processed 718848 / 763044 train patches
+2026-10-27 11:35:59 | INFO | Preparation complete: analysis_outputs_restored/16_baselines

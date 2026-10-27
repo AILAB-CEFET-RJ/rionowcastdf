@@ -1,0 +1,54 @@
+2026-10-27 11:58:12 | INFO | ========================================================================================
+2026-10-27 11:58:12 | INFO | CORRDIFF PHASE 16 v2 - CLASSICAL BASELINE EVALUATION
+2026-10-27 11:58:12 | INFO | Splits: ['validation']
+2026-10-27 11:58:12 | INFO | Baselines: ['zero', 'train_global_mean_field', 'train_slot_mean', 'climatology_month_hour_slot', 'persistence_1h_radar_reference']
+2026-10-27 11:58:12 | INFO | ========================================================================================
+2026-10-27 11:58:12 | INFO | validation | full_split | zero | 1/602
+2026-10-27 11:58:55 | INFO | validation | full_split | zero | 101/602
+2026-10-27 11:59:37 | INFO | validation | full_split | zero | 201/602
+2026-10-27 12:00:20 | INFO | validation | full_split | zero | 301/602
+2026-10-27 12:01:02 | INFO | validation | full_split | zero | 401/602
+2026-10-27 12:01:44 | INFO | validation | full_split | zero | 501/602
+2026-10-27 12:02:27 | INFO | validation | full_split | zero | 601/602
+2026-10-27 12:02:27 | INFO | validation | persistence_common | zero | 1/542
+2026-10-27 12:03:10 | INFO | validation | persistence_common | zero | 101/542
+2026-10-27 12:03:52 | INFO | validation | persistence_common | zero | 201/542
+2026-10-27 12:04:34 | INFO | validation | persistence_common | zero | 301/542
+2026-10-27 12:05:16 | INFO | validation | persistence_common | zero | 401/542
+2026-10-27 12:05:59 | INFO | validation | persistence_common | zero | 501/542
+2026-10-27 12:06:16 | INFO | validation | full_split | train_global_mean_field | 1/602
+2026-10-27 12:06:59 | INFO | validation | full_split | train_global_mean_field | 101/602
+2026-10-27 12:07:41 | INFO | validation | full_split | train_global_mean_field | 201/602
+2026-10-27 12:08:24 | INFO | validation | full_split | train_global_mean_field | 301/602
+2026-10-27 12:09:06 | INFO | validation | full_split | train_global_mean_field | 401/602
+2026-10-27 12:09:49 | INFO | validation | full_split | train_global_mean_field | 501/602
+2026-10-27 12:10:31 | INFO | validation | full_split | train_global_mean_field | 601/602
+2026-10-27 12:10:32 | INFO | validation | persistence_common | train_global_mean_field | 1/542
+2026-10-27 12:11:15 | INFO | validation | persistence_common | train_global_mean_field | 101/542
+2026-10-27 12:11:57 | INFO | validation | persistence_common | train_global_mean_field | 201/542
+2026-10-27 12:12:39 | INFO | validation | persistence_common | train_global_mean_field | 301/542
+2026-10-27 12:13:21 | INFO | validation | persistence_common | train_global_mean_field | 401/542
+2026-10-27 12:14:03 | INFO | validation | persistence_common | train_global_mean_field | 501/542
+2026-10-27 12:14:21 | INFO | validation | full_split | train_slot_mean | 1/602
+2026-10-27 12:15:03 | INFO | validation | full_split | train_slot_mean | 101/602
+2026-10-27 12:15:44 | INFO | validation | full_split | train_slot_mean | 201/602
+2026-10-27 12:16:26 | INFO | validation | full_split | train_slot_mean | 301/602
+2026-10-27 12:17:08 | INFO | validation | full_split | train_slot_mean | 401/602
+2026-10-27 12:17:50 | INFO | validation | full_split | train_slot_mean | 501/602
+2026-10-27 12:18:32 | INFO | validation | full_split | train_slot_mean | 601/602
+2026-10-27 12:18:33 | INFO | validation | persistence_common | train_slot_mean | 1/542
+2026-10-27 12:19:15 | INFO | validation | persistence_common | train_slot_mean | 101/542
+2026-10-27 12:19:57 | INFO | validation | persistence_common | train_slot_mean | 201/542
+2026-10-27 12:20:38 | INFO | validation | persistence_common | train_slot_mean | 301/542
+2026-10-27 12:21:20 | INFO | validation | persistence_common | train_slot_mean | 401/542
+2026-10-27 12:22:02 | INFO | validation | persistence_common | train_slot_mean | 501/542
+2026-10-27 12:22:20 | INFO | validation | full_split | climatology_month_hour_slot | 1/602
+2026-10-27 12:23:01 | INFO | validation | full_split | climatology_month_hour_slot | 101/602
+2026-10-27 12:23:43 | INFO | validation | full_split | climatology_month_hour_slot | 201/602
+2026-10-27 12:24:25 | INFO | validation | full_split | climatology_month_hour_slot | 301/602
+2026-10-27 12:25:07 | INFO | validation | full_split | climatology_month_hour_slot | 401/602
+2026-10-27 12:25:49 | INFO | validation | full_split | climatology_month_hour_slot | 501/602
+2026-10-27 12:26:30 | INFO | validation | full_split | climatology_month_hour_slot | 601/602
+2026-10-27 12:26:31 | INFO | validation | persistence_common | climatology_month_hour_slot | 1/542
+2026-10-27 12:27:13 | INFO | validation | persistence_common | climatology_month_hour_slot | 101/542
+2026-10-27 12:27:55 | INFO | validation | persistence_common | climatology_month_hour_slot | 201/542

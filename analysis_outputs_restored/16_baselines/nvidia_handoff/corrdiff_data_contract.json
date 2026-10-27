@@ -1,0 +1,72 @@
+{
+  "phase_version": "phase16-baselines-v2.2-resolution-safe-persistence",
+  "purpose": "portable data/split/normalization contract for subsequent NVIDIA CorrDiff integration",
+  "dataset": {
+    "zarr_path": "datasets/corrdiff_2011_2024_restored/train.zarr",
+    "input_key": "input",
+    "target_key": "target",
+    "timestamps_key": "timestamps",
+    "input_shape_per_patch": [
+      12,
+      32,
+      32
+    ],
+    "target_shape_per_patch": [
+      1,
+      32,
+      32
+    ],
+    "patches_per_timestamp": 12,
+    "grid_nominal_km": 2.0
+  },
+  "channels_in_order": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "target_semantics": {
+    "stored_space": "log1p(clipped radar dBZ)",
+    "inverse_for_diagnostics": "dbz = expm1(target)",
+    "negative_dbz_in_raw_radar": "not recoverable because builder clips negative dBZ to zero"
+  },
+  "split_contract": {
+    "train": "2011-2020 with Phase-15 boundary purge",
+    "validation": "2021-2022 with Phase-15 boundary purge",
+    "test_primary": "2023, locked",
+    "test_stress_ood": "2024, locked stress/OOD",
+    "purge": "48 h on each side of temporal boundaries",
+    "all_patches_same_timestamp_same_split": true
+  },
+  "normalization_contract": {
+    "artifact": "train_input_normalization.npz",
+    "fit_on": "train only",
+    "scope": "per input channel over all train patch pixels",
+    "do_not_refit_on_validation_or_tests": true
+  },
+  "evaluation_contract": {
+    "artifact": "metric_protocol.json",
+    "primary_thresholds_dbz": [
+      20,
+      30,
+      40,
+      45
+    ],
+    "primary_fss_supports_km": [
+      2,
+      4,
+      8,
+      16
+    ],
+    "2023_and_2024_must_be_reported_separately": true
+  },
+  "integration_boundary": "This handoff intentionally does not assume NVIDIA CorrDiff class, Hydra config or trainer names. Exact repository integration belongs to the later CorrDiff environment integration phase."
+}

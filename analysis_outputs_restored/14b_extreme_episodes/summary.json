@@ -1,0 +1,24 @@
+{
+  "version": "14b-extreme-episodes-v1",
+  "arguments": {
+    "dataset_dir": "datasets/corrdiff_2011_2024_restored",
+    "output_dir": "analysis_outputs_restored/14b_extreme_episodes",
+    "radar_cache_dir": "/home/vsantos/repositories/rionowcastdf/data/radar_cache",
+    "threshold_dbz": 45,
+    "batch_samples": 512,
+    "pixel_km": 2.0,
+    "focus_year": 2024,
+    "top_episodes": 10,
+    "historical_episodes": 5
+  },
+  "n_timestamps": 84684,
+  "n_patches": 1016208,
+  "n_episodes": 2957,
+  "identical_extreme_1h_transitions": 39,
+  "threshold_rule": "float32 target >= float32(log1p(threshold_dBZ)) with mask == 1",
+  "scope": "Unique metrics cover stored anchors only, not the complete radar domain.",
+  "episode_rule": "At least one covered valid event pixel; exact 1h UTC pairs only; gaps/dry hours split episodes. Not storm tracking.",
+  "sensitivity_rule": "Diagnostic removal of whole ranked episodes; no dataset modification; rankings use unique pixel-hours.",
+  "cache_scope": "Selected peak +/-2h frames only; no claim of full cache validation.",
+  "script_sha256": "d90253b2faf45d6ee246bfe8be15b676530eb757a606aea77fc2f2012cba23b5"
+}

@@ -1,0 +1,487 @@
+{
+  "phase_version": "phase17-conditioning-ablations-v1-nvidia-corrdiff-design",
+  "experiments": [
+    {
+      "experiment_id": "C00",
+      "name": "raw12_reference",
+      "tier": "core",
+      "purpose": "Reference conditioning using all 12 raw ERA5 predictors.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [],
+      "interpretation_role": "reference",
+      "raw_channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "derived_channels": [],
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "n_raw_channels": 12,
+      "n_derived_channels": 0,
+      "n_total_channels": 12,
+      "requires_derived_computation": false,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C01",
+      "name": "moisture_only",
+      "tier": "sufficiency",
+      "purpose": "Measure how much occurrence/intensity skill is retained by moisture predictors alone.",
+      "raw_families": [
+        "moisture"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_sufficiency",
+      "raw_channels": [
+        "tcwv",
+        "r_850",
+        "r_500"
+      ],
+      "derived_channels": [],
+      "channels": [
+        "tcwv",
+        "r_850",
+        "r_500"
+      ],
+      "n_raw_channels": 3,
+      "n_derived_channels": 0,
+      "n_total_channels": 3,
+      "requires_derived_computation": false,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C02",
+      "name": "thermal_only",
+      "tier": "sufficiency",
+      "purpose": "Measure skill retained by thermal predictors alone, especially at high thresholds.",
+      "raw_families": [
+        "thermal"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_sufficiency",
+      "raw_channels": [
+        "t2m",
+        "t_850",
+        "t_500"
+      ],
+      "derived_channels": [],
+      "channels": [
+        "t2m",
+        "t_850",
+        "t_500"
+      ],
+      "n_raw_channels": 3,
+      "n_derived_channels": 0,
+      "n_total_channels": 3,
+      "requires_derived_computation": false,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C03",
+      "name": "dynamics_only",
+      "tier": "sufficiency",
+      "purpose": "Measure skill retained by wind/dynamics predictors alone, including possible spatial-organization signal.",
+      "raw_families": [
+        "dynamics"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_sufficiency",
+      "raw_channels": [
+        "u10",
+        "v10",
+        "u_850",
+        "v_850",
+        "u_500",
+        "v_500"
+      ],
+      "derived_channels": [],
+      "channels": [
+        "u10",
+        "v10",
+        "u_850",
+        "v_850",
+        "u_500",
+        "v_500"
+      ],
+      "n_raw_channels": 6,
+      "n_derived_channels": 0,
+      "n_total_channels": 6,
+      "requires_derived_computation": false,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C04",
+      "name": "no_dynamics",
+      "tier": "necessity",
+      "purpose": "Leave dynamics out while preserving moisture + thermal predictors.",
+      "raw_families": [
+        "moisture",
+        "thermal"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_necessity",
+      "raw_channels": [
+        "tcwv",
+        "t2m",
+        "t_850",
+        "r_850",
+        "t_500",
+        "r_500"
+      ],
+      "derived_channels": [],
+      "channels": [
+        "tcwv",
+        "t2m",
+        "t_850",
+        "r_850",
+        "t_500",
+        "r_500"
+      ],
+      "n_raw_channels": 6,
+      "n_derived_channels": 0,
+      "n_total_channels": 6,
+      "requires_derived_computation": false,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C05",
+      "name": "no_thermal",
+      "tier": "necessity",
+      "purpose": "Leave thermal predictors out while preserving moisture + dynamics.",
+      "raw_families": [
+        "moisture",
+        "dynamics"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_necessity",
+      "raw_channels": [
+        "tcwv",
+        "u10",
+        "v10",
+        "r_850",
+        "u_850",
+        "v_850",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "derived_channels": [],
+      "channels": [
+        "tcwv",
+        "u10",
+        "v10",
+        "r_850",
+        "u_850",
+        "v_850",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "n_raw_channels": 9,
+      "n_derived_channels": 0,
+      "n_total_channels": 9,
+      "requires_derived_computation": false,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C06",
+      "name": "no_moisture",
+      "tier": "necessity",
+      "purpose": "Leave moisture predictors out while preserving thermal + dynamics.",
+      "raw_families": [
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [],
+      "interpretation_role": "family_necessity",
+      "raw_channels": [
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "u_500",
+        "v_500"
+      ],
+      "derived_channels": [],
+      "channels": [
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "u_500",
+        "v_500"
+      ],
+      "n_raw_channels": 9,
+      "n_derived_channels": 0,
+      "n_total_channels": 9,
+      "requires_derived_computation": false,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C07",
+      "name": "raw12_plus_all_derived",
+      "tier": "representation",
+      "purpose": "Test whether deterministic derived representations improve optimization/conditioning relative to raw12.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [
+        "moisture_derived",
+        "thermal_derived",
+        "dynamics_derived"
+      ],
+      "interpretation_role": "derived_representation",
+      "raw_channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "derived_channels": [
+        "wind_speed_10",
+        "wind_speed_850",
+        "wind_speed_500",
+        "delta_t_500_850",
+        "delta_t_850_surface",
+        "delta_r_500_850",
+        "bulk_wind_diff_10_850",
+        "bulk_wind_diff_850_500"
+      ],
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500",
+        "wind_speed_10",
+        "wind_speed_850",
+        "wind_speed_500",
+        "delta_t_500_850",
+        "delta_t_850_surface",
+        "delta_r_500_850",
+        "bulk_wind_diff_10_850",
+        "bulk_wind_diff_850_500"
+      ],
+      "n_raw_channels": 12,
+      "n_derived_channels": 8,
+      "n_total_channels": 20,
+      "requires_derived_computation": true,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C08",
+      "name": "raw12_plus_moisture_derived",
+      "tier": "representation",
+      "purpose": "Isolate representational effect of relative-humidity vertical contrast.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [
+        "moisture_derived"
+      ],
+      "interpretation_role": "derived_family",
+      "raw_channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "derived_channels": [
+        "delta_r_500_850"
+      ],
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500",
+        "delta_r_500_850"
+      ],
+      "n_raw_channels": 12,
+      "n_derived_channels": 1,
+      "n_total_channels": 13,
+      "requires_derived_computation": true,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C09",
+      "name": "raw12_plus_thermal_derived",
+      "tier": "representation",
+      "purpose": "Isolate representational effect of temperature contrasts.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [
+        "thermal_derived"
+      ],
+      "interpretation_role": "derived_family",
+      "raw_channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "derived_channels": [
+        "delta_t_500_850",
+        "delta_t_850_surface"
+      ],
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500",
+        "delta_t_500_850",
+        "delta_t_850_surface"
+      ],
+      "n_raw_channels": 12,
+      "n_derived_channels": 2,
+      "n_total_channels": 14,
+      "requires_derived_computation": true,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    },
+    {
+      "experiment_id": "C10",
+      "name": "raw12_plus_dynamics_derived",
+      "tier": "representation",
+      "purpose": "Isolate representational effect of wind speeds and bulk wind differences.",
+      "raw_families": [
+        "moisture",
+        "thermal",
+        "dynamics"
+      ],
+      "derived_families": [
+        "dynamics_derived"
+      ],
+      "interpretation_role": "derived_family",
+      "raw_channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500"
+      ],
+      "derived_channels": [
+        "wind_speed_10",
+        "wind_speed_850",
+        "wind_speed_500",
+        "bulk_wind_diff_10_850",
+        "bulk_wind_diff_850_500"
+      ],
+      "channels": [
+        "tcwv",
+        "t2m",
+        "u10",
+        "v10",
+        "t_850",
+        "r_850",
+        "u_850",
+        "v_850",
+        "t_500",
+        "r_500",
+        "u_500",
+        "v_500",
+        "wind_speed_10",
+        "wind_speed_850",
+        "wind_speed_500",
+        "bulk_wind_diff_10_850",
+        "bulk_wind_diff_850_500"
+      ],
+      "n_raw_channels": 12,
+      "n_derived_channels": 5,
+      "n_total_channels": 17,
+      "requires_derived_computation": true,
+      "normalization_policy": "fit mean/std on Phase-15 train only for exactly these channels"
+    }
+  ]
+}

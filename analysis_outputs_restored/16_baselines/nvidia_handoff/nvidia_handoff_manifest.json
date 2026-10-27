@@ -1,0 +1,74 @@
+{
+  "phase_version": "phase16-baselines-v2.2-resolution-safe-persistence",
+  "handoff_directory": "analysis_outputs_restored/16_baselines/nvidia_handoff",
+  "files": [
+    {
+      "name": "train_patch_indices.npy",
+      "sha256": "46140e90c8b1706f4e5ce59f6b12cee472aec92c708fb9225210a48329acfca0",
+      "bytes": 6104480,
+      "source": "analysis_outputs_restored/15_formal_splits/train_patch_indices.npy"
+    },
+    {
+      "name": "validation_patch_indices.npy",
+      "sha256": "1a94dfa051b8ebf143fd60a6fe7c5b4e55be22737af17b90ad0e9a46af8b4eaa",
+      "bytes": 1231616,
+      "source": "analysis_outputs_restored/15_formal_splits/validation_patch_indices.npy"
+    },
+    {
+      "name": "test_primary_patch_indices.npy",
+      "sha256": "c0305f1589af278b0a56d9609aff9baa9717bbcc9e2e77045fb54754e6374481",
+      "bytes": 476864,
+      "source": "analysis_outputs_restored/15_formal_splits/test_primary_patch_indices.npy"
+    },
+    {
+      "name": "test_stress_ood_patch_indices.npy",
+      "sha256": "135ac2af095573d74fbbd711942a2ab2b8926ac31909a533a0b5184e46948718",
+      "bytes": 298496,
+      "source": "analysis_outputs_restored/15_formal_splits/test_stress_ood_patch_indices.npy"
+    },
+    {
+      "name": "excluded_purge_patch_indices.npy",
+      "sha256": "ffbb3c4fc1027481405cccc57d85830b1ba33382268ef2f5990393cff92dfc3d",
+      "bytes": 18848,
+      "source": "analysis_outputs_restored/15_formal_splits/excluded_purge_patch_indices.npy"
+    },
+    {
+      "name": "split_config.json",
+      "sha256": "73defd7b82de01e42a3dadee6a94349b50252e4885a9cd95d3ac784d94c5925c",
+      "bytes": 2006,
+      "source": "analysis_outputs_restored/15_formal_splits/split_config.json"
+    },
+    {
+      "name": "split_summary.parquet",
+      "sha256": "1d4fe3f10347fd9373975a7403dd144199a185b8525eed47c36c64a91d76a859",
+      "bytes": 8323,
+      "source": "analysis_outputs_restored/15_formal_splits/split_summary.parquet"
+    },
+    {
+      "name": "train_input_normalization.npz",
+      "sha256": "1b6c8d647b348d36bdeb56958ccbbb17b0d0cb7f22077b0b31bc1ebebf481f8e",
+      "bytes": 1430,
+      "source": "analysis_outputs_restored/16_baselines/train_input_normalization.npz"
+    },
+    {
+      "name": "metric_protocol.json",
+      "sha256": "b58a55a37cc25752ce687e31e5c116bb3ad8aab08c6633fccb522afa6fd485bd",
+      "bytes": 965,
+      "source": "analysis_outputs_restored/16_baselines/metric_protocol.json"
+    },
+    {
+      "name": "baseline_preparation.json",
+      "sha256": "da8a664d477d5d0cf0bee7b1558dcbe452daa0129e61f970490095b423f0f336",
+      "bytes": 774,
+      "source": "analysis_outputs_restored/16_baselines/baseline_preparation.json"
+    },
+    {
+      "name": "corrdiff_data_contract.json",
+      "sha256": "be77c9d77da4c43387dafd29e13138d33cb617f1382abb54bd6d202dba48ac8f",
+      "bytes": 2005,
+      "source": "generated"
+    }
+  ],
+  "next_environment": "NVIDIA CorrDiff environment",
+  "next_action": "consume split indices + train-only normalization in the native CorrDiff data pipeline; do not train neural baselines in Phase 16"
+}
