@@ -1,0 +1,31 @@
+{
+  "phase_version": "phase7-temporal-lags-v1.1-phase6-compatible",
+  "source_phase6_version": "phase6-diurnal-v1-availability-conditioned-season-standardized",
+  "available_timestamps": 84684,
+  "expected_timestamps": 122736,
+  "lags_hours": [
+    0,
+    1,
+    2,
+    3,
+    6,
+    12,
+    24
+  ],
+  "timezone_local": "America/Sao_Paulo",
+  "radar_unit": "dBZ",
+  "climatology_adjustment": "demeaning within month_local x hour_local",
+  "pairing_rule": "only exact UTC timestamp pairs t and t-lag are retained; missing timestamps are never treated as contiguous",
+  "spatial_alignment_assumption": "none; timestamp-level aggregates from Phase 6 only",
+  "phase8_boundary": "Phase 7 characterizes lag dependence; formal persistence forecast skill is deferred to Phase 8.",
+  "warnings": [
+    "Phase 6 reported coverage warnings; lag analyses inherit non-random availability risk."
+  ],
+  "methodological_notes": [
+    "Raw lag associations may contain seasonal and diurnal structure; adjusted metrics remove month x local-hour means.",
+    "Adjusted associations are descriptive residual associations, not causal estimates.",
+    "Event persistence is timestamp-level: at least one stored patch pixel crosses the dBZ threshold.",
+    "Pixel-fraction metrics still describe the overlapping-patch training distribution, not a de-duplicated full field.",
+    "Lag 0 is retained only as a contemporaneous reference for predictor-to-radar associations."
+  ]
+}
