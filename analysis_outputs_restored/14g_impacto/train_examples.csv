@@ -1,0 +1,24 @@
+timestamp_utc,split,source,source_sha256,status,decoded_fraction_before_quarantine,month_utc
+2011-07-09 02:00:00+00:00,train,/home/vsantos/data/radar_sumare/2011/07/09/2011_07_09_02_00.png,8fef954b165e9adb819160e04d21921711f66fdcdadbc255ee7c766a8630204a,accepted_partial,0.00017006802721088434,2011-07
+2011-09-08 06:00:00+00:00,train,/home/vsantos/data/radar_sumare/2011/09/08/2011_09_08_06_00.png,3f86be5e5f158aa576e23683e87417f5cd8a36c99ad38169f148a4f3d82edbda,quarantine_map_review,0.0,2011-09
+2011-09-20 05:00:00+00:00,train,/home/vsantos/data/radar_sumare/2011/09/20/2011_09_20_05_00.png,5548bfd3d58e495d5fab9025629f54f1ce54bc858aedb45250b1c1974fe5f0a7,quarantine_no_decodable_observation,0.0,2011-09
+2012-02-14 13:00:00+00:00,train,/home/vsantos/data/radar_sumare/2012/02/14/2012_02_14_13_00.png,fdf29f67b6c832c49a2d679f29fbb71ba3236b1684b44239f257fa472b98ef00,quarantine_no_decodable_observation,0.0,2012-02
+2012-02-25 10:00:00+00:00,train,/home/vsantos/data/radar_sumare/2012/02/25/2012_02_25_10_00.png,c98dc8475674fbfdbb7785e03139cc5a9255b317542b79ab2c28a64315131c25,quarantine_map_review,0.0,2012-02
+2012-05-18 17:00:00+00:00,train,/home/vsantos/data/radar_sumare/2012/05/18/2012_05_18_17_00.png,1bb57ab19c3a554f15fab96d346336c27f9e7c66f6f5188d67e5fa272519fadf,accepted_partial,0.0006802721088435374,2012-05
+2013-01-30 06:00:00+00:00,train,/home/vsantos/data/radar_sumare/2013/01/30/2013_01_30_06_00.png,8caff9264abeab7e8bc27e1f33c2aef7cd22f0b7674fb090f5f5ccf5f478d549,quarantine_no_decodable_observation,0.0,2013-01
+2013-02-27 16:00:00+00:00,train,/home/vsantos/data/radar_sumare/2013/02/27/2013_02_27_16_00.png,bff90879773b78136586b033b28468981fa0b7159d7ffcfd9755e64bce98e5c1,accepted_partial,0.026020408163265306,2013-02
+2014-02-04 20:00:00+00:00,train,/home/vsantos/data/radar_sumare/2014/02/04/2014_02_04_20_00.png,4484ecc11ffe0c3da701eced2150046b39604892c9c8bc13dadd9cdc7f34f2b2,quarantine_no_decodable_observation,0.0,2014-02
+2014-06-08 02:00:00+00:00,train,/home/vsantos/data/radar_sumare/2014/06/08/2014_06_08_02_00.png,8404d84575855411ca91eba36eb7eced3227554eb1aa3bfe2cc8036f7a388691,quarantine_map_review,0.0,2014-06
+2014-07-11 23:00:00+00:00,train,/home/vsantos/data/radar_sumare/2014/07/11/2014_07_11_23_00.png,9516f7f4e6a42b96d92314ced8b6aebda7c04e5b521608eb0478ac3aa2d9376b,accepted_partial,0.006292517006802721,2014-07
+2015-01-15 08:00:00+00:00,train,/home/vsantos/data/radar_sumare/2015/01/15/2015_01_15_08_00.png,4484ecc11ffe0c3da701eced2150046b39604892c9c8bc13dadd9cdc7f34f2b2,quarantine_no_decodable_observation,0.0,2015-01
+2015-03-17 12:00:00+00:00,train,/home/vsantos/data/radar_sumare/2015/03/17/2015_03_17_12_00.png,1546bc63d1f08d0d54efc9445c7c1fbd6cfd7a36ae7c5cfef834dce26765a953,accepted_partial,0.006972789115646258,2015-03
+2016-02-27 15:00:00+00:00,train,/home/vsantos/data/radar_sumare/2016/02/27/2016_02_27_15_00.png,ce703275bcfa9958d04617a8a57fe6863ee9b2b32383e08209ec7259a86ef6e9,accepted_partial,0.026360544217687076,2016-02
+2016-09-19 08:00:00+00:00,train,/home/vsantos/data/radar_sumare/2016/09/19/2016_09_19_08_00.png,b44ca2001f577c0a54c2354ac797ccfc886d67387db12db8aff938e0c96b1f77,quarantine_no_decodable_observation,0.0,2016-09
+2017-02-11 11:00:00+00:00,train,/home/vsantos/data/radar_sumare/2017/02/11/2017_02_11_11_00.png,b327629d0a7b8f1e3b55c2ac20324bf4ae56fd81e94074a6304cd8ae0385eff3,quarantine_no_decodable_observation,0.0,2017-02
+2017-05-22 06:00:00+00:00,train,/home/vsantos/data/radar_sumare/2017/05/22/2017_05_22_06_00.png,bd390e07c70efbc7bcfcaed1c591afcbfb596c049bc1320207b5744372dbecc7,accepted_partial,0.01649659863945578,2017-05
+2018-05-29 21:00:00+00:00,train,/home/vsantos/data/radar_sumare/2018/05/29/2018_05_29_21_00.png,a6a01cb75b950631239a5b09a7a1ee6606fcd17daf52c0709b41df777531bf28,quarantine_no_decodable_observation,0.0,2018-05
+2018-09-19 15:00:00+00:00,train,/home/vsantos/data/radar_sumare/2018/09/19/2018_09_19_15_00.png,0ac998b1fe3f7443976ce3aa29df7088c8b864daea480034af5824f14a1b19a0,accepted_partial,0.02023809523809524,2018-09
+2019-03-12 03:00:00+00:00,train,/home/vsantos/data/radar_sumare/2019/03/12/2019_03_12_03_00.png,fba700bbc73c7c8291e30a9df9b1988735c937b34cfb10833db60702e8b93890,accepted_partial,0.05663265306122449,2019-03
+2019-09-22 11:00:00+00:00,train,/home/vsantos/data/radar_sumare/2019/09/22/2019_09_22_11_00.png,07cff338884da8bf421c748af92a9dc0d10aefd49bb91bcbf713056993cc2831,quarantine_no_decodable_observation,0.0,2019-09
+2020-03-07 04:00:00+00:00,train,/home/vsantos/data/radar_sumare/2020/03/07/2020_03_07_04_00.png,29331e5228d4cd6562ce6d690de356f1f3ab90629792d18b588cca4d7c904ea6,quarantine_no_decodable_observation,0.0,2020-03
+2020-10-20 14:00:00+00:00,train,/home/vsantos/data/radar_sumare/2020/10/20/2020_10_20_14_00.png,9bd5aa41bf4d8ee27b97cbb3c047344725ffb0723c1796b3b48b70cc059c8678,accepted_partial,0.005612244897959183,2020-10

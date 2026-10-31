@@ -1,0 +1,13 @@
+split,status,hours,denominator_hours,percent
+excluded_purge,accepted_partial,166,195,85.12820512820512
+excluded_purge,quarantine_no_decodable_observation,29,195,14.871794871794872
+test_primary,accepted_partial,3232,4966,65.08256141763995
+test_primary,quarantine_no_decodable_observation,1734,4966,34.91743858236005
+test_stress_ood,accepted_partial,2131,3108,68.56499356499357
+test_stress_ood,quarantine_map_review,64,3108,2.0592020592020592
+test_stress_ood,quarantine_no_decodable_observation,913,3108,29.375804375804375
+train,accepted_partial,31791,63587,49.99606837875666
+train,quarantine_map_review,74,63587,0.1163759888027427
+train,quarantine_no_decodable_observation,31722,63587,49.887555632440595
+validation,accepted_partial,10581,12828,82.48362956033677
+validation,quarantine_no_decodable_observation,2247,12828,17.516370439663238

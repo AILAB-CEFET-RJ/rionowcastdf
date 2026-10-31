@@ -1,0 +1,228 @@
+nohup: ignoring input
+1/122736 {'missing_png': 1}
+1001/122736 {'missing_png': 704, 'accepted_partial': 74, 'quarantine_no_decodable_observation': 196, 'quarantine_map_review': 27}
+2001/122736 {'missing_png': 1267, 'accepted_partial': 331, 'quarantine_no_decodable_observation': 376, 'quarantine_map_review': 27}
+3001/122736 {'missing_png': 1916, 'accepted_partial': 506, 'quarantine_no_decodable_observation': 552, 'quarantine_map_review': 27}
+4001/122736 {'missing_png': 2561, 'accepted_partial': 713, 'quarantine_no_decodable_observation': 700, 'quarantine_map_review': 27}
+5001/122736 {'missing_png': 3175, 'accepted_partial': 820, 'quarantine_no_decodable_observation': 979, 'quarantine_map_review': 27}
+6001/122736 {'missing_png': 3520, 'accepted_partial': 975, 'quarantine_no_decodable_observation': 1479, 'quarantine_map_review': 27}
+7001/122736 {'missing_png': 3836, 'accepted_partial': 1172, 'quarantine_no_decodable_observation': 1922, 'quarantine_map_review': 70, 'error': 1}
+8001/122736 {'missing_png': 3852, 'accepted_partial': 1681, 'quarantine_no_decodable_observation': 2397, 'quarantine_map_review': 70, 'error': 1}
+9001/122736 {'missing_png': 3863, 'accepted_partial': 2378, 'quarantine_no_decodable_observation': 2686, 'quarantine_map_review': 70, 'error': 4}
+10001/122736 {'missing_png': 3879, 'accepted_partial': 2773, 'quarantine_no_decodable_observation': 3275, 'quarantine_map_review': 70, 'error': 4}
+11001/122736 {'missing_png': 3897, 'accepted_partial': 3188, 'quarantine_no_decodable_observation': 3826, 'quarantine_map_review': 86, 'error': 4}
+12001/122736 {'missing_png': 4067, 'accepted_partial': 3474, 'quarantine_no_decodable_observation': 4370, 'quarantine_map_review': 86, 'error': 4}
+13001/122736 {'missing_png': 4083, 'accepted_partial': 3853, 'quarantine_no_decodable_observation': 4975, 'quarantine_map_review': 86, 'error': 4}
+14001/122736 {'missing_png': 4152, 'accepted_partial': 4042, 'quarantine_no_decodable_observation': 5717, 'quarantine_map_review': 86, 'error': 4}
+15001/122736 {'missing_png': 4171, 'accepted_partial': 4231, 'quarantine_no_decodable_observation': 6509, 'quarantine_map_review': 86, 'error': 4}
+16001/122736 {'missing_png': 4192, 'accepted_partial': 4630, 'quarantine_no_decodable_observation': 7089, 'quarantine_map_review': 86, 'error': 4}
+17001/122736 {'missing_png': 4210, 'accepted_partial': 5267, 'quarantine_no_decodable_observation': 7434, 'quarantine_map_review': 86, 'error': 4}
+18001/122736 {'missing_png': 4232, 'accepted_partial': 5972, 'quarantine_no_decodable_observation': 7707, 'quarantine_map_review': 86, 'error': 4}
+19001/122736 {'missing_png': 4243, 'accepted_partial': 6575, 'quarantine_no_decodable_observation': 8093, 'quarantine_map_review': 86, 'error': 4}
+20001/122736 {'missing_png': 4253, 'accepted_partial': 7217, 'quarantine_no_decodable_observation': 8441, 'quarantine_map_review': 86, 'error': 4}
+21001/122736 {'missing_png': 4289, 'accepted_partial': 7498, 'quarantine_no_decodable_observation': 9124, 'quarantine_map_review': 86, 'error': 4}
+22001/122736 {'missing_png': 4299, 'accepted_partial': 7836, 'quarantine_no_decodable_observation': 9776, 'quarantine_map_review': 86, 'error': 4}
+23001/122736 {'missing_png': 4433, 'accepted_partial': 8084, 'quarantine_no_decodable_observation': 10393, 'quarantine_map_review': 86, 'error': 5}
+24001/122736 {'missing_png': 4834, 'accepted_partial': 8329, 'quarantine_no_decodable_observation': 10747, 'quarantine_map_review': 86, 'error': 5}
+25001/122736 {'missing_png': 4959, 'accepted_partial': 8732, 'quarantine_no_decodable_observation': 11219, 'quarantine_map_review': 86, 'error': 5}
+26001/122736 {'missing_png': 5003, 'accepted_partial': 9234, 'quarantine_no_decodable_observation': 11673, 'quarantine_map_review': 86, 'error': 5}
+27001/122736 {'missing_png': 5047, 'accepted_partial': 9672, 'quarantine_no_decodable_observation': 12191, 'quarantine_map_review': 86, 'error': 5}
+28001/122736 {'missing_png': 5183, 'accepted_partial': 9962, 'quarantine_no_decodable_observation': 12765, 'quarantine_map_review': 86, 'error': 5}
+29001/122736 {'missing_png': 5196, 'accepted_partial': 10476, 'quarantine_no_decodable_observation': 13237, 'quarantine_map_review': 87, 'error': 5}
+30001/122736 {'missing_png': 5204, 'accepted_partial': 10889, 'quarantine_no_decodable_observation': 13816, 'quarantine_map_review': 87, 'error': 5}
+31001/122736 {'missing_png': 5232, 'accepted_partial': 11222, 'quarantine_no_decodable_observation': 14448, 'quarantine_map_review': 94, 'error': 5}
+32001/122736 {'missing_png': 5573, 'accepted_partial': 11366, 'quarantine_no_decodable_observation': 14963, 'quarantine_map_review': 94, 'error': 5}
+33001/122736 {'missing_png': 5599, 'accepted_partial': 11717, 'quarantine_no_decodable_observation': 15586, 'quarantine_map_review': 94, 'error': 5}
+34001/122736 {'missing_png': 5614, 'accepted_partial': 12093, 'quarantine_no_decodable_observation': 16195, 'quarantine_map_review': 94, 'error': 5}
+35001/122736 {'missing_png': 5666, 'accepted_partial': 12529, 'quarantine_no_decodable_observation': 16707, 'quarantine_map_review': 94, 'error': 5}
+36001/122736 {'missing_png': 5974, 'accepted_partial': 12875, 'quarantine_no_decodable_observation': 17053, 'quarantine_map_review': 94, 'error': 5}
+37001/122736 {'missing_png': 6000, 'accepted_partial': 13409, 'quarantine_no_decodable_observation': 17493, 'quarantine_map_review': 94, 'error': 5}
+38001/122736 {'missing_png': 6030, 'accepted_partial': 13882, 'quarantine_no_decodable_observation': 17990, 'quarantine_map_review': 94, 'error': 5}
+39001/122736 {'missing_png': 6172, 'accepted_partial': 14112, 'quarantine_no_decodable_observation': 18618, 'quarantine_map_review': 94, 'error': 5}
+40001/122736 {'missing_png': 6378, 'accepted_partial': 14462, 'quarantine_no_decodable_observation': 19062, 'quarantine_map_review': 94, 'error': 5}
+41001/122736 {'missing_png': 6731, 'accepted_partial': 14643, 'quarantine_no_decodable_observation': 19528, 'quarantine_map_review': 94, 'error': 5}
+42001/122736 {'missing_png': 6906, 'accepted_partial': 15044, 'quarantine_no_decodable_observation': 19952, 'quarantine_map_review': 94, 'error': 5}
+43001/122736 {'missing_png': 6909, 'accepted_partial': 15577, 'quarantine_no_decodable_observation': 20416, 'quarantine_map_review': 94, 'error': 5}
+44001/122736 {'missing_png': 6983, 'accepted_partial': 16112, 'quarantine_no_decodable_observation': 20807, 'quarantine_map_review': 94, 'error': 5}
+45001/122736 {'missing_png': 7085, 'accepted_partial': 16697, 'quarantine_no_decodable_observation': 21120, 'quarantine_map_review': 94, 'error': 5}
+46001/122736 {'missing_png': 7122, 'accepted_partial': 17241, 'quarantine_no_decodable_observation': 21539, 'quarantine_map_review': 94, 'error': 5}
+47001/122736 {'missing_png': 7224, 'accepted_partial': 17456, 'quarantine_no_decodable_observation': 22222, 'quarantine_map_review': 94, 'error': 5}
+48001/122736 {'missing_png': 7328, 'accepted_partial': 17753, 'quarantine_no_decodable_observation': 22821, 'quarantine_map_review': 94, 'error': 5}
+49001/122736 {'missing_png': 7730, 'accepted_partial': 17821, 'quarantine_no_decodable_observation': 23351, 'quarantine_map_review': 94, 'error': 5}
+50001/122736 {'missing_png': 7823, 'accepted_partial': 18052, 'quarantine_no_decodable_observation': 24027, 'quarantine_map_review': 94, 'error': 5}
+51001/122736 {'missing_png': 7847, 'accepted_partial': 18381, 'quarantine_no_decodable_observation': 24674, 'quarantine_map_review': 94, 'error': 5}
+52001/122736 {'missing_png': 7894, 'accepted_partial': 19042, 'quarantine_no_decodable_observation': 24966, 'quarantine_map_review': 94, 'error': 5}
+53001/122736 {'missing_png': 8013, 'accepted_partial': 19639, 'quarantine_no_decodable_observation': 25250, 'quarantine_map_review': 94, 'error': 5}
+54001/122736 {'missing_png': 8223, 'accepted_partial': 20060, 'quarantine_no_decodable_observation': 25619, 'quarantine_map_review': 94, 'error': 5}
+55001/122736 {'missing_png': 8306, 'accepted_partial': 20600, 'quarantine_no_decodable_observation': 25996, 'quarantine_map_review': 94, 'error': 5}
+56001/122736 {'missing_png': 8403, 'accepted_partial': 20970, 'quarantine_no_decodable_observation': 26529, 'quarantine_map_review': 94, 'error': 5}
+57001/122736 {'missing_png': 8504, 'accepted_partial': 21240, 'quarantine_no_decodable_observation': 27158, 'quarantine_map_review': 94, 'error': 5}
+58001/122736 {'missing_png': 8696, 'accepted_partial': 21449, 'quarantine_no_decodable_observation': 27757, 'quarantine_map_review': 94, 'error': 5}
+59001/122736 {'missing_png': 9236, 'accepted_partial': 21664, 'quarantine_no_decodable_observation': 28002, 'quarantine_map_review': 94, 'error': 5}
+60001/122736 {'missing_png': 9347, 'accepted_partial': 22116, 'quarantine_no_decodable_observation': 28439, 'quarantine_map_review': 94, 'error': 5}
+61001/122736 {'missing_png': 9457, 'accepted_partial': 22625, 'quarantine_no_decodable_observation': 28820, 'quarantine_map_review': 94, 'error': 5}
+62001/122736 {'missing_png': 9515, 'accepted_partial': 23312, 'quarantine_no_decodable_observation': 29075, 'quarantine_map_review': 94, 'error': 5}
+63001/122736 {'missing_png': 9593, 'accepted_partial': 23993, 'quarantine_no_decodable_observation': 29316, 'quarantine_map_review': 94, 'error': 5}
+64001/122736 {'missing_png': 9770, 'accepted_partial': 24456, 'quarantine_no_decodable_observation': 29676, 'quarantine_map_review': 94, 'error': 5}
+65001/122736 {'missing_png': 9935, 'accepted_partial': 24774, 'quarantine_no_decodable_observation': 30193, 'quarantine_map_review': 94, 'error': 5}
+66001/122736 {'missing_png': 10301, 'accepted_partial': 25026, 'quarantine_no_decodable_observation': 30575, 'quarantine_map_review': 94, 'error': 5}
+67001/122736 {'missing_png': 10623, 'accepted_partial': 25316, 'quarantine_no_decodable_observation': 30963, 'quarantine_map_review': 94, 'error': 5}
+68001/122736 {'missing_png': 10812, 'accepted_partial': 25732, 'quarantine_no_decodable_observation': 31358, 'quarantine_map_review': 94, 'error': 5}
+69001/122736 {'missing_png': 10847, 'accepted_partial': 26501, 'quarantine_no_decodable_observation': 31554, 'quarantine_map_review': 94, 'error': 5}
+70001/122736 {'missing_png': 10962, 'accepted_partial': 27307, 'quarantine_no_decodable_observation': 31633, 'quarantine_map_review': 94, 'error': 5}
+71001/122736 {'missing_png': 11232, 'accepted_partial': 27882, 'quarantine_no_decodable_observation': 31788, 'quarantine_map_review': 94, 'error': 5}
+72001/122736 {'missing_png': 11315, 'accepted_partial': 28681, 'quarantine_no_decodable_observation': 31906, 'quarantine_map_review': 94, 'error': 5}
+73001/122736 {'missing_png': 11506, 'accepted_partial': 29281, 'quarantine_no_decodable_observation': 32115, 'quarantine_map_review': 94, 'error': 5}
+74001/122736 {'missing_png': 11677, 'accepted_partial': 29719, 'quarantine_no_decodable_observation': 32506, 'quarantine_map_review': 94, 'error': 5}
+75001/122736 {'missing_png': 12133, 'accepted_partial': 29936, 'quarantine_no_decodable_observation': 32833, 'quarantine_map_review': 94, 'error': 5}
+76001/122736 {'missing_png': 12574, 'accepted_partial': 30154, 'quarantine_no_decodable_observation': 33043, 'quarantine_map_review': 94, 'error': 136}
+77001/122736 {'missing_png': 12843, 'accepted_partial': 30549, 'quarantine_no_decodable_observation': 33368, 'quarantine_map_review': 94, 'error': 147}
+78001/122736 {'missing_png': 12894, 'accepted_partial': 31191, 'quarantine_no_decodable_observation': 33675, 'quarantine_map_review': 94, 'error': 147}
+79001/122736 {'missing_png': 13110, 'accepted_partial': 31574, 'quarantine_no_decodable_observation': 33992, 'quarantine_map_review': 94, 'error': 231}
+80001/122736 {'missing_png': 13742, 'accepted_partial': 31856, 'quarantine_no_decodable_observation': 34038, 'quarantine_map_review': 94, 'error': 271}
+81001/122736 {'missing_png': 13980, 'accepted_partial': 32351, 'quarantine_no_decodable_observation': 34290, 'quarantine_map_review': 94, 'error': 286}
+82001/122736 {'missing_png': 14174, 'accepted_partial': 32771, 'quarantine_no_decodable_observation': 34676, 'quarantine_map_review': 94, 'error': 286}
+83001/122736 {'missing_png': 14503, 'accepted_partial': 33061, 'quarantine_no_decodable_observation': 35057, 'quarantine_map_review': 94, 'error': 286}
+84001/122736 {'missing_png': 14919, 'accepted_partial': 33240, 'quarantine_no_decodable_observation': 35462, 'quarantine_map_review': 94, 'error': 286}
+85001/122736 {'missing_png': 15631, 'accepted_partial': 33508, 'quarantine_no_decodable_observation': 35482, 'quarantine_map_review': 94, 'error': 286}
+86001/122736 {'missing_png': 15768, 'accepted_partial': 34264, 'quarantine_no_decodable_observation': 35589, 'quarantine_map_review': 94, 'error': 286}
+87001/122736 {'missing_png': 15866, 'accepted_partial': 35000, 'quarantine_no_decodable_observation': 35755, 'quarantine_map_review': 94, 'error': 286}
+88001/122736 {'missing_png': 15914, 'accepted_partial': 35897, 'quarantine_no_decodable_observation': 35810, 'quarantine_map_review': 94, 'error': 286}
+89001/122736 {'missing_png': 16124, 'accepted_partial': 36522, 'quarantine_no_decodable_observation': 35975, 'quarantine_map_review': 94, 'error': 286}
+90001/122736 {'missing_png': 16261, 'accepted_partial': 37090, 'quarantine_no_decodable_observation': 36270, 'quarantine_map_review': 94, 'error': 286}
+91001/122736 {'missing_png': 16331, 'accepted_partial': 37691, 'quarantine_no_decodable_observation': 36599, 'quarantine_map_review': 94, 'error': 286}
+92001/122736 {'missing_png': 16436, 'accepted_partial': 38111, 'quarantine_no_decodable_observation': 37074, 'quarantine_map_review': 94, 'error': 286}
+93001/122736 {'missing_png': 16801, 'accepted_partial': 38651, 'quarantine_no_decodable_observation': 37169, 'quarantine_map_review': 94, 'error': 286}
+94001/122736 {'missing_png': 17085, 'accepted_partial': 39350, 'quarantine_no_decodable_observation': 37186, 'quarantine_map_review': 94, 'error': 286}
+95001/122736 {'missing_png': 17146, 'accepted_partial': 40288, 'quarantine_no_decodable_observation': 37187, 'quarantine_map_review': 94, 'error': 286}
+96001/122736 {'missing_png': 17273, 'accepted_partial': 41135, 'quarantine_no_decodable_observation': 37213, 'quarantine_map_review': 94, 'error': 286}
+97001/122736 {'missing_png': 17365, 'accepted_partial': 42026, 'quarantine_no_decodable_observation': 37230, 'quarantine_map_review': 94, 'error': 286}
+98001/122736 {'missing_png': 17456, 'accepted_partial': 42877, 'quarantine_no_decodable_observation': 37288, 'quarantine_map_review': 94, 'error': 286}
+99001/122736 {'missing_png': 17558, 'accepted_partial': 43719, 'quarantine_no_decodable_observation': 37344, 'quarantine_map_review': 94, 'error': 286}
+100001/122736 {'missing_png': 17771, 'accepted_partial': 44405, 'quarantine_no_decodable_observation': 37445, 'quarantine_map_review': 94, 'error': 286}
+101001/122736 {'missing_png': 18090, 'accepted_partial': 45059, 'quarantine_no_decodable_observation': 37472, 'quarantine_map_review': 94, 'error': 286}
+102001/122736 {'missing_png': 18525, 'accepted_partial': 45592, 'quarantine_no_decodable_observation': 37504, 'quarantine_map_review': 94, 'error': 286}
+103001/122736 {'missing_png': 19160, 'accepted_partial': 45820, 'quarantine_no_decodable_observation': 37641, 'quarantine_map_review': 94, 'error': 286}
+104001/122736 {'missing_png': 19255, 'accepted_partial': 46396, 'quarantine_no_decodable_observation': 37970, 'quarantine_map_review': 94, 'error': 286}
+105001/122736 {'missing_png': 19375, 'accepted_partial': 47046, 'quarantine_no_decodable_observation': 38200, 'quarantine_map_review': 94, 'error': 286}
+106001/122736 {'missing_png': 19472, 'accepted_partial': 47780, 'quarantine_no_decodable_observation': 38369, 'quarantine_map_review': 94, 'error': 286}
+107001/122736 {'missing_png': 19662, 'accepted_partial': 48381, 'quarantine_no_decodable_observation': 38578, 'quarantine_map_review': 94, 'error': 286}
+108001/122736 {'missing_png': 19904, 'accepted_partial': 48847, 'quarantine_no_decodable_observation': 38870, 'quarantine_map_review': 94, 'error': 286}
+109001/122736 {'missing_png': 20137, 'accepted_partial': 49178, 'quarantine_no_decodable_observation': 39306, 'quarantine_map_review': 94, 'error': 286}
+110001/122736 {'missing_png': 20490, 'accepted_partial': 49503, 'quarantine_no_decodable_observation': 39628, 'quarantine_map_review': 94, 'error': 286}
+111001/122736 {'missing_png': 21037, 'accepted_partial': 49822, 'quarantine_no_decodable_observation': 39762, 'quarantine_map_review': 94, 'error': 286}
+112001/122736 {'missing_png': 21445, 'accepted_partial': 50243, 'quarantine_no_decodable_observation': 39933, 'quarantine_map_review': 94, 'error': 286}
+113001/122736 {'missing_png': 22040, 'accepted_partial': 50483, 'quarantine_no_decodable_observation': 40098, 'quarantine_map_review': 94, 'error': 286}
+114001/122736 {'missing_png': 22736, 'accepted_partial': 50741, 'quarantine_no_decodable_observation': 40144, 'quarantine_map_review': 94, 'error': 286}
+115001/122736 {'missing_png': 23267, 'accepted_partial': 51129, 'quarantine_no_decodable_observation': 40225, 'quarantine_map_review': 94, 'error': 286}
+116001/122736 {'missing_png': 23828, 'accepted_partial': 51447, 'quarantine_no_decodable_observation': 40346, 'quarantine_map_review': 94, 'error': 286}
+117001/122736 {'missing_png': 24552, 'accepted_partial': 51621, 'quarantine_no_decodable_observation': 40448, 'quarantine_map_review': 94, 'error': 286}
+118001/122736 {'missing_png': 25080, 'accepted_partial': 51827, 'quarantine_no_decodable_observation': 40678, 'quarantine_map_review': 130, 'error': 286}
+119001/122736 {'missing_png': 25861, 'accepted_partial': 51948, 'quarantine_no_decodable_observation': 40776, 'quarantine_map_review': 130, 'error': 286}
+120001/122736 {'missing_png': 26531, 'accepted_partial': 52167, 'quarantine_no_decodable_observation': 40851, 'quarantine_map_review': 166, 'error': 286}
+121001/122736 {'missing_png': 27163, 'accepted_partial': 52346, 'quarantine_no_decodable_observation': 41040, 'quarantine_map_review': 166, 'error': 286}
+122001/122736 {'missing_png': 27768, 'accepted_partial': 52685, 'quarantine_no_decodable_observation': 41096, 'quarantine_map_review': 166, 'error': 286}
+/home/vsantos/repositories/rionowcastdf/corrdiff_radar_qc/14d_rebuild_radar_cache.py:126: DtypeWarning: Columns (0: error) have mixed types. Specify dtype option on import or set low_memory=False.
+  df=pd.read_csv(a.output_dir/'qc_manifest.csv')
+{
+  "config_sha256": "d80fab3592fae1621ed097a2176c5ab12f33a5f2d4ebe2a3090e13ef0a49c42b",
+  "manifest_sha256": "d30d15fa194d0229894e5b3a8c663fa6753e8e6e0584af5bee2ca58998f8df3e",
+  "counts": {
+    "missing_png": 28075,
+    "accepted_partial": 53057,
+    "quarantine_no_decodable_observation": 41152,
+    "quarantine_map_review": 166,
+    "error": 286
+  },
+  "by_year": {
+    "2011": {
+      "missing_png": 3861,
+      "accepted_partial": 2178,
+      "quarantine_no_decodable_observation": 2648,
+      "quarantine_map_review": 70,
+      "error": 3
+    },
+    "2012": {
+      "accepted_partial": 3428,
+      "quarantine_no_decodable_observation": 4973,
+      "error": 1,
+      "missing_png": 366,
+      "quarantine_map_review": 16
+    },
+    "2013": {
+      "quarantine_no_decodable_observation": 4166,
+      "accepted_partial": 3816,
+      "missing_png": 777,
+      "error": 1
+    },
+    "2014": {
+      "accepted_partial": 3148,
+      "quarantine_no_decodable_observation": 4939,
+      "missing_png": 665,
+      "quarantine_map_review": 8
+    },
+    "2015": {
+      "accepted_partial": 3463,
+      "quarantine_no_decodable_observation": 4009,
+      "missing_png": 1288
+    },
+    "2016": {
+      "quarantine_no_decodable_observation": 4425,
+      "accepted_partial": 3346,
+      "missing_png": 1013
+    },
+    "2017": {
+      "accepted_partial": 3513,
+      "quarantine_no_decodable_observation": 3753,
+      "missing_png": 1494
+    },
+    "2018": {
+      "quarantine_no_decodable_observation": 2736,
+      "missing_png": 1518,
+      "accepted_partial": 4506
+    },
+    "2019": {
+      "accepted_partial": 4174,
+      "quarantine_no_decodable_observation": 2339,
+      "missing_png": 2086,
+      "error": 161
+    },
+    "2020": {
+      "quarantine_no_decodable_observation": 1805,
+      "error": 120,
+      "missing_png": 2818,
+      "accepted_partial": 4041
+    },
+    "2021": {
+      "accepted_partial": 5915,
+      "quarantine_no_decodable_observation": 1430,
+      "missing_png": 1415
+    },
+    "2022": {
+      "accepted_partial": 5669,
+      "missing_png": 2076,
+      "quarantine_no_decodable_observation": 1015
+    },
+    "2023": {
+      "accepted_partial": 3525,
+      "quarantine_no_decodable_observation": 1900,
+      "missing_png": 3335
+    },
+    "2024": {
+      "missing_png": 5363,
+      "quarantine_no_decodable_observation": 1014,
+      "accepted_partial": 2335,
+      "quarantine_map_review": 72
+    }
+  },
+  "grid_shape": [
+    70,
+    84
+  ],
+  "complete": true,
+  "panels": 32,
+  "unused_review_timestamps": [],
+  "production_ready": false,
+  "dry_rule_documented": false,
+  "note": "Source semantics and coverage must be reviewed. Quarantine is reversible; it is not proof of an invalid image."
+}
