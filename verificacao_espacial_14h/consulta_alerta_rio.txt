@@ -1,0 +1,42 @@
+Assunto: Confirmação da semântica dos PNGs históricos do Radar do Sumaré (2011–2024): ausência de eco, ausência de dados e georreferenciamento
+
+Prezados(as),
+
+Estou desenvolvendo uma pesquisa acadêmica de reconstrução de campos de refletividade com ERA5 e CorrDiff, utilizando o acervo de PNGs históricos atribuído ao Radar do Sumaré, de 2011 a 2024. Antes de reconstruir o cache e iniciar o treinamento, preciso confirmar quais pixels representam observações válidas e quais representam dados indisponíveis.
+
+A dúvida central é: neste produto PNG específico, como distinguir um pixel observado abaixo da menor classe exibida de um pixel sem observação válida? A distinção pode ser feita exclusivamente pelos canais RGBA e pela posição na imagem ou depende de registros externos de operação, qualidade ou cobertura?
+
+Solicito, se possível, esclarecimento dos seguintes pontos:
+
+1. Transparência em uma imagem com ecos
+Quando um pixel possui alpha=0, dentro da área nominal do produto, ele significa necessariamente ausência de eco acima do limiar de exibição? Ou o mesmo valor também representa bloqueio, ausência de leitura, dados removidos pelo controle de qualidade ou regiões fora da cobertura? Existe máscara oficial de validade/cobertura, inclusive de bloqueios, que possa ser fornecida? O alcance geométrico, por si só, é suficiente para considerar um pixel válido?
+
+2. Imagem inteiramente transparente
+O arquivo 2012_02_25_03_00.png, com dimensão 656×654, contém exclusivamente RGBA=(0,0,0,0). Sua assinatura SHA-256 é 4484ecc11ffe0c3da701eced2150046b39604892c9c8bc13dadd9cdc7f34f2b2. A mesma assinatura aparece em 15.356 horas do subconjunto de treino analisado. Esse arquivo pode ser produzido tanto por uma varredura válida sem ecos quanto por indisponibilidade, manutenção, falha de comunicação ou regime de tempo seco? É possível identificar o motivo para cada horário por logs, tabelas de status, outro produto ou identificador de varredura? A existência do arquivo com horário atualizado comprova aquisição nova, ou o servidor pode repetir uma imagem anterior/substituta?
+
+3. Imagens contendo apenas cartografia
+O arquivo 2012_02_25_04_00.png apresenta um mapa opaco, sem correspondência exata com as sete cores de eco utilizadas no nosso diagnóstico. Qual é a função desse arquivo no sistema de distribuição? Ele representa fundo cartográfico, imagem substituta, outro produto ou uma observação sem ecos? Há uma identificação oficial que permita reconhecê-lo de forma inequívoca? Não estamos atribuindo valores de refletividade às cores do mapa.
+
+4. Paleta e limiar do produto
+Qual é a tabela oficial de correspondência RGB/RGBA → classe de refletividade, inclusive valores especiais, para esse acervo? Ela se manteve constante de 2011 a 2024? As cores correspondem a valores centrais, limites inferiores ou intervalos de classes? Qual é o limiar mínimo efetivamente exibido? Há antialiasing, interpolação de cores ou composição sobre fundo que altere os valores originais? Quando o retorno está abaixo do limiar exibido, devemos tratá-lo como observação censurada abaixo desse limiar, e não como medida física exata de 0 dBZ?
+
+5. Geometria espacial e conteúdo gráfico
+Qual é o produto físico representado (por exemplo, PPI, CAPPI ou máximo vertical), sua projeção, resolução nativa e extensão geográfica? Toda a imagem 656×654 corresponde ao campo georreferenciado ou há margens, legenda, textos ou outros elementos? Quais coordenadas correspondem aos centros/cantos dos pixels extremos? É correto usar um mapeamento linear entre a imagem inteira e latitude [-23,5; -22,25], longitude [-44; -42,5], ou existe outra transformação?
+
+Na nossa implementação legada, a grade de aproximadamente 2 km amostra pontos discretos do PNG. Identificamos imagens com cores da paleta entre esses pontos. Exemplos para inspeção: 2011_08_27_11_00.png, 2016_10_02_14_00.png e 2014_10_02_04_00.png. É possível confirmar se os pequenos grupos de pixels coloridos desses exemplos são ecos do produto ou elementos gráficos/ruído? Há recomendação de reamostragem e controle de qualidade para esse raster?
+
+6. Tempo e mudanças históricas
+Os horários dos nomes dos arquivos estão em UTC ou em horário local? Representam aquisição, geração ou publicação? Houve mudanças de produto, paleta, resolução, projeção, política de transparência ou imagens substitutas no período de 2011 a 2024? Em caso positivo, quais as datas e regras por versão? É necessário distinguir produtos de radares diferentes no acervo?
+
+7. Evidência disponível e regra operacional
+Seria possível fornecer um documento, trecho de código de geração, tabela de códigos, máscara de cobertura ou exemplos classificados oficialmente que sustentem as respostas? O mais importante para a pesquisa é uma regra reproduzível para separar:
+(a) eco válido;
+(b) observação válida abaixo do limiar exibido;
+(c) ausência de observação/qualidade insuficiente;
+(d) fundo cartográfico ou imagem substituta.
+
+Caso o PNG não preserve essa distinção, peço a confirmação explícita dessa limitação e indicação de um produto ou registro auxiliar que permita recuperá-la. Não precisamos presumir que todas as imagens transparentes sejam inválidas ou que todas representem tempo seco.
+
+Esses esclarecimentos são decisivos para evitar tanto a criação de falsas observações de chuva quanto a exclusão indevida de muitas horas válidas sem eco.
+
+Agradeço pela colaboração e fico à disposição para encaminhar os arquivos de exemplo e os painéis de diagnóstico.
