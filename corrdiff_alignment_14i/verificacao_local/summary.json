@@ -1,0 +1,29 @@
+{
+  "version": "14i-alignment-pilot-v1",
+  "config_sha256": "8fa35b083e8ff6325422428db9db601c122514c6aa6f2c6c634e3b5a782f7ac8",
+  "cases": 3,
+  "unique_requested_frames": 9,
+  "counts": {
+    "map_screen_review": 1,
+    "missing_png": 6,
+    "palette_sampled_observation_validity_unconfirmed": 1,
+    "transparent_ambiguous": 1
+  },
+  "complete": true,
+  "source_read_errors": 0,
+  "all_requested_files_present": false,
+  "grid_shape": [
+    70,
+    84
+  ],
+  "geometric_grid_points": 5880,
+  "production_ready": false,
+  "dry_rule_documented": false,
+  "temporal_aggregation": "none",
+  "era5_values_read": false,
+  "old_cache_used": false,
+  "old_dataset_modified": false,
+  "script_sha256": "fd2793e3cbe25606d51bebf5e00982820ea7d0b776097b4e0a9da5ff7e2cf191",
+  "module_sha256": "fd0c92b8693db9f257fd0aac2aef7ab5ce05f562f9c5a637653c039762008f41",
+  "note": "Complete means all requested frames were attempted. Palette_mask is not observational validity. Missing/transparent/map frames are never filled as dry. UTC references do not prove ERA5 availability."
+}
