@@ -1,0 +1,4 @@
+timestamp_file,source,source_sha256,source_mode,status,transparent_pixels,palette_opaque_pixels,palette_sampled_pixels,palette_unsampled_pixels,grid_palette_points,components,components_with_sample,nearest_sample_distance_median_px,interpretation
+2011_08_27_11_00,/home/vsantos/data/radar_sumare/2011/08/27/2011_08_27_11_00.png,fcf61ce7e745d896d4324d4eeaed9d33a5f76df654c481603f4c86264022a815,RGBA,checked,429023,1,0,1,0,1,0,2.8284271247461903,palette_present_but_not_sampled
+2016_10_02_14_00,/home/vsantos/data/radar_sumare/2016/10/02/2016_10_02_14_00.png,d3546c7ec989cab5f64a3b152661245803dd46039d3b6a74c1c8e5003e0f206f,RGBA,checked,429016,8,0,8,0,1,0,3.802775637731995,palette_present_but_not_sampled
+2014_10_02_04_00,/home/vsantos/data/radar_sumare/2014/10/02/2014_10_02_04_00.png,a4bf87b5644522b529d872baf525897addd660194d9057e99ac0de31da6ef068,RGBA,checked,428648,294,0,294,0,12,0,3.605551275463989,palette_present_but_not_sampled

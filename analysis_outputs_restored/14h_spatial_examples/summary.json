@@ -1,0 +1,124 @@
+{
+  "version": "14h-spatial-v1",
+  "grid_shape": [
+    70,
+    84
+  ],
+  "source_size": [
+    656,
+    654
+  ],
+  "grid_resolution_km": 2,
+  "lat_range": [
+    -23.5,
+    -22.25
+  ],
+  "lon_range": [
+    -44,
+    -42.5
+  ],
+  "pixel_map": "legacy linear geographic mapping, integer truncation; no area aggregation",
+  "geographic_registration_verified": false,
+  "palette": [
+    [
+      197,
+      0,
+      197,
+      50
+    ],
+    [
+      227,
+      6,
+      5,
+      45
+    ],
+    [
+      255,
+      112,
+      0,
+      40
+    ],
+    [
+      195,
+      230,
+      0,
+      35
+    ],
+    [
+      4,
+      85,
+      4,
+      30
+    ],
+    [
+      19,
+      122,
+      19,
+      25
+    ],
+    [
+      0,
+      167,
+      12,
+      20
+    ]
+  ],
+  "alpha_required": 255,
+  "production_ready": false,
+  "results": [
+    {
+      "timestamp_file": "2011_08_27_11_00",
+      "source": "/home/vsantos/data/radar_sumare/2011/08/27/2011_08_27_11_00.png",
+      "source_sha256": "fcf61ce7e745d896d4324d4eeaed9d33a5f76df654c481603f4c86264022a815",
+      "source_mode": "RGBA",
+      "status": "checked",
+      "transparent_pixels": 429023,
+      "palette_opaque_pixels": 1,
+      "palette_sampled_pixels": 0,
+      "palette_unsampled_pixels": 1,
+      "grid_palette_points": 0,
+      "components": 1,
+      "components_with_sample": 0,
+      "nearest_sample_distance_median_px": 2.8284271247461903,
+      "interpretation": "palette_present_but_not_sampled"
+    },
+    {
+      "timestamp_file": "2016_10_02_14_00",
+      "source": "/home/vsantos/data/radar_sumare/2016/10/02/2016_10_02_14_00.png",
+      "source_sha256": "d3546c7ec989cab5f64a3b152661245803dd46039d3b6a74c1c8e5003e0f206f",
+      "source_mode": "RGBA",
+      "status": "checked",
+      "transparent_pixels": 429016,
+      "palette_opaque_pixels": 8,
+      "palette_sampled_pixels": 0,
+      "palette_unsampled_pixels": 8,
+      "grid_palette_points": 0,
+      "components": 1,
+      "components_with_sample": 0,
+      "nearest_sample_distance_median_px": 3.802775637731995,
+      "interpretation": "palette_present_but_not_sampled"
+    },
+    {
+      "timestamp_file": "2014_10_02_04_00",
+      "source": "/home/vsantos/data/radar_sumare/2014/10/02/2014_10_02_04_00.png",
+      "source_sha256": "a4bf87b5644522b529d872baf525897addd660194d9057e99ac0de31da6ef068",
+      "source_mode": "RGBA",
+      "status": "checked",
+      "transparent_pixels": 428648,
+      "palette_opaque_pixels": 294,
+      "palette_sampled_pixels": 0,
+      "palette_unsampled_pixels": 294,
+      "grid_palette_points": 0,
+      "components": 12,
+      "components_with_sample": 0,
+      "nearest_sample_distance_median_px": 3.605551275463989,
+      "interpretation": "palette_present_but_not_sampled"
+    }
+  ],
+  "limits": [
+    "Não distingue cor de legenda de eco meteorológico.",
+    "Não determina validade de transparência nem cobertura física.",
+    "Reproduz geometria legada; não valida georreferenciamento do produtor.",
+    "Nenhuma alteração em PNG, cache, dataset ou splits."
+  ]
+}

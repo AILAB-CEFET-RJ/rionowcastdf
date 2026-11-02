@@ -1,0 +1,83 @@
+{
+  "version": "14i-alignment-pilot-v1",
+  "filename_timezone": "America/Sao_Paulo",
+  "source_width": 656,
+  "source_height": 654,
+  "radar_latitude": -22.955139,
+  "radar_longitude": -43.248278,
+  "display_range_km": 138.9,
+  "earth_radius_m": 6371008.8,
+  "projection": "spherical AEQD, radar centred, north up, east right",
+  "lat_range": [
+    -23.5,
+    -22.25
+  ],
+  "lon_range": [
+    -44.0,
+    -42.5
+  ],
+  "grid_degree_step": 0.018018018018018018,
+  "sampling": "nearest native source pixel; numpy.rint; no spatial/temporal averaging",
+  "reference_repo": "AILAB-CEFET-RJ/rionowcast-radar-stations",
+  "reference_commit": "65201b6787bb26997da5bc2145807d1a8fd4be33",
+  "reference_config": "configs/radar_sumare_historical_audited_v1.json",
+  "legacy_repo_commit": "554c019356481832a62d7d0d46d3d07df1bc29fe",
+  "palette_rgb": [
+    [
+      197,
+      0,
+      197
+    ],
+    [
+      227,
+      6,
+      5
+    ],
+    [
+      255,
+      112,
+      0
+    ],
+    [
+      195,
+      230,
+      0
+    ],
+    [
+      4,
+      85,
+      4
+    ],
+    [
+      19,
+      122,
+      19
+    ],
+    [
+      0,
+      167,
+      12
+    ]
+  ],
+  "palette_dbz": [
+    50,
+    45,
+    40,
+    35,
+    30,
+    25,
+    20
+  ],
+  "alpha_for_palette": 255,
+  "dry_rule": null,
+  "map_screen_rgb": [
+    242,
+    239,
+    233
+  ],
+  "map_screen_fraction": 0.01,
+  "map_screen_is_proof": false,
+  "geometric_circle_is_observation_mask": false,
+  "production_ready": false,
+  "config_sha256": "8fa35b083e8ff6325422428db9db601c122514c6aa6f2c6c634e3b5a782f7ac8"
+}
