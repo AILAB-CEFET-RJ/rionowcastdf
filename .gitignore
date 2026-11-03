@@ -163,3 +163,14 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# Caches intermediários do radar
+/data/radar_intermediate_14j*/
+
+# Artefatos locais volumosos das auditorias
+/analysis_outputs_restored/**/*.sqlite
+/analysis_outputs_restored/**/*.sqlite-*
+/analysis_outputs_restored/**/*.parquet
+/analysis_outputs_restored/**/paired_manifest.csv
+/analysis_outputs_restored/**/*.npz
+/analysis_outputs_restored/**/*.pt
