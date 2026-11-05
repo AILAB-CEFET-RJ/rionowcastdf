@@ -1,0 +1,23 @@
+{
+  "version": "alertario-communication-2026-11-04-v1",
+  "provenance": "Respostas do produtor retransmitidas pelo pesquisador nesta conversa; não são uma publicação técnica pública.",
+  "received_in_conversation_date": "2026-11-05",
+  "supplement_message_date": "2026-11-04",
+  "claims": [
+    "Um PNG totalmente transparente é uma varredura válida em que nenhum eco ultrapassou o limiar de exibição.",
+    "Quando o radar está desligado, em manutenção ou em Regime de Tempo Seco, não são geradas imagens.",
+    "Falhas de comunicação ou processamento levam à manutenção, com ausência de imagens e gaps de horários.",
+    "Em imagem válida, dentro da região efetivamente observada, alfa zero significa ausência de retorno detectável.",
+    "O mesmo RGBA não representa simultaneamente observação abaixo do limiar e ausência de observação.",
+    "A legenda apresenta níveis de 20 a 50 dBZ a cada 5 dBZ; a paleta e o limiar permaneceram inalterados entre 2011 e 2024.",
+    "As cores de cartografia e mensagens não coincidem com a escala meteorológica.",
+    "Nos exemplos de 25/02/2012 às 03h e 04h não havia pixels de refletividade exibidos."
+  ],
+  "scope_limits": [
+    "Sem retorno detectável não equivale a medição numérica de 0 dBZ nem comprova ausência de chuva no solo.",
+    "A resposta condiciona a regra ao domínio efetivamente observado. O círculo geométrico do 14j não é, por si, máscara de bloqueio ou cobertura observacional.",
+    "Ausência de arquivo no acervo é ausência de dado disponível; não permite atribuir automaticamente a causa operacional.",
+    "Ausência de refletividade no exemplo cartográfico não identifica todas as telas com mensagens nem certifica universalmente mapas como varreduras válidas."
+  ],
+  "archive_start": {"date_local": "2011-01-17", "timezone": "America/Sao_Paulo", "source": "Pesquisador", "first_minute_known": false}
+}

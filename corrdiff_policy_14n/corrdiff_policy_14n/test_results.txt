@@ -1,0 +1,24 @@
+test_ambiguous_local_excluded (test_policy.Tests.test_ambiguous_local_excluded) ... Policy objects 6/6
+ok
+test_external_coverage_and_corruption (test_policy.Tests.test_external_coverage_and_corruption) ... Policy objects 6/6
+Policy objects 6/6
+ok
+test_git_housekeeping_no_deletions (test_policy.Tests.test_git_housekeeping_no_deletions) ... ok
+test_pixel_semantics (test_policy.Tests.test_pixel_semantics) ... ok
+test_policy_resume_period_and_map (test_policy.Tests.test_policy_resume_period_and_map) ... Policy objects 6/6
+Policy objects 6/6
+Policy objects 6/6
+ok
+test_smoke_end_to_end (test_policy.Tests.test_smoke_end_to_end) ... Policy objects 6/6
+Loaded 1/3 2011-01-17T02:00:00+00:00 support=5880
+Loaded 2/3 2012-12-11T19:00:00+00:00 support=5878
+Loaded 3/3 2014-01-01T00:00:00+00:00 support=5880
+Step 1/3: loss=0.064539
+Step 2/3: loss=0.020254
+Step 3/3: loss=0.026969
+ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 4.767s
+
+OK

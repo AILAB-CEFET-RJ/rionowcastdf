@@ -1,0 +1,20 @@
+[
+  {
+    "file": "2012_02_25_04_00.png",
+    "sha256": "19b91433186547f39d7ad694b0541b81cba969ae974de755c4744845955de657",
+    "status": "map_screen_review",
+    "native_palette": 0,
+    "policy_accepted": false
+  },
+  {
+    "file": "2012_12_11_17_00.png",
+    "sha256": "b69019ee4d33b55b81d3f3db4c7b15b522039da95de14d86085e09aca50c7b2f",
+    "status": "palette_sampled_observation_validity_unconfirmed",
+    "native_palette": 17578,
+    "policy_accepted": true,
+    "observation_pixels": 5756,
+    "echo_pixels": 714,
+    "no_echo_pixels": 5042,
+    "unknown_pixels": 124
+  }
+]
