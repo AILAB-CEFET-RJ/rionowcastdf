@@ -1,0 +1,23 @@
+{
+  "version": "14k-pairing-v1",
+  "complete": true,
+  "radar_snapshot_complete": true,
+  "provisional": false,
+  "expected_hours": 122736,
+  "radar_not_processed": 0,
+  "era5_error_files": 0,
+  "era5_complete_12_hours": 118344,
+  "paired_palette_candidate_hours": 50738,
+  "train_smoke_candidate_hours": 37613,
+  "split_counts": {
+    "train": 87624,
+    "validation": 17424,
+    "test_stress_ood": 8736,
+    "test_primary": 8664,
+    "excluded_purge": 288
+  },
+  "production_ready": false,
+  "dry_rule_documented": false,
+  "temporal_aggregation": "none",
+  "note": "Candidates are technical availability only, not valid full radar targets. No patches or normalizations created."
+}

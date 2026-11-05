@@ -1,0 +1,26 @@
+{
+  "version": "14k-pairing-v1",
+  "start_utc": "2011-01-01T00:00:00+00:00",
+  "end_utc": "2024-12-31T23:00:00+00:00",
+  "roots": {
+    "single": "/home/vsantos/data/reanalysis/cds/era5/single",
+    "pressure": "/home/vsantos/data/reanalysis/cds/era5/pressure"
+  },
+  "pressure_unit": "hPa",
+  "channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "code_sha256": "6005678ae29161d13ed23eed537b54e87fee7ca28a1704e895d617b00adc8f70",
+  "fingerprint": "size + mtime_ns (not content hash)"
+}

@@ -1,0 +1,36 @@
+{
+  "version": "14l-technical-smoke-v1",
+  "complete": true,
+  "technical_smoke_passed": true,
+  "production_ready": false,
+  "dry_rule_documented": false,
+  "corrdiff_native_tested": false,
+  "selected_train_hours": 8,
+  "patches_attempted": 96,
+  "patches_used": 48,
+  "empty_patches_skipped": 48,
+  "conditioning_shape": [
+    48,
+    12,
+    32,
+    32
+  ],
+  "target_shape": [
+    48,
+    1,
+    32,
+    32
+  ],
+  "support_pixels_with_patch_overlap": 1268,
+  "support_fraction_with_patch_overlap": 0.025797526041666668,
+  "cache_provisional": false,
+  "training": {
+    "steps": 20,
+    "parameters_changed": true,
+    "all_steps_finite": true,
+    "model": "TinyRegressor; not CorrDiff",
+    "initial_batch_loss": 0.04938565939664841,
+    "final_batch_loss": 0.0224907249212265
+  },
+  "note": "Technical loader/interpolation/masked-loss test only. No validation/test used; no dry labels inferred."
+}

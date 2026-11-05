@@ -1,0 +1,36 @@
+{
+  "version": "14n-policy-smoke-v1",
+  "args": {
+    "policy_dir": "analysis_outputs_restored/14n_policy_v1",
+    "output_dir": "analysis_outputs_restored/14n_smoke_v1",
+    "max_timestamps": 8,
+    "steps": 20,
+    "batch_size": 4,
+    "device": "cpu",
+    "seed": 42
+  },
+  "channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "code_sha256": "956104b1896d62f421acff83e3e3109eaed24e5ff369b241c25f64b01e8b24d2",
+  "contract_code_sha256": "e4df06051af49116af163ac7fc9ca5ea06aabe30d25f91d5425919f39c9cc0e6",
+  "policy_manifest_sha256": "47ec77b752f60eaf5cd619754c18216d04fe85017ac9b8f8cfdd04618cf8d017",
+  "policy_config_sha256": "ef09c0050cbbd56da2cd44a194f966a54be4b9b7216c93bcba3e4c3af39db1fb",
+  "coverage_state": "provisional_geometric_region",
+  "geometry_sha256": "3772dfe0fd24283a6bc14bca2d7d701a3d3f87b07660cea4845a712b4b77272d",
+  "input_interpolation": "bilinear on lat/lon rectilinear axes; no extrapolation",
+  "target_scaling": "diagnostic target_code/50; zero denotes no displayed echo, not measured 0 dBZ; NOT final transform",
+  "mask_semantics": "producer no-echo plus palette inside declared coverage; unknown excluded; coverage status explicit",
+  "cache_provisional": false
+}

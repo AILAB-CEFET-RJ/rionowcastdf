@@ -1,0 +1,6 @@
+split,all_hours,transparent_hours,transparent_percent_of_split,transparent_with_era5_unambiguous,palette_pair_candidates,hypothetical_palette_plus_transparent,hypothesis_applied
+excluded_purge,288,12,4.166666666666666,12,146,158,False
+test_primary,8664,856,9.879963065558634,734,2745,3479,False
+test_stress_ood,8736,274,3.1364468864468864,192,1599,1791,False
+train,87624,17327,19.774262759061443,17325,37613,54938,False
+validation,17424,1057,6.066345270890725,1057,8635,9692,False

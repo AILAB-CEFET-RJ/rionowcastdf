@@ -1,0 +1,72 @@
+{
+  "version": "14n-producer-policy-v1",
+  "cache_dir": "/home/vsantos/repositories/rionowcastdf/data/radar_intermediate_14j_v1",
+  "pairing_dir": "/home/vsantos/repositories/rionowcastdf/analysis_outputs_restored/14k_pairing_v2",
+  "runtime_versions": {
+    "python": "3.12.14",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5"
+  },
+  "pairing_run_config_sha256": "1e5204d84c9e72b98acf55d2fde2b87a41ce033b6a3a3848a3a6cc049ba5b817",
+  "paired_manifest_sha256": "d282ac96c202ffd2f893f48bafa071583228696e7006be72b146e53e8c70984a",
+  "input_checks": {
+    "/home/vsantos/repositories/rionowcastdf/data/radar_intermediate_14j_v1/config.json": "1c654b87390458128989b2aab0ee9429070d5cc699a4be3609d5d183de204ae3",
+    "/home/vsantos/repositories/rionowcastdf/data/radar_intermediate_14j_v1/geometry.npz": "3772dfe0fd24283a6bc14bca2d7d701a3d3f87b07660cea4845a712b4b77272d",
+    "/home/vsantos/repositories/rionowcastdf/analysis_outputs_restored/14k_pairing_v2/radar_manifest_snapshot.sqlite": "569d0452e00920b5f8ba6aee064a1e9b4c6b1de310c9a517cfff175cb031522c",
+    "/home/vsantos/repositories/rionowcastdf/analysis_outputs_restored/14k_pairing_v2/era5_inventory_snapshot.sqlite": "e0a13697f81e74f13f25f9bf971c61baa007b31dfcf161f8ba9578ca2498baeb"
+  },
+  "archive_start_local": "2011-01-17",
+  "archive_boundary_utc": "2011-01-17T02:00:00+00:00",
+  "archive_first_minute_known": false,
+  "coverage_state": "provisional_geometric_region",
+  "coverage_metadata": {
+    "evidence": "14j geometric extent only; effective observational coverage not certified",
+    "semantics": "geometric_region_only"
+  },
+  "coverage_sha256": null,
+  "map_reviews": {
+    "19b91433186547f39d7ad694b0541b81cba969ae974de755c4744845955de657": {
+      "source_sha256": "19b91433186547f39d7ad694b0541b81cba969ae974de755c4744845955de657",
+      "decision": "pending",
+      "evidence": "Exemplo 2012_02_25_04_00.png: produtor confirmou ausência de refletividade exibida; validade de toda a classe cartográfica não foi generalizada.",
+      "reviewer": "",
+      "reviewed_at": "2026-11-04"
+    }
+  },
+  "producer_evidence": {
+    "version": "alertario-communication-2026-11-04-v1",
+    "provenance": "Respostas do produtor retransmitidas pelo pesquisador nesta conversa; não são uma publicação técnica pública.",
+    "received_in_conversation_date": "2026-11-05",
+    "supplement_message_date": "2026-11-04",
+    "claims": [
+      "Um PNG totalmente transparente é uma varredura válida em que nenhum eco ultrapassou o limiar de exibição.",
+      "Quando o radar está desligado, em manutenção ou em Regime de Tempo Seco, não são geradas imagens.",
+      "Falhas de comunicação ou processamento levam à manutenção, com ausência de imagens e gaps de horários.",
+      "Em imagem válida, dentro da região efetivamente observada, alfa zero significa ausência de retorno detectável.",
+      "O mesmo RGBA não representa simultaneamente observação abaixo do limiar e ausência de observação.",
+      "A legenda apresenta níveis de 20 a 50 dBZ a cada 5 dBZ; a paleta e o limiar permaneceram inalterados entre 2011 e 2024.",
+      "As cores de cartografia e mensagens não coincidem com a escala meteorológica.",
+      "Nos exemplos de 25/02/2012 às 03h e 04h não havia pixels de refletividade exibidos."
+    ],
+    "scope_limits": [
+      "Sem retorno detectável não equivale a medição numérica de 0 dBZ nem comprova ausência de chuva no solo.",
+      "A resposta condiciona a regra ao domínio efetivamente observado. O círculo geométrico do 14j não é, por si, máscara de bloqueio ou cobertura observacional.",
+      "Ausência de arquivo no acervo é ausência de dado disponível; não permite atribuir automaticamente a causa operacional.",
+      "Ausência de refletividade no exemplo cartográfico não identifica todas as telas com mensagens nem certifica universalmente mapas como varreduras válidas."
+    ],
+    "archive_start": {
+      "date_local": "2011-01-17",
+      "timezone": "America/Sao_Paulo",
+      "source": "Pesquisador",
+      "first_minute_known": false
+    }
+  },
+  "code_sha256": {
+    "apply_policy.py": "8938ab17c67d8d1ccbd8c7c0b95c2f7d37e84f88c640302edb4900e73ae703ec",
+    "smoke_policy.py": "956104b1896d62f421acff83e3e3109eaed24e5ff369b241c25f64b01e8b24d2",
+    "pair_contract.py": "e4df06051af49116af163ac7fc9ca5ea06aabe30d25f91d5425919f39c9cc0e6",
+    "repository_report.py": "35963e460974fe8c587caae9aa0981148afdd786c89046fea8dd7f0560a4d9a9"
+  },
+  "aggregation": "none; exact hourly timestamp; unchanged nearest-neighbor grid",
+  "target_encoding": "0 category no displayed echo; palette dBZ classes; NaN unknown; not measured zero dBZ"
+}

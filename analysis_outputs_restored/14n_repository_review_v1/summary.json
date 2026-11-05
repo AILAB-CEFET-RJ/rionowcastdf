@@ -1,0 +1,9 @@
+{
+  "review_entries": 5878,
+  "gitignore_updated": true,
+  "files_deleted": 0,
+  "files_moved": 0,
+  "git_index_modified": false,
+  "git_history_modified": false,
+  "note": "Ignore rules do not remove tracked files or large blobs in previous commits. Review CSV before targeted git rm --cached; do not delete cache or active audit outputs."
+}

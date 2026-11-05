@@ -1,0 +1,9 @@
+in_archive_period,status,hours
+False,missing_png,386
+True,decode_error,286
+True,map_screen_review,166
+True,missing_png,27694
+True,no_exact_palette_review,1207
+True,palette_in_png_not_sampled_in_corrected_grid,21466
+True,palette_sampled_observation_validity_unconfirmed,52005
+True,transparent_ambiguous,19526

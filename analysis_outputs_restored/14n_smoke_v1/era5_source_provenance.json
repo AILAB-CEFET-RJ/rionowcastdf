@@ -1,0 +1,218 @@
+[
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/single/year=2011/month=1/ab27c130fd09464f875bad3e20f8e23b-0.parquet",
+    "fingerprint": "1643851:1786569856000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "tcwv,t2m,u10,v10",
+      "description": "ERA5 single-level CorrDiff inputs for 2011-01 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-08-12T15:24:17.549216",
+      "units_tcwv": "kg m**-2",
+      "units_t2m": "K",
+      "units_u10": "m s**-1",
+      "units_v10": "m s**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/pressure/year=2011/month=1/8b8f642a93dc4d9680a41176960b02b1-0.parquet",
+    "fingerprint": "5134427:1783996828000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "u,v,r,q,t,w,crwc",
+      "pressure_units": "hPa",
+      "description": "ERA5 atmospheric data for 2011-01 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-07-13T20:40:29.324714",
+      "units_u": "m s**-1",
+      "units_v": "m s**-1",
+      "units_r": "%",
+      "units_q": "kg kg**-1",
+      "units_t": "K",
+      "units_w": "Pa s**-1",
+      "units_crwc": "kg kg**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/single/year=2014/month=1/2af3465c7f924fb8a748332b4b81fd19-0.parquet",
+    "fingerprint": "1651881:1786569864000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "tcwv,t2m,u10,v10",
+      "description": "ERA5 single-level CorrDiff inputs for 2014-01 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-08-12T15:24:24.912969",
+      "units_tcwv": "kg m**-2",
+      "units_t2m": "K",
+      "units_u10": "m s**-1",
+      "units_v10": "m s**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/pressure/year=2014/month=1/50c47ca456ec4922b72feb29af2c55b2-0.parquet",
+    "fingerprint": "5069130:1783996846000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "u,v,r,q,t,w,crwc",
+      "pressure_units": "hPa",
+      "description": "ERA5 atmospheric data for 2014-01 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-07-13T20:40:46.112424",
+      "units_u": "m s**-1",
+      "units_v": "m s**-1",
+      "units_r": "%",
+      "units_q": "kg kg**-1",
+      "units_t": "K",
+      "units_w": "Pa s**-1",
+      "units_crwc": "kg kg**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/single/year=2014/month=9/8960bebf9cc6490e89dd1f3f28037bb0-0.parquet",
+    "fingerprint": "1613055:1786569866000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "tcwv,t2m,u10,v10",
+      "description": "ERA5 single-level CorrDiff inputs for 2014-09 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-08-12T15:24:26.270517",
+      "units_tcwv": "kg m**-2",
+      "units_t2m": "K",
+      "units_u10": "m s**-1",
+      "units_v10": "m s**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/pressure/year=2014/month=9/708cc7cb74fc442a969b433e92fbbc05-0.parquet",
+    "fingerprint": "4947758:1783996850000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "u,v,r,q,t,w,crwc",
+      "pressure_units": "hPa",
+      "description": "ERA5 atmospheric data for 2014-09 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-07-13T20:40:49.902384",
+      "units_u": "m s**-1",
+      "units_v": "m s**-1",
+      "units_r": "%",
+      "units_q": "kg kg**-1",
+      "units_t": "K",
+      "units_w": "Pa s**-1",
+      "units_crwc": "kg kg**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/single/year=2016/month=9/9fc3b9e01dab4ea187490427ace3e614-0.parquet",
+    "fingerprint": "1608849:1786569870000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "tcwv,t2m,u10,v10",
+      "description": "ERA5 single-level CorrDiff inputs for 2016-09 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-08-12T15:24:30.712553",
+      "units_tcwv": "kg m**-2",
+      "units_t2m": "K",
+      "units_u10": "m s**-1",
+      "units_v10": "m s**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/pressure/year=2016/month=9/18688a8803c843718563d2e71748294b-0.parquet",
+    "fingerprint": "4964785:1783996860000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "u,v,r,q,t,w,crwc",
+      "pressure_units": "hPa",
+      "description": "ERA5 atmospheric data for 2016-09 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-07-13T20:41:00.671157",
+      "units_u": "m s**-1",
+      "units_v": "m s**-1",
+      "units_r": "%",
+      "units_q": "kg kg**-1",
+      "units_t": "K",
+      "units_w": "Pa s**-1",
+      "units_crwc": "kg kg**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/single/year=2018/month=2/adddc660776a4a0fb179f801eb7bc4de-0.parquet",
+    "fingerprint": "1494046:1786569872000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "tcwv,t2m,u10,v10",
+      "description": "ERA5 single-level CorrDiff inputs for 2018-02 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-08-12T15:24:33.571701",
+      "units_tcwv": "kg m**-2",
+      "units_t2m": "K",
+      "units_u10": "m s**-1",
+      "units_v10": "m s**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/pressure/year=2018/month=2/cd2e0f1eb6e14beabcdfa5645c2ff963-0.parquet",
+    "fingerprint": "4658491:1783996868000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "u,v,r,q,t,w,crwc",
+      "pressure_units": "hPa",
+      "description": "ERA5 atmospheric data for 2018-02 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-07-13T20:41:08.620274",
+      "units_u": "m s**-1",
+      "units_v": "m s**-1",
+      "units_r": "%",
+      "units_q": "kg kg**-1",
+      "units_t": "K",
+      "units_w": "Pa s**-1",
+      "units_crwc": "kg kg**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/single/year=2020/month=12/f734459b82d04e29beede8e3fd50dd1e-0.parquet",
+    "fingerprint": "1653402:1786569882000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "tcwv,t2m,u10,v10",
+      "description": "ERA5 single-level CorrDiff inputs for 2020-12 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-08-12T15:24:42.785305",
+      "units_tcwv": "kg m**-2",
+      "units_t2m": "K",
+      "units_u10": "m s**-1",
+      "units_v10": "m s**-1"
+    }
+  },
+  {
+    "path": "/home/vsantos/data/reanalysis/cds/era5/pressure/year=2020/month=12/67470fd5a9674efeb4a01aa84f72fa53-0.parquet",
+    "fingerprint": "5176967:1783996882000000000",
+    "metadata": {
+      "source": "ERA5 Reanalysis",
+      "region": "{'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "timezone": "UTC",
+      "variables": "u,v,r,q,t,w,crwc",
+      "pressure_units": "hPa",
+      "description": "ERA5 atmospheric data for 2020-12 in {'north': -21.699774257353113, 'west': -45.05290312102409, 'south': -23.801876626302175, 'east': -42.35676996062447}",
+      "processing_date": "2026-07-13T20:41:23.577452",
+      "units_u": "m s**-1",
+      "units_v": "m s**-1",
+      "units_r": "%",
+      "units_q": "kg kg**-1",
+      "units_t": "K",
+      "units_w": "Pa s**-1",
+      "units_crwc": "kg kg**-1"
+    }
+  }
+]

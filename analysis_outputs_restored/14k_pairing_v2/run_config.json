@@ -1,0 +1,53 @@
+{
+  "version": "14k-pairing-v1",
+  "created_at_utc": "2026-11-03T12:26:18.801947+00:00",
+  "args": {
+    "command": "pair",
+    "radar_cache_dir": "data/radar_intermediate_14j_v1",
+    "inventory_dir": "analysis_outputs_restored/14k_era5_inventory",
+    "allow_partial": false,
+    "purge_hours": 48,
+    "output_dir": "analysis_outputs_restored/14k_pairing_v2",
+    "start_utc": "2011-01-01T00:00:00Z",
+    "end_utc": "2024-12-31T23:00:00Z"
+  },
+  "code_sha256": "6005678ae29161d13ed23eed537b54e87fee7ca28a1704e895d617b00adc8f70",
+  "inventory_config": {
+    "version": "14k-pairing-v1",
+    "start_utc": "2011-01-01T00:00:00+00:00",
+    "end_utc": "2024-12-31T23:00:00+00:00",
+    "roots": {
+      "single": "/home/vsantos/data/reanalysis/cds/era5/single",
+      "pressure": "/home/vsantos/data/reanalysis/cds/era5/pressure"
+    },
+    "pressure_unit": "hPa",
+    "channels": [
+      "tcwv",
+      "t2m",
+      "u10",
+      "v10",
+      "t_850",
+      "r_850",
+      "u_850",
+      "v_850",
+      "t_500",
+      "r_500",
+      "u_500",
+      "v_500"
+    ],
+    "code_sha256": "6005678ae29161d13ed23eed537b54e87fee7ca28a1704e895d617b00adc8f70",
+    "fingerprint": "size + mtime_ns (not content hash)"
+  },
+  "radar_config_sha256": "1c654b87390458128989b2aab0ee9429070d5cc699a4be3609d5d183de204ae3",
+  "geometry_sha256": "3772dfe0fd24283a6bc14bca2d7d701a3d3f87b07660cea4845a712b4b77272d",
+  "radar_snapshot_sha256": "569d0452e00920b5f8ba6aee064a1e9b4c6b1de310c9a517cfff175cb031522c",
+  "era5_snapshot_sha256": "e0a13697f81e74f13f25f9bf971c61baa007b31dfcf161f8ba9578ca2498baeb",
+  "target_bounds": [
+    -23.5,
+    -22.256756756756708,
+    -44.0,
+    -42.504504504504446
+  ],
+  "purge_interval": "[boundary-48h, boundary+48h) by default; matches phase15",
+  "units_policy": "recorded from source metadata; no conversion or physical range validation"
+}

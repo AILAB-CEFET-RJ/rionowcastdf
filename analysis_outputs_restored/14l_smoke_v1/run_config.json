@@ -1,0 +1,36 @@
+{
+  "version": "14l-technical-smoke-v1",
+  "args": {
+    "pairing_dir": "analysis_outputs_restored/14k_pairing_v2",
+    "radar_cache_dir": "data/radar_intermediate_14j_v1",
+    "output_dir": "analysis_outputs_restored/14l_smoke_v1",
+    "allow_provisional": false,
+    "max_timestamps": 8,
+    "steps": 20,
+    "batch_size": 4,
+    "device": "cpu",
+    "seed": 42
+  },
+  "channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "code_sha256": "7b2cde62c6f05b29c027623044f98bcec906bfb61ec8e998580708649025aede",
+  "contract_code_sha256": "6005678ae29161d13ed23eed537b54e87fee7ca28a1704e895d617b00adc8f70",
+  "pair_manifest_sha256": "d282ac96c202ffd2f893f48bafa071583228696e7006be72b146e53e8c70984a",
+  "geometry_sha256": "3772dfe0fd24283a6bc14bca2d7d701a3d3f87b07660cea4845a712b4b77272d",
+  "input_interpolation": "bilinear on lat/lon rectilinear axes; no extrapolation",
+  "target_scaling": "diagnostic dBZ/50; not precipitation, not log1p production transform",
+  "mask_semantics": "opaque exact palette support only; NOT certified observational validity",
+  "cache_provisional": false
+}

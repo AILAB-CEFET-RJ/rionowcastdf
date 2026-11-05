@@ -174,3 +174,14 @@ cython_debug/
 /analysis_outputs_restored/**/paired_manifest.csv
 /analysis_outputs_restored/**/*.npz
 /analysis_outputs_restored/**/*.pt
+
+# Generated radar cache/policy artifacts (14j--14n)
+/analysis_outputs_restored/**/policy_manifest.csv.gz
+/analysis_outputs_restored/**/files.csv.gz
+/analysis_outputs_restored/**/targets/
+/analysis_outputs_restored/**/review_bundle.zip
+/analysis_outputs_restored/**/smoke_tensors.npz
+/analysis_outputs_restored/**/diagnostic_model_state.pt
+/logs/
+*.pyc
+*:Zone.Identifier

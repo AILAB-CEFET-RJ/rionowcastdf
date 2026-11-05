@@ -1,0 +1,25 @@
+{
+  "ambiguous_local_timestamps": 18,
+  "complete": true,
+  "config_sha256": "1c654b87390458128989b2aab0ee9429070d5cc699a4be3609d5d183de204ae3",
+  "counts": {
+    "decode_error": 286,
+    "map_screen_review": 166,
+    "missing_png": 28080,
+    "no_exact_palette_review": 1207,
+    "palette_in_png_not_sampled_in_corrected_grid": 21466,
+    "palette_sampled_observation_validity_unconfirmed": 52005,
+    "transparent_ambiguous": 19526
+  },
+  "dry_rule_documented": false,
+  "era5_values_read": false,
+  "expected_timestamps": 122736,
+  "note": "Complete is inventory completion, not meteorological approval. No observational validity mask has been inferred.",
+  "old_cache_used": false,
+  "processed_timestamps": 122736,
+  "production_ready": false,
+  "source_changes": 0,
+  "temporal_aggregation": "none",
+  "unique_source_objects": 72870,
+  "version": "14j-intermediate-cache-v1"
+}

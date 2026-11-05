@@ -1,0 +1,17 @@
+channel,state,hours,denominator_hours
+tcwv,finite_rectangular_cover,122736,122736
+t2m,finite_rectangular_cover,122736,122736
+u10,finite_rectangular_cover,122736,122736
+v10,finite_rectangular_cover,122736,122736
+t_850,finite_rectangular_cover,122736,122736
+r_850,finite_rectangular_cover,122736,122736
+u_850,finite_rectangular_cover,122736,122736
+v_850,finite_rectangular_cover,122736,122736
+t_500,finite_rectangular_cover,118344,122736
+t_500,incomplete_or_invalid_grid,4392,122736
+r_500,finite_rectangular_cover,118344,122736
+r_500,incomplete_or_invalid_grid,4392,122736
+u_500,finite_rectangular_cover,118344,122736
+u_500,incomplete_or_invalid_grid,4392,122736
+v_500,finite_rectangular_cover,118344,122736
+v_500,incomplete_or_invalid_grid,4392,122736

@@ -1,0 +1,6 @@
+split,hours,era5_complete_12,legacy_palette_candidates,policy_pair_candidates,ambiguous_hours,policy_candidate_percent
+excluded_purge,288,192,146,186,0,64.58333333333333
+test_primary,8664,6504,2745,4433,0,51.1657433056325
+test_stress_ood,8736,6600,1599,2346,0,26.854395604395606
+train,87238,87238,37613,70271,18,80.55090671496366
+validation,17424,17424,8635,13912,0,79.84389348025712

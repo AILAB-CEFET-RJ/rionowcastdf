@@ -1,0 +1,38 @@
+{
+  "version": "14n-producer-policy-v1",
+  "complete": true,
+  "production_ready": false,
+  "no_echo_rule_documented": true,
+  "coverage_state": "provisional_geometric_region",
+  "spatial_validity_confirmed": false,
+  "target_encoding_finalized": false,
+  "corrdiff_native_tested": false,
+  "archive_boundary_utc": "2011-01-17T02:00:00+00:00",
+  "original_hours": 122736,
+  "outside_archive_period_hours": 386,
+  "in_archive_hours": 122350,
+  "unique_objects_processed": 72870,
+  "policy_status_counts": {
+    "valid_echo_and_no_echo": 52005,
+    "excluded_missing_png": 27694,
+    "valid_no_echo_on_sampled_grid": 21466,
+    "valid_transparent_no_echo": 19526,
+    "excluded_no_exact_palette_review": 1207,
+    "excluded_decode_error": 286,
+    "map_review_pending": 166
+  },
+  "policy_pair_candidate_hours": 91148,
+  "policy_train_candidate_hours": 70271,
+  "paired_transparent_hours": 19320,
+  "object_error_hours": 0,
+  "unused_map_review_hashes": [],
+  "artifact_sha256": {
+    "policy_manifest.parquet": "47ec77b752f60eaf5cd619754c18216d04fe85017ac9b8f8cfdd04618cf8d017",
+    "coverage.npz": "06216d64ba11b1f8a155f3e809c6d81951d1840c9a95b0e111097bfd91ba8ca9",
+    "policy_config.json": "ef09c0050cbbd56da2cd44a194f966a54be4b9b7216c93bcba3e4c3af39db1fb"
+  },
+  "temporal_aggregation": "none",
+  "raw_pngs_read": false,
+  "era5_values_read": false,
+  "note": "Producer semantics applied; geometric-only default is a provisional spatial assumption. Zero is a no-echo code, not measured dBZ. Original 14j/14k unchanged."
+}

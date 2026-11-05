@@ -1,0 +1,23 @@
+{
+  "version": "14k-pairing-v1",
+  "complete": true,
+  "files": 336,
+  "error_files": 0,
+  "metrics_rows": 1472832,
+  "channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "production_ready": false,
+  "values_read": true
+}

@@ -1,0 +1,39 @@
+{
+  "version": "14n-policy-smoke-v1",
+  "complete": true,
+  "technical_smoke_passed": true,
+  "production_ready": false,
+  "no_echo_rule_documented": true,
+  "coverage_state": "provisional_geometric_region",
+  "corrdiff_native_tested": false,
+  "selected_train_hours": 8,
+  "patches_attempted": 96,
+  "patches_used": 96,
+  "empty_patches_skipped": 0,
+  "conditioning_shape": [
+    96,
+    12,
+    32,
+    32
+  ],
+  "target_shape": [
+    96,
+    1,
+    32,
+    32
+  ],
+  "support_pixels_with_patch_overlap": 97931,
+  "support_fraction_with_patch_overlap": 0.9962056477864584,
+  "cache_provisional": false,
+  "selected_no_echo_only_hours": 4,
+  "selected_echo_hours": 4,
+  "training": {
+    "steps": 20,
+    "parameters_changed": true,
+    "all_steps_finite": true,
+    "model": "TinyRegressor; not CorrDiff",
+    "initial_batch_loss": 0.017570851370692253,
+    "final_batch_loss": 0.0012289849109947681
+  },
+  "note": "Technical test only. No validation/test used. Zero is a category code. Coverage and final target remain explicit methodological decisions."
+}

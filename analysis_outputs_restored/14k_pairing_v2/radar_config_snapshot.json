@@ -1,0 +1,102 @@
+{
+  "cadence_minutes": 60,
+  "code_sha256": {
+    "alignment_reference.py": "fd0c92b8693db9f257fd0aac2aef7ab5ce05f562f9c5a637653c039762008f41",
+    "build_cache.py": "2198f33e94c643d0aa10c03f5a720b79db2d1aed88416dff6849e3489ac3810a"
+  },
+  "end_utc": "2024-12-31T23:00:00+00:00",
+  "native_classes": {
+    "0": "transparent",
+    "1..7": "opaque exact palette in contract order",
+    "253": "outside geometric grid",
+    "254": "partial alpha",
+    "255": "unrecognized opaque"
+  },
+  "radar_dir": "/home/vsantos/data/radar_sumare",
+  "reference_contract": {
+    "alpha_for_palette": 255,
+    "display_range_km": 138.9,
+    "dry_rule": null,
+    "earth_radius_m": 6371008.8,
+    "filename_timezone": "America/Sao_Paulo",
+    "geometric_circle_is_observation_mask": false,
+    "grid_degree_step": 0.018018018018018018,
+    "lat_range": [
+      -23.5,
+      -22.25
+    ],
+    "legacy_repo_commit": "554c019356481832a62d7d0d46d3d07df1bc29fe",
+    "lon_range": [
+      -44.0,
+      -42.5
+    ],
+    "map_screen_fraction": 0.01,
+    "map_screen_is_proof": false,
+    "map_screen_rgb": [
+      242,
+      239,
+      233
+    ],
+    "palette_dbz": [
+      50,
+      45,
+      40,
+      35,
+      30,
+      25,
+      20
+    ],
+    "palette_rgb": [
+      [
+        197,
+        0,
+        197
+      ],
+      [
+        227,
+        6,
+        5
+      ],
+      [
+        255,
+        112,
+        0
+      ],
+      [
+        195,
+        230,
+        0
+      ],
+      [
+        4,
+        85,
+        4
+      ],
+      [
+        19,
+        122,
+        19
+      ],
+      [
+        0,
+        167,
+        12
+      ]
+    ],
+    "production_ready": false,
+    "projection": "spherical AEQD, radar centred, north up, east right",
+    "radar_latitude": -22.955139,
+    "radar_longitude": -43.248278,
+    "reference_commit": "65201b6787bb26997da5bc2145807d1a8fd4be33",
+    "reference_config": "configs/radar_sumare_historical_audited_v1.json",
+    "reference_repo": "AILAB-CEFET-RJ/rionowcast-radar-stations",
+    "sampling": "nearest native source pixel; numpy.rint; no spatial/temporal averaging",
+    "source_height": 654,
+    "source_width": 656,
+    "version": "14i-alignment-pilot-v1"
+  },
+  "semantic_policy": "unresolved; no dry fill; no observation validity inferred",
+  "source_layout": "YYYY/MM/DD/YYYY_MM_DD_HH_MM.png",
+  "start_utc": "2011-01-01T00:00:00+00:00",
+  "version": "14j-intermediate-cache-v1"
+}

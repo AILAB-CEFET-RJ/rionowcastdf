@@ -1,0 +1,6 @@
+split,hours,era5_complete_12,era5_technical_candidates,palette_pair_candidates,ambiguous_local_hours
+excluded_purge,288,192,192,146,0
+test_primary,8664,6504,6504,2745,0
+test_stress_ood,8736,6600,6600,1599,0
+train,87624,87624,87624,37613,18
+validation,17424,17424,17424,8635,0
