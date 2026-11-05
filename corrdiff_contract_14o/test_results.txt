@@ -1,0 +1,11 @@
+test_corrupt_shard_refused (test_contract.ContractTests.test_corrupt_shard_refused) ... ok
+test_full_prepare_train_only_stats_and_loader (test_contract.ContractTests.test_full_prepare_train_only_stats_and_loader) ... ok
+test_masked_loss_and_residual_unknown_invariance (test_contract.ContractTests.test_masked_loss_and_residual_unknown_invariance) ... ok
+test_numeric_decode_and_stats (test_contract.ContractTests.test_numeric_decode_and_stats) ... ok
+test_pilot_never_uses_validation (test_contract.ContractTests.test_pilot_never_uses_validation) ... ok
+test_resume_integrity_and_changed_source (test_contract.ContractTests.test_resume_integrity_and_changed_source) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.589s
+
+OK
