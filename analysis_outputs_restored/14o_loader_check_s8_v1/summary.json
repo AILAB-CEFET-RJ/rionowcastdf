@@ -1,0 +1,10 @@
+{
+  "complete": true,
+  "loader_check_passed": true,
+  "sampled_train_patches": 48,
+  "supported_pixel_occurrences": 48999,
+  "echo_pixel_occurrences": 477,
+  "production_ready": false,
+  "corrdiff_native_tested": false,
+  "pilot_only": false
+}
