@@ -1,7 +1,15 @@
 {
-  "version": "14o-spatial-numeric-contract-v1",
+  "version": "14o-spatial-numeric-contract-v2",
   "product": "displayed_reflectivity_classes_with_no_echo_code",
-  "source_palette_dbz": [20, 25, 30, 35, 40, 45, 50],
+  "source_palette_dbz": [
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50
+  ],
   "no_echo_code": 0,
   "no_echo_meaning": "producer-confirmed absence of detectable return in valid observed region; not measured 0 dBZ or zero surface rain",
   "unknown": "NaN in scientific target; false in observation_mask; zero only as masked tensor placeholder",
@@ -10,17 +18,20 @@
   "categorical_output": "nearest code in [0,20,25,30,35,40,45,50]; ties choose lower code; for derived display only",
   "input_normalization": "per-channel population mean/std over each eligible unique training hour and each grid point once, before overlapping patches",
   "spatial_reference": "inherit exact 14j geometry and checksums through 14n; no new georeferencing",
-  "grid_shape": [70, 84],
+  "grid_shape": [
+    70,
+    84
+  ],
   "radar_resampling": "existing nearest native pixel; no averaging or max pooling",
   "era5_resampling": "bilinear interpolation on latitude/longitude; no extrapolation",
   "coverage": "inherit 14n observed_region_mask and its provisional or reviewed status",
   "patch_size": 32,
-  "patch_stride": 16,
-  "patch_edges": "regular starts only; final 6 rows and 4 columns not covered; no padding",
+  "patch_stride": 8,
+  "patch_edges": "append final start at height-size and width-size; full geometric coverage without padding",
   "patch_selection": "all patches with at least one supported pixel; no echo-based oversampling",
   "temporal_aggregation": "none; exact UTC hour paired with local radar filename using historical America/Sao_Paulo offsets",
   "map_policy": "inherit hash-specific 14n reviews; pending maps remain excluded",
-  "normalization_floor": 1e-8,
+  "normalization_floor": 1e-08,
   "native_loss": "mean over supported pixels per batch; no NaN arithmetic; residual and noise zero outside support",
   "production_ready": false
 }

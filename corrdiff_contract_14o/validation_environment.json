@@ -10,5 +10,5 @@
     "pytz": "2026.5"
   },
   "native_models_executed": false,
-  "tests": "six synthetic contract/integration tests passed"
+  "tests": "eight contract tests passed; stride 8, full geometric coverage and immutable reindex verified"
 }

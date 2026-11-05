@@ -114,7 +114,16 @@ def stats_merge(count,mean,m2,fields):
     delta=mu-mean;total=count+n
     return total,mean+delta*n/total,m2+v+delta**2*count*n/total
 
+def patch_starts(length,size,stride):
+    if size<=0 or stride<=0 or size>length or stride>size:raise ValueError("Invalid patch geometry")
+    starts=list(range(0,length-size+1,stride))
+    if starts[-1]!=length-size:starts.append(length-size)
+    return starts
+
 def finish(out,selected,contract):
+    ys=patch_starts(70,32,contract["patch_stride"])
+    xs=patch_starts(84,32,contract["patch_stride"])
+    per_hour=len(ys)*len(xs)
     count=0;mean=np.zeros(12);m2=np.zeros(12);patches=[];hour_records=[]
     sources={}
     for key,group in selected.groupby('month_key',sort=True):
@@ -128,8 +137,8 @@ def finish(out,selected,contract):
             if row.split=='train': count,mean,m2=stats_merge(count,mean,m2,x[i])
             stamp=row.timestamp_utc.isoformat()
             hour_records.append({'timestamp_utc':stamp,'split':row.split,'shard':key,'hour_index':i})
-            for iy in range(0,70-32+1,16):
-                for ix in range(0,84-32+1,16):
+            for iy in ys:
+                for ix in xs:
                     mask=m[i,iy:iy+32,ix:ix+32];n=int(mask.sum())
                     if n:
                         patches.append({'timestamp_utc':stamp,'split':row.split,'shard':key,'hour_index':i,
@@ -153,7 +162,8 @@ def finish(out,selected,contract):
       'target_encoding_finalized':True,'coverage_state':contract['coverage_state'],
       'spatial_validity_confirmed':contract['spatial_validity_confirmed'],'corrdiff_native_tested':False,
       'pilot_only':contract['pilot_hours']>0,'selected_hours':len(selected),'split_hours':selected.split.value_counts().to_dict(),
-      'patches':len(pdf),'patches_attempted':len(selected)*12,'empty_patches_skipped':len(selected)*12-len(pdf),
+      'patches':len(pdf),'patches_attempted':len(selected)*per_hour,'empty_patches_skipped':len(selected)*per_hour-len(pdf),
+      'patch_stride':contract['patch_stride'],'patches_per_hour_max':per_hour,'geometric_grid_coverage_fraction':1.0,
       'fully_supported_patches':int(pdf.fully_supported.sum()),'train_normalization_pixels_per_channel':count,
       'artifact_sha256':{n:digest(out/n) for n in names},
       'note':'Eligible hours are technical candidates under the inherited coverage assumption; no scientific approval inferred.'})

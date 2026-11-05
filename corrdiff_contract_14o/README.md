@@ -1,4 +1,4 @@
-# 14o — contrato espacial e numérico e preparação para os modelos nativos
+# 14o — contrato espacial e numérico — revisão passo 8
 
 Esta entrega usa o snapshot **14n** como fonte dos alvos. Não reconstrói os PNGs,
 não altera 14j/14k/14n e não aplica conversão Z–R para chuva. A auditoria 14m pode
@@ -55,10 +55,12 @@ do radar. Não aplicar essa quantização às métricas contínuas sem identific
    hipótese. Estar dentro da geometria não certifica observação física de todos
    os pixels. A resposta do produtor sobre alfa zero resolve a semântica em
    região observada; não desenha por si só os limites dessa região.
-7. Patches de 32×32, passo 16: inícios de linha 0,16,32 e de coluna 0,16,32,48.
-   São até 12 por hora, sem preenchimento artificial nas bordas. As últimas
-   seis linhas e quatro colunas não entram nos patches; são preservadas nos
-   campos horários. A estatística ERA5 usa a grade inteira, antes dos patches.
+7. Patches de 32×32, passo nominal 8, incluindo bordas: inícios de linha
+   0,8,16,24,32,38 e de coluna 0,8,16,24,32,40,48,52. São até 48 patches
+   por hora e cobertura geométrica completa de 70×84, sem padding. O último
+   deslocamento é menor que 8 para alinhar a borda. Isso não certifica validade
+   observacional: a máscara permanece obrigatória. A estatística ERA5 usa cada
+   ponto da grade inteira uma vez por hora, antes dos patches.
 8. Cada patch com ao menos um pixel suportado entra no índice. Não se descarta
    patch sem eco nem se faz oversampling de chuva. `fully_supported` permite
    comparar apenas patches integralmente suportados.
@@ -123,9 +125,9 @@ alterar o ambiente usado para preparar os dados.
 ```bash
 nohup python -u corrdiff_contract_14o/prepare.py \
   --policy-dir analysis_outputs_restored/14n_policy_v1 \
-  --output-dir data/corrdiff_14o_pilot_v1 \
+  --output-dir data/corrdiff_14o_pilot_s8_v1 \
   --pilot-hours 8 \
-  > logs/14o_pilot_v1.log 2>&1 &
+  > logs/14o_pilot_s8_v1.log 2>&1 &
 ```
 
 São até oito horas de treino distribuídas pelo período. Não é amostragem
@@ -136,8 +138,8 @@ Após `complete=true`:
 
 ```bash
 python corrdiff_contract_14o/check_data.py \
-  --data-dir data/corrdiff_14o_pilot_v1 \
-  --output-dir analysis_outputs_restored/14o_loader_pilot_v1
+  --data-dir data/corrdiff_14o_pilot_s8_v1 \
+  --output-dir analysis_outputs_restored/14o_loader_pilot_s8_v1
 ```
 
 ## Depois: preparação completa
@@ -145,8 +147,8 @@ python corrdiff_contract_14o/check_data.py \
 ```bash
 nohup python -u corrdiff_contract_14o/prepare.py \
   --policy-dir analysis_outputs_restored/14n_policy_v1 \
-  --output-dir data/corrdiff_14o_v1 \
-  > logs/14o_prepare_v1.log 2>&1 &
+  --output-dir data/corrdiff_14o_s8_v1 \
+  > logs/14o_prepare_s8_v1.log 2>&1 &
 ```
 
 Não rodar piloto e preparação completa simultaneamente se disputarem disco.
@@ -157,7 +159,7 @@ nova execução. Não apague o snapshot para resolver esse aviso.
 Com os totais que você enviou, esperamos **90.962 horas**, excluindo as 186
 candidatas da faixa de purga: treino 70.271; validação 13.912; teste principal
 4.433; teste OOD 2.346. O programa calcula os totais reais, sem fixá-los no código.
-São até 1.091.544 patches; patches sem nenhum suporte são omitidos.
+São até 4.366.176 patches; patches sem nenhum suporte são omitidos.
 
 Os campos principais ocupariam aproximadamente **28,35 GB decimais** para
 90.962 horas (12 canais float32, alvo float32, máscara bool, grade 70×84), além
@@ -197,13 +199,13 @@ Em um ambiente que já tenha essa API PhysicsNeMo disponível:
 
 ```bash
 python -u corrdiff_contract_14o/native_smoke.py \
-  --data-dir data/corrdiff_14o_pilot_v1 \
-  --output-dir analysis_outputs_restored/14o_native_pilot_v1 \
+  --data-dir data/corrdiff_14o_pilot_s8_v1 \
+  --output-dir analysis_outputs_restored/14o_native_pilot_s8_v1 \
   --device cpu --steps 20 --batch-size 2
 ```
 
 Esse comando pode ser usado com `nohup` e redirecionamento para
-`logs/14o_native_pilot_v1.log`. CPU é o padrão por causa do aviso CUDA anterior.
+`logs/14o_native_pilot_s8_v1.log`. CPU é o padrão por causa do aviso CUDA anterior.
 Se o import nativo falhar, envie o erro e a versão/checkout instalado; não
 instale a versão mais recente sobre o ambiente de produção às cegas. Uma
 execução opcional com `--fully-supported-only` isola a compatibilidade dos
@@ -219,15 +221,15 @@ e avaliação da geração ainda não estão certificados.
 
 Depois do piloto, envie:
 
-1. `data/corrdiff_14o_pilot_v1/summary.json`;
-2. `analysis_outputs_restored/14o_loader_pilot_v1/summary.json`;
+1. `data/corrdiff_14o_pilot_s8_v1/summary.json`;
+2. `analysis_outputs_restored/14o_loader_pilot_s8_v1/summary.json`;
 3. relatório ou traceback do teste nativo, se executado.
 
 Depois do build completo, envie:
 
-1. `data/corrdiff_14o_v1/summary.json`;
-2. `data/corrdiff_14o_v1/normalization.json`;
-3. `data/corrdiff_14o_v1/patch_summary.csv`.
+1. `data/corrdiff_14o_s8_v1/summary.json`;
+2. `data/corrdiff_14o_s8_v1/normalization.json`;
+3. `data/corrdiff_14o_s8_v1/patch_summary.csv`.
 
 Não envie os `.npy`, SQLite ou Parquets grandes ao GitHub. Preserve os relatórios
 pequenos em uma pasta de análises versionável. Para evitar repetir o bloqueio
@@ -240,3 +242,61 @@ de push, acrescente ao `.gitignore` (sem excluir arquivos do disco):
 
 Arquivos já rastreados não deixam de ser rastreados apenas com `.gitignore`.
 Esta entrega não reescreve histórico Git nem remove as auditorias anteriores.
+
+## Atualização de uma execução anterior com passo 16
+
+Se o build anterior ainda estiver rodando, deixe-o terminar e não substitua os
+scripts durante a execução. Os campos horários completos continuam utilizáveis.
+Não use `--resume` com o código novo sobre um build criado com o código antigo:
+o contrato imutável foi alterado.
+
+Depois que o build antigo terminar, extraia esta revisão e crie um novo índice:
+
+```bash
+nohup python -u corrdiff_contract_14o/reindex.py \
+  --prepared-dir data/corrdiff_14o_v1 \
+  --output-dir data/corrdiff_14o_s8_v1 \
+  > logs/14o_reindex_s8_v1.log 2>&1 &
+```
+
+Ajuste `--prepared-dir` se o diretório anterior tiver outro nome. Para o piloto,
+use os respectivos caminhos de piloto. Execute **ou** a reindexação de um build
+concluído **ou** a preparação nova; não ambos para o mesmo destino.
+
+A reindexação não acessa PNGs ou os Parquets ERA5 originais: verifica os shards
+preparados, refaz o índice e recalcula as mesmas estatísticas de treino, exigindo
+igualdade com a normalização anterior. Portanto ainda há leitura de disco.
+Os shards são referenciados por links simbólicos: **mantenha o diretório antigo**.
+O destino reindexado depende dele e não deve ser copiado sozinho para outra máquina.
+Não há duplicação física dos campos mensais. Se interrompida a reindexação, use
+outro diretório novo para repetir; ela não possui retomada própria.
+
+O loader lê as coordenadas do índice e aceita os novos recortes sem alterar
+as dimensões dos tensores. A quantidade de recortes quadruplica em relação aos
+12 da versão original, mas não a quantidade de observações independentes.
+O índice Parquet e a RAM usados para construí-lo aumentam; os campos mensais
+continuam com o mesmo tamanho. O limite DuckDB de 1 GB não limita a RAM do índice.
+
+## Zarr e reavaliação das fases 0–14
+
+Esta revisão continua produzindo NumPy + Parquet, não Zarr. Não execute scripts
+que esperam Zarr diretamente nessa estrutura. A exportação com o esquema exato
+esperado pelas auditorias anteriores e a adaptação de suas suposições numéricas
+são etapas distintas, ainda não incluídas aqui.
+
+As auditorias aplicáveis ao dataset final devem ser reexecutadas em nova pasta
+versionada. Mudaram os horários pareados, a geometria, as máscaras, a semântica
+de sem eco, os candidatos e a codificação do alvo. Relatórios anteriores não
+certificam a nova versão. Preserve-os como histórico de diagnóstico.
+
+Antes da reexecução, verificar nos scripts: ausência de inversão `expm1` do
+antigo alvo log1p; limiares meteorológicos aplicados a `target_code` ou a 50 vezes
+o tensor normalizado; exclusão dos pixels mascarados; normalização ajustada
+somente no treino; splits e purga preservados; estatísticas por hora/pixel único
+separadas das estatísticas ponderadas pelos patches sobrepostos.
+
+As avaliações espaciais devem recompor a grade e combinar previsões
+sobrepostas, usando uma contagem de contribuições por pixel. Não interpretar
+cada ocorrência repetida de um pixel nos patches como observação independente.
+O passo 8 dá cobertura completa, mas não resolve o contexto espacial do patch:
+32×32 continua sendo uma escolha de baseline a verificar na validação.

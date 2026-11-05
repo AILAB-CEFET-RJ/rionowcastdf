@@ -1,6 +1,6 @@
 # Validação desta entrega
 
-Foram executados seis testes sintéticos ponta a ponta, com SQLite, Parquet e
+Foram executados oito testes sintéticos ponta a ponta, com SQLite, Parquet e
 alvos NPZ, cobrindo:
 
 1. Preparação mensal, estatísticas somente de treino e leitura dos patches.
@@ -31,3 +31,6 @@ aqui; PhysicsNeMo não está instalado. Não há alegação de treino CorrDiff
 validado, geração validada ou qualidade preditiva demonstrada.
 
 Nenhum arquivo de 14j, 14k ou 14n foi modificado por esta entrega.
+
+7. Passo 8 com bordas: 48 recortes e todos os 5.880 pontos cobertos.
+8. Reindexação preservando os campos e a normalização, com leitura pelo loader.

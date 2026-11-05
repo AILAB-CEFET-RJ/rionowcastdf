@@ -72,16 +72,16 @@ class ContractTests(unittest.TestCase):
     def test_full_prepare_train_only_stats_and_loader(self):
         with tempfile.TemporaryDirectory() as td:
             a=fixture(Path(td));self.run_quiet(a);out=Path(a.output_dir)
-            s=json.loads((out/'summary.json').read_text());self.assertEqual(s['patches'],36)
+            s=json.loads((out/'summary.json').read_text());self.assertEqual(s['patches'],144)
             stats=json.loads((out/'normalization.json').read_text())
             self.assertEqual(stats['count_per_channel'],2*70*84)
             self.assertAlmostEqual(stats['mean'][0],5+(-23.5-22.3)/2,places=5)
-            ds=RadarDataset(out);self.assertEqual(len(ds),24)
-            b=ds[12];self.assertEqual(tuple(b['conditioning'].shape),(12,32,32))
+            ds=RadarDataset(out);self.assertEqual(len(ds),96)
+            b=ds[48];self.assertEqual(tuple(b['conditioning'].shape),(12,32,32))
             self.assertFalse(b['mask'][0,0,0]);self.assertEqual(b['target'][0,0,0],0)
             self.assertEqual(int((b['target']>0).sum()),12*12)
-            self.assertEqual(len(RadarDataset(out,fully_supported=True)),23)
-            self.assertEqual(len(RadarDataset(out,'validation')),12)
+            self.assertEqual(len(RadarDataset(out,fully_supported=True)),95)
+            self.assertEqual(len(RadarDataset(out,'validation')),48)
             self.assertFalse(s['production_ready']);self.assertFalse(s['corrdiff_native_tested'])
 
     def test_resume_integrity_and_changed_source(self):
@@ -119,6 +119,28 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(r[0,0,0,1],0);self.assertEqual(n[0,0,0,1],0)
         self.assertTrue(torch.isfinite(n).all())
         with self.assertRaises(ValueError):masked_mse(pred,y,torch.zeros_like(m))
+
+    def test_stride8_full_coverage(self):
+        ys=p.patch_starts(70,32,8);xs=p.patch_starts(84,32,8)
+        self.assertEqual(ys,[0,8,16,24,32,38])
+        self.assertEqual(xs,[0,8,16,24,32,40,48,52])
+        cover=np.zeros((70,84),int)
+        for y in ys:
+            for x in xs:cover[y:y+32,x:x+32]+=1
+        self.assertTrue((cover>0).all());self.assertEqual(len(ys)*len(xs),48)
+
+    def test_reindex_preserves_fields_and_normalization(self):
+        import reindex
+        with tempfile.TemporaryDirectory() as td:
+            a=fixture(Path(td));self.run_quiet(a);source=Path(a.output_dir)
+            h=digest(source/'shards/2011-01/conditioning.npy')
+            out=Path(td)/'reindexed'
+            with contextlib.redirect_stdout(io.StringIO()):
+                reindex.run(argparse.Namespace(prepared_dir=str(source),output_dir=str(out)))
+            self.assertEqual(digest(out/'normalization.json'),digest(source/'normalization.json'))
+            self.assertEqual(h,digest(out/'shards/2011-01/conditioning.npy'))
+            self.assertTrue((out/'shards').is_symlink())
+            self.assertEqual(len(RadarDataset(out)),96)
 
     def test_numeric_decode_and_stats(self):
         np.testing.assert_array_equal(nearest_category([-2,0,9,10,11,20,22.5,51]),[0,0,0,0,20,20,20,50])
