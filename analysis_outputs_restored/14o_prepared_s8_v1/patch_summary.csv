@@ -1,0 +1,5 @@
+split,patches,fully_supported,supported_pixel_occurrences,echo_pixel_occurrences
+test_primary,212784,165892,216799195,3511486
+test_stress_ood,112608,86719,115023357,1433738
+train,3373008,2737431,3440670063,44012473
+validation,667776,537912,680956077,9072632
