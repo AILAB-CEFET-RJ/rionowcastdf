@@ -1,14 +1,14 @@
 {
-  "encountered_pngs": 2585000,
+  "encountered_pngs": 2912000,
   "reused_by_stat": 0,
-  "decoded_unique_this_run": 1887016,
-  "reused_by_hash": 697984,
+  "decoded_unique_this_run": 2160560,
+  "reused_by_hash": 751440,
   "source_changes_this_run": 0,
   "skipped_symlinks": 0,
   "traversal_errors": 0,
   "complete": false,
   "version": "14m-full-png-audit-v1",
   "run": "20261103T214056Z_14e9f81a",
-  "elapsed_seconds": 145648.94,
-  "files_per_second": 17.75
+  "elapsed_seconds": 167685.43,
+  "files_per_second": 17.37
 }
