@@ -1,0 +1,17 @@
+{
+  "version": "14p-temporal-policy-v1",
+  "complete": true,
+  "temporal_rule_finalized": true,
+  "selected_hours": 99098,
+  "production_ready": false,
+  "zarr_created": false,
+  "cache_modified": false,
+  "artifact_sha256": {
+    "required_sources.csv": "992a7f841f060a26833eaa94a2249034daf7293a7bea999c12d5446a63be83bd",
+    "selected_counts.csv": "8d94b675a61a996f73d8183477a82d800fa17b598dd81e4cf7a1ce23126b4f7a",
+    "temporal_contract.json": "59ee685441c915d3170a69f620424399c539634ce9108cae5bd2c39fb5e4af7e",
+    "selected_manifest.parquet": "3364f3ead925675ebd0ee4ff354907df9495d8962b83969a745c3c8e315e32a9",
+    "additional_sources_to_decode.csv": "5f3c3f361fc1656660a3db9ac9c966a83db350ec5e8f4d8101e11190da6fb0fa",
+    "cache_reference.json": "6d0c848fd69a9345e1eaa3ab1910763ee7c076861aeb7b45857325a1700d34cb"
+  }
+}

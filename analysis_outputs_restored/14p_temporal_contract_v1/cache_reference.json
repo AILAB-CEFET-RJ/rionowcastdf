@@ -1,0 +1,5 @@
+{
+  "path": "/home/vsantos/repositories/rionowcastdf/data/radar_intermediate_14j_v1",
+  "summary_sha256": "49fa63f2241c70a5c819c40db31c6f18026429ca4fa1e49f042404aa0af35bed",
+  "note": "Index match by content hash only; loader must validate decoded object bytes."
+}
