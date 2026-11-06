@@ -1,0 +1,86 @@
+{
+  "version": "14m-full-png-audit-v1",
+  "radar_dir": "/home/vsantos/data/radar_sumare",
+  "script_sha256": "8e271fbc354fabda5b166e5e30ec7342e1a2d7671b04f8b74e42c835205b4b3c",
+  "numpy_version": "2.5.2",
+  "pillow_version": "12.3.0",
+  "palette_rgb_dbz": [
+    [
+      [
+        197,
+        0,
+        197
+      ],
+      50
+    ],
+    [
+      [
+        227,
+        6,
+        5
+      ],
+      45
+    ],
+    [
+      [
+        255,
+        112,
+        0
+      ],
+      40
+    ],
+    [
+      [
+        195,
+        230,
+        0
+      ],
+      35
+    ],
+    [
+      [
+        4,
+        85,
+        4
+      ],
+      30
+    ],
+    [
+      [
+        19,
+        122,
+        19
+      ],
+      25
+    ],
+    [
+      [
+        0,
+        167,
+        12
+      ],
+      20
+    ]
+  ],
+  "expected_width": 656,
+  "expected_height": 654,
+  "reference": {
+    "center_lat": -22.955139,
+    "center_lon": -43.248278,
+    "range_m": 138900,
+    "earth_radius_m": 6371008.8,
+    "projection": "spherical AEQD",
+    "grid_shape": [
+      70,
+      84
+    ],
+    "validity": "reference geometry only; not observational validity"
+  },
+  "options": {
+    "cadence_minutes": 2,
+    "samples_per_group": 2,
+    "max_samples": 160,
+    "sample_budget_mib": 96,
+    "max_file_mib": 64
+  }
+}

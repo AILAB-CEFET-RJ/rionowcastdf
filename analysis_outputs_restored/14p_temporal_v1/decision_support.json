@@ -1,0 +1,12 @@
+{
+  "train_paired_hours": {
+    "exact": 70271,
+    "nearest2": 75319,
+    "nearest5": 75724
+  },
+  "selection_scope": "train only; other splits availability reporting only",
+  "nearest2_additional_train_hours": 5048,
+  "nearest5_additional_train_hours": 5453,
+  "decision": "pending explicit freeze",
+  "no_target_averaging": true
+}
