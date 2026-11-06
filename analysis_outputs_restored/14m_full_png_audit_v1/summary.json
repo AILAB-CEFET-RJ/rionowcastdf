@@ -1,6 +1,33 @@
 {
   "version": "14m-full-png-audit-v1",
-  "complete": false,
+  "complete": true,
+  "scan_finished": true,
+  "production_ready": false,
+  "dry_rule_documented": false,
+  "observational_validity_inferred": false,
+  "root": "/home/vsantos/data/radar_sumare",
   "run": "20261103T214056Z_14e9f81a",
-  "stage": "scan"
+  "counts": {
+    "decode_error": 7722,
+    "map_screen_review": 6149,
+    "no_exact_palette_review": 38414,
+    "palette_in_png_not_sampled_in_corrected_grid": 687993,
+    "palette_sampled_observation_validity_unconfirmed": 1697789,
+    "transparent_ambiguous": 621744
+  },
+  "processed_files": 3059811,
+  "encountered_pngs": 3059811,
+  "reused_by_stat": 0,
+  "decoded_unique_this_run": 2294693,
+  "reused_by_hash": 765118,
+  "source_changes_this_run": 0,
+  "skipped_symlinks": 0,
+  "traversal_errors": 0,
+  "unique_file_hashes": 2294693,
+  "temporal_runs": 895550,
+  "observed_gaps": 28197,
+  "samples": 125,
+  "sample_bytes": 2937966,
+  "review_directory": "review/20261103T214056Z_14e9f81a",
+  "note": "Complete means traversal finished without inaccessible directories or skipped symlinks. Per-file errors remain in counts. No hourly subsampling. All PNG suffixes are considered. The root must be quiescent for a consistent census."
 }

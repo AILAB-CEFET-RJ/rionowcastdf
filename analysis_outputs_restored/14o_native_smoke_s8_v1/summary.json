@@ -1,0 +1,67 @@
+{
+  "version": "14o-native-smoke-v1",
+  "complete": true,
+  "technical_smoke_passed": true,
+  "corrdiff_native_tested": true,
+  "stock_training_entrypoint_tested": false,
+  "generation_tested": false,
+  "production_ready": false,
+  "coverage_state": "provisional_geometric_region",
+  "selected_train_patches": 48,
+  "fully_supported_only": false,
+  "stages": {
+    "regression": {
+      "losses": [
+        0.0005322246579453349,
+        0.0016851502005010843,
+        0.00010026499512605369,
+        3.02019871014636e-05,
+        1.9502280338201672e-05,
+        8.129864727379754e-05,
+        0.003604232333600521,
+        2.7298956410959363e-05,
+        0.00010874365398194641,
+        3.789558832067996e-05,
+        0.0004715995746664703,
+        7.647136953892186e-06,
+        0.00037770948256365955,
+        4.322455424699001e-05,
+        0.00033239531330764294,
+        3.382106660865247e-05,
+        7.042138349788729e-06,
+        0.021122058853507042,
+        0.00019662643899209797,
+        0.004834386985749006
+      ],
+      "all_steps_finite": true,
+      "parameters_changed": true
+    },
+    "diffusion": {
+      "losses": [
+        0.519747257232666,
+        0.9697341918945312,
+        0.5788750648498535,
+        0.7734990119934082,
+        0.5298097729682922,
+        0.6902353167533875,
+        0.13741618394851685,
+        0.7400112152099609,
+        0.6966261863708496,
+        0.42156675457954407,
+        0.5267086625099182,
+        0.45653989911079407,
+        0.3988216817378998,
+        0.14548204839229584,
+        0.3928813934326172,
+        0.3151519298553467,
+        0.770147442817688,
+        0.5147145390510559,
+        0.5979729890823364,
+        0.952859103679657
+      ],
+      "all_steps_finite": true,
+      "parameters_changed": true
+    }
+  },
+  "note": "Native models with a small architecture and custom masked loop; no validation/test, no skill claim, no sampler validation."
+}

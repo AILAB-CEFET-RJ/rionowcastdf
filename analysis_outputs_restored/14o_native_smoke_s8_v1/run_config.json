@@ -1,0 +1,22 @@
+{
+  "args": {
+    "data_dir": "data/corrdiff_14o_s8_v1",
+    "output_dir": "analysis_outputs_restored/14o_native_smoke_s8_v1",
+    "device": "cpu",
+    "steps": 20,
+    "batch_size": 2,
+    "max_patches": 48,
+    "seed": 2026,
+    "cpu_threads": 2,
+    "lr": 0.0001,
+    "sigma_data": 0.5,
+    "fully_supported_only": false
+  },
+  "upstream_inspected_commit": "42fa19c3fa4c80d76a621b2454511326cde8a177",
+  "torch_version": "2.13.0+cu129",
+  "model_module": "physicsnemo.models.diffusion_unets.unet",
+  "prepared_summary_sha256": "d4d239aeb01fe049aaf64863cd8e653805c5b506b8d7c31111f6c112e8869f78",
+  "adapter_loop": true,
+  "conditioning_channels": "12 ERA5 + 2 static coordinates + 1 support mask",
+  "sigma_data": "explicit smoke hyperparameter, not a fitted residual statistic"
+}
