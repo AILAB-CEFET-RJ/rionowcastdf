@@ -1,0 +1,16 @@
+{
+  "README_ZARR_REFERENCIA.md": "0e79cd23b9e27b13afa2c453ab5b6e59f2ab1b4db43f9f478670a6496ed18984",
+  "VALIDACAO_ZARR_REFERENCIA.md": "671d1a199cfccaae7dbf564884276a01497a479d0a36cb317427f24694205c8d",
+  "configs/corrdiff_reference_zarr.json": "7d754b186557b4be68ea2492e5867878d2cf9f35afe1da29ccb5db6928781394",
+  "reference_builder_existing.patch": "e8e111155a53fca9690a79e8cda48c36013d286f4446808b59e7934a889ff145",
+  "requirements_reference_zarr.txt": "13e8e809136019bf9f46047d56c6c24552198e428765cc64c5c7197f172a8a72",
+  "src/corrdiff/builder/contract_cache.py": "f1f269a1b75cae9f04cbf177c9208df7485929dd254088108fb57b4b5161f128",
+  "src/corrdiff/builder/contract_common.py": "2de4ff4a6fb069cad0c1987582959d5aca54b31094729dcdd18e2378153565de",
+  "src/corrdiff/builder/contract_dataset.py": "23b5cd0e0bbbf9614d677754284c2fa2b4cdd91d45217e63ecacb02d60a92857",
+  "src/corrdiff/builder/contract_era5.py": "db3dc24d363eeca2d4e792f8e58e294d8bd9a305c6abf044228a18135f834588",
+  "src/corrdiff/builder/contract_zarr.py": "ed5529c80e54f879ee0f5a40841c33ad84d3becf61cbcebeca90a91cff8abb7b",
+  "src/corrdiff/builder/dataset_builder.py": "3e7b45ac0b43b02b9a4998022d6a03b3807f72ecc65c88e7fe102c357ec824ba",
+  "src/corrdiff/builder/radar_cache_builder.py": "f9369ddb9dea583e844406d27a0706cb8667098faa4127d805343f56986c6c26",
+  "src/corrdiff/builder/reference_geometry.py": "fd0c92b8693db9f257fd0aac2aef7ab5ce05f562f9c5a637653c039762008f41",
+  "tests/test_reference_zarr.py": "7b90459eb4e67307e68b5063a4fd61cb1373166b6c124c8ec6315a5bf5c7a626"
+}

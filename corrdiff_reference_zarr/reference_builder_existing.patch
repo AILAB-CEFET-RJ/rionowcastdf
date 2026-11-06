@@ -1,0 +1,50 @@
+diff --git a/src/corrdiff/builder/dataset_builder.py b/src/corrdiff/builder/dataset_builder.py
+index 4e03393..704fce5 100644
+--- a/src/corrdiff/builder/dataset_builder.py
++++ b/src/corrdiff/builder/dataset_builder.py
+@@ -151,6 +151,16 @@ IMPORTANT ASSUMPTIONS
+ 
+ from __future__ import annotations
+ 
++# Contract mode is dispatched before importing legacy configuration/dependencies.
++import sys as _contract_sys
++if __name__ == "__main__" and any(a == "--contract-config" or a.startswith("--contract-config=") for a in _contract_sys.argv[1:]):
++    from pathlib import Path as _ContractPath
++    _contract_sys.path.insert(0, str(_ContractPath(__file__).resolve().parents[3]))
++    from src.corrdiff.builder.contract_zarr import main as _contract_main
++    _contract_main()
++    raise SystemExit(0)
++
++
+ import argparse
+ from concurrent.futures import ProcessPoolExecutor
+ import multiprocessing as mp
+diff --git a/src/corrdiff/builder/radar_cache_builder.py b/src/corrdiff/builder/radar_cache_builder.py
+index fa9cd0f..087440b 100644
+--- a/src/corrdiff/builder/radar_cache_builder.py
++++ b/src/corrdiff/builder/radar_cache_builder.py
+@@ -19,6 +19,15 @@ Optimized version:
+ - Suitable for multi-million image archives
+ """
+ 
++# Contract mode is dispatched before importing legacy configuration/dependencies.
++import sys as _contract_sys
++if __name__ == "__main__" and any(a == "--contract-config" or a.startswith("--contract-config=") for a in _contract_sys.argv[1:]):
++    from pathlib import Path as _ContractPath
++    _contract_sys.path.insert(0, str(_ContractPath(__file__).resolve().parents[3]))
++    from src.corrdiff.builder.contract_cache import main as _contract_main
++    _contract_main()
++    raise SystemExit(0)
++
+ from pathlib import Path
+ from concurrent.futures import ProcessPoolExecutor
+ import multiprocessing as mp
+@@ -30,7 +39,7 @@ from src.config.paths import (
+     RADAR_CACHE_DIR,
+ )
+ 
+-from src.corrdiff.builder.CorrdiffDatasetBuilder import (
++from src.corrdiff.builder.dataset_builder import (
+     RadarDataset,
+ )
+ 

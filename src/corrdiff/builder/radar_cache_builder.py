@@ -19,6 +19,15 @@ Optimized version:
 - Suitable for multi-million image archives
 """
 
+# Contract mode is dispatched before importing legacy configuration/dependencies.
+import sys as _contract_sys
+if __name__ == "__main__" and any(a == "--contract-config" or a.startswith("--contract-config=") for a in _contract_sys.argv[1:]):
+    from pathlib import Path as _ContractPath
+    _contract_sys.path.insert(0, str(_ContractPath(__file__).resolve().parents[3]))
+    from src.corrdiff.builder.contract_cache import main as _contract_main
+    _contract_main()
+    raise SystemExit(0)
+
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing as mp
@@ -30,7 +39,7 @@ from src.config.paths import (
     RADAR_CACHE_DIR,
 )
 
-from src.corrdiff.builder.CorrdiffDatasetBuilder import (
+from src.corrdiff.builder.dataset_builder import (
     RadarDataset,
 )
 

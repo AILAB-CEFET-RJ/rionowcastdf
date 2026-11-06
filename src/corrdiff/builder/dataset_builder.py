@@ -151,6 +151,16 @@ IMPORTANT ASSUMPTIONS
 
 from __future__ import annotations
 
+# Contract mode is dispatched before importing legacy configuration/dependencies.
+import sys as _contract_sys
+if __name__ == "__main__" and any(a == "--contract-config" or a.startswith("--contract-config=") for a in _contract_sys.argv[1:]):
+    from pathlib import Path as _ContractPath
+    _contract_sys.path.insert(0, str(_ContractPath(__file__).resolve().parents[3]))
+    from src.corrdiff.builder.contract_zarr import main as _contract_main
+    _contract_main()
+    raise SystemExit(0)
+
+
 import argparse
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing as mp
