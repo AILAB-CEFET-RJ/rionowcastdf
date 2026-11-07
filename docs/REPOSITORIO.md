@@ -15,7 +15,7 @@ A reorganização estrutural agrupa os módulos de preparação em `pipelines/da
 | tests/ | Testes automatizados do builder e da integração; testes locais não substituem auditoria do acervo. |
 | notebooks/, experimental/ | Exploração e experimentos; não são o fluxo oficial. |
 | docs/documents/, docs/guides/, figures/ | Documentação e figuras existentes. Não atribuir resultados antigos ao novo dataset. |
-| README_RECONSTRUCAO_FASES_00_A_18.md | Roteiro histórico preservado; não é uma certificação de compatibilidade com o novo Zarr. |
+| docs/history/README_RECONSTRUCAO_FASES_00_A_18.md | Roteiro histórico preservado; não é uma certificação de compatibilidade com o novo Zarr. |
 
 ## Preparação e evidências históricas
 
