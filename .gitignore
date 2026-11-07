@@ -194,3 +194,22 @@ cython_debug/
 /analysis_outputs_restored/14p_*/review_groups.csv
 /analysis_outputs_restored/14p_*/required_sources.csv
 /analysis_outputs_restored/14p_*/additional_sources_to_decode.csv
+
+# Organização da referência (não remove arquivos já rastreados)
+/.venv-*/
+*.swp
+*.swo
+*.before-filename-fix
+/*.log
+/download_pressure.txt
+/experimental/donwscaling/data/
+/recovery_runs/**/*.log
+/recovery_comparison/**/*.log
+
+# Novos resultados: publicar somente resumos pequenos por padrão
+/analysis_outputs_reference/**
+!/analysis_outputs_reference/**/
+!/analysis_outputs_reference/**/README.md
+!/analysis_outputs_reference/**/summary.json
+!/analysis_outputs_reference/**/normalization.json
+!/analysis_outputs_reference/**/*.complete.json
