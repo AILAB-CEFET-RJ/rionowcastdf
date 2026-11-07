@@ -108,8 +108,14 @@ def inputs(c):
         if abs(offset)>tolerance or offset!=r.offset_seconds:raise ValueError('Invalid temporal offset')
         if r.timestamp_utc<pd.Timestamp('2011-01-17T02:00:00Z'):raise ValueError('Before archive')
         if expected_split(r.timestamp_utc)!=r.split or expected_split(r.source_utc)!=r.split:raise ValueError('Split leakage')
-        expected=r.source_utc.tz_convert('America/Sao_Paulo').strftime('%Y/%m/%d/%Y_%m_%d_%H_%M.png')
-        if str(r.path)!=expected:raise ValueError('Local PNG filename does not match UTC: '+str(r.path))
+        # A pasta do acervo pode diferir da data local da aquisição.
+        # Preservar o caminho congelado e validar o horário pelo nome do PNG.
+        source_path=Path(str(r.path))
+        if source_path.is_absolute() or '..' in source_path.parts:
+            raise ValueError('Unsafe relative PNG path: '+str(r.path))
+        expected=r.source_utc.tz_convert('America/Sao_Paulo').strftime('%Y_%m_%d_%H_%M.png')
+        if source_path.name!=expected:
+            raise ValueError(f'Local PNG filename does not match UTC: {r.path}; expected basename={expected}; source_utc={r.source_utc}')
         if len(r.sha)!=64 or any(x not in '0123456789abcdef' for x in r.sha):raise ValueError('Invalid SHA')
     if df.groupby('path').split.nunique().gt(1).any():raise ValueError('PNG path reused across splits')
     for key,op in [('start_utc','ge'),('end_utc','lt')]:
