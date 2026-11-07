@@ -19,7 +19,43 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def audit(config, output, png_samples_per_policy=2):
+
+def verify_raw_era5(c, root, output, stages, geometry):
+    """Recompute with the frozen reader; writes scratch artifacts only under audit output."""
+    import duckdb
+    from src.corrdiff.builder.contract_era5 import Inventory, Month
+    cfg=dict(c,era5_identity_file=str(root/'era5_identity.json'))
+    checked=0
+    with tempfile.TemporaryDirectory(prefix='era5_recheck_',dir=output) as tmp:
+        inv=Inventory(cfg,Path(tmp))
+        engine=duckdb.connect()
+        try:
+            engine.execute("SET TimeZone='UTC'")
+            engine.execute(f"SET threads={int(c['duckdb_threads'])}")
+            engine.execute('SET memory_limit=?',[c['duckdb_memory']])
+            engine.execute('SET temp_directory=?',[str(Path(tmp)/'duckdb_tmp')])
+            for name, rows, folder in stages:
+                reference=np.load(folder/'input.npy',mmap_mode='r')
+                reader=Month(engine,inv,rows.timestamp_utc.tolist(),c['channels'])
+                try:
+                    for i,t in enumerate(rows.timestamp_utc):
+                        for j,ch in enumerate(c['channels']):
+                            actual=reader.field(t,ch,geometry['lat'],geometry['lon'])
+                            require(np.array_equal(actual,reference[i,j]),f'ERA5 raw/staging mismatch {t} {ch}')
+                        checked+=1
+                        if checked%100==0:
+                            print(json.dumps({'stage':'era5_recompute','month':name,'hours_checked':checked}),flush=True)
+                finally:
+                    reader.close()
+                del reference
+                print(json.dumps({'stage':'era5_month_pass','month':name,'hours_checked':checked}),flush=True)
+            dump(output/'era5_sources_verified.json',inv.provenance)
+        finally:
+            engine.close()
+            inv.close()
+    return checked
+
+def audit(config, output, png_samples_per_policy=2, all_selected_pngs=False, recompute_era5=False):
     started = time.monotonic()
     c = load_config(config)
     root = Path(c['output_dir']).resolve()
@@ -31,10 +67,13 @@ def audit(config, output, png_samples_per_policy=2):
             require(output != p and p not in output.parents and output not in p.parents,
                     'Audit output must be separate from inputs: ' + key)
     output.mkdir(parents=True, exist_ok=False)
-    report = dict(version='reference-integrity-v1', complete=False, integrity_passed=False,
-                  production_ready=False, splits={}, raw_png_samples=0)
+    report = dict(version='reference-integrity-v2', complete=False, integrity_passed=False,
+                  production_ready=False, splits={}, raw_png_samples=0,
+                  all_selected_pngs_requested=all_selected_pngs, era5_recompute_requested=recompute_era5,
+                  raw_png_paths_checked=0, era5_raw_hours_checked=0)
     dump(output/'summary.json', report)
     try:
+        print('Audit started: validating contracts and artifacts', flush=True)
         summary = read(root/'summary.json')
         require(summary.get('complete') and summary.get('zarr_created'), 'Incomplete dataset')
         for name, digest in summary['artifact_sha256'].items():
@@ -59,8 +98,13 @@ def audit(config, output, png_samples_per_policy=2):
             for name in ('input.npy','target_code.npy','mask.npy'):
                 require(sha(folder/name) == rec['sha256'][name], 'Staging checksum '+month+'/'+name)
             stages.append((month, rows, folder))
+            print(json.dumps({'stage':'staging_checksums','month':month,'hours':len(rows)}),flush=True)
             for i, stamp in enumerate(rows.timestamp_utc):
                 locations[stamp] = (folder, i)
+        if recompute_era5:
+            report['era5_raw_hours_checked'] = verify_raw_era5(c, root, output, stages, g)
+            dump(output/'summary.json',report)
+        print('Recomputing train-only normalization',flush=True)
         norm = normalization(stages, c['channels'])
         saved = read(root/'normalization.json')
         for key, value in norm.items():
@@ -147,25 +191,44 @@ def audit(config, output, png_samples_per_policy=2):
             report['splits'][split] = counts
             dump(output/'summary.json',report)
             print(split+': PASS',flush=True)
-        # Raw-source confirmation is explicitly sampled, stratified by split and policy.
+        # Full mode hashes every selected acquisition path, including duplicate contents.
+        # Decoding identical content is shared only after each path's checksum is verified.
         samples = []
-        for _, rows in df.groupby(['split','policy_status']):
-            unique = rows.drop_duplicates('sha').sort_values('timestamp_utc')
-            idx = np.unique(np.linspace(0,len(unique)-1,min(png_samples_per_policy,len(unique)),dtype=int))
-            samples.extend(unique.iloc[idx].to_dict('records'))
+        if all_selected_pngs:
+            require(not df.groupby('path').sha.nunique().gt(1).any(), 'Path with conflicting source hashes')
+            paths = df.drop_duplicates('path').sort_values('path')
+            with (output/'png_paths_verified.jsonl').open('w') as log:
+                for number,r in enumerate(paths.itertuples(index=False),1):
+                    require(sha(inside(c['radar_dir'],r.path)) == r.sha, 'PNG path checksum '+r.path)
+                    log.write(json.dumps({'path':r.path,'sha':r.sha})+'\n')
+                    report['raw_png_paths_checked']=number
+                    if number%1000==0:
+                        print(json.dumps({'stage':'png_path_hashes','checked':number,'total':len(paths)}),flush=True)
+            samples=df.drop_duplicates(['sha','policy_status']).sort_values('timestamp_utc').to_dict('records')
+        else:
+            for _, rows in df.groupby(['split','policy_status']):
+                unique = rows.drop_duplicates('sha').sort_values('timestamp_utc')
+                idx = np.unique(np.linspace(0,len(unique)-1,min(png_samples_per_policy,len(unique)),dtype=int))
+                samples.extend(unique.iloc[idx].to_dict('records'))
         with tempfile.TemporaryDirectory(dir=output) as temp:
             raw_c = dict(c,reuse_14j_dir=None)
             for r in samples:
                 result = decode_job((r['sha'],r['path'],r['policy_status'],None),raw_c,g,Path(temp))
-                with np.load(Path(temp)/result[1],allow_pickle=False) as raw, np.load(inside(c['radar_cache_dir'],index[r['sha']][0]),allow_pickle=False) as cached:
+                decoded=Path(temp)/result[1]
+                with np.load(decoded,allow_pickle=False) as raw, np.load(inside(c['radar_cache_dir'],index[r['sha']][0]),allow_pickle=False) as cached:
                     require(np.array_equal(raw['target_code'],cached['target_code'],equal_nan=True) and np.array_equal(raw['mask'],cached['mask']), 'PNG/cache mismatch '+r['path'])
+                decoded.unlink()
                 report['raw_png_samples'] += 1
+                if report['raw_png_samples']%500==0:
+                    print(json.dumps({'stage':'png_decode','checked':report['raw_png_samples'],'total':len(samples)}),flush=True)
         dump(output/'png_samples.json', [{k:str(r[k]) for k in ('timestamp_utc','split','policy_status','path','sha')} for r in samples])
         report.update(complete=True,integrity_passed=True,selected_hours=len(df),unique_cache_objects_checked=len(checked_objects),
             normalization_recomputed=True,all_patch_tensors_compared_to_staging=True,
-            all_targets_compared_to_cache=True,era5_raw_recomputed=False,
+            all_targets_compared_to_cache=True,era5_raw_recomputed=recompute_era5,
+            all_selected_png_paths_checked=all_selected_pngs,
+            all_selected_png_contents_decoded=all_selected_pngs,
             coverage_state=summary['coverage_state'],spatial_validity_confirmed=summary['spatial_validity_confirmed'],
-            note='Technical integrity only. PNG comparison is sampled; ERA5 raw interpolation and physical coverage are not independently validated.')
+            note='Technical reproducibility under the frozen contract. Full PNG and ERA5 scopes are explicit in flags. Reuses contracted decoder/interpolator; physical coverage and meteorological correctness are not independently validated.')
     except Exception as exc:
         report['error'] = type(exc).__name__+': '+str(exc)
         raise
@@ -181,6 +244,8 @@ if __name__ == '__main__':
     p.add_argument('--contract-config',required=True)
     p.add_argument('--output-dir',required=True)
     p.add_argument('--png-samples-per-policy',type=int,default=2)
+    p.add_argument('--all-selected-pngs',action='store_true',help='Hash every selected source path; decode every distinct selected content/policy')
+    p.add_argument('--recompute-era5',action='store_true',help='Reread selected ERA5 hours from original Parquets and compare interpolated fields to staging')
     args=p.parse_args()
     if args.png_samples_per_policy<1:p.error('PNG samples must be >=1')
-    audit(args.contract_config,args.output_dir,args.png_samples_per_policy)
+    audit(args.contract_config,args.output_dir,args.png_samples_per_policy,args.all_selected_pngs,args.recompute_era5)
