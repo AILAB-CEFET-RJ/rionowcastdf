@@ -106,12 +106,12 @@ constante. Não se força uma distribuição de chuva/sem eco na amostragem.
 ## Instalação no servidor
 
 Extraia o ZIP na raiz de `/home/vsantos/repositories/rionowcastdf`, resultando
-na pasta `corrdiff_contract_14o`. Use o ambiente `dataset` já utilizado.
+na pasta `pipelines/dataset_preparation/corrdiff_contract_14o`. Use o ambiente `dataset` já utilizado.
 
 ```bash
 cd /home/vsantos/repositories/rionowcastdf
-python -m pip install -r corrdiff_contract_14o/requirements.txt
-python -m unittest discover -s corrdiff_contract_14o/tests -v
+python -m pip install -r pipelines/dataset_preparation/corrdiff_contract_14o/requirements.txt
+python -m unittest discover -s pipelines/dataset_preparation/corrdiff_contract_14o/tests -v
 mkdir -p logs
 ```
 
@@ -123,7 +123,7 @@ alterar o ambiente usado para preparar os dados.
 ## Primeiro: piloto com dados reais
 
 ```bash
-nohup python -u corrdiff_contract_14o/prepare.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_contract_14o/prepare.py \
   --policy-dir analysis_outputs_restored/14n_policy_v1 \
   --output-dir data/corrdiff_14o_pilot_s8_v1 \
   --pilot-hours 8 \
@@ -137,7 +137,7 @@ marcadas `pilot_only=true`. Não reutilizá-las no experimento completo.
 Após `complete=true`:
 
 ```bash
-python corrdiff_contract_14o/check_data.py \
+python pipelines/dataset_preparation/corrdiff_contract_14o/check_data.py \
   --data-dir data/corrdiff_14o_pilot_s8_v1 \
   --output-dir analysis_outputs_restored/14o_loader_pilot_s8_v1
 ```
@@ -145,7 +145,7 @@ python corrdiff_contract_14o/check_data.py \
 ## Depois: preparação completa
 
 ```bash
-nohup python -u corrdiff_contract_14o/prepare.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_contract_14o/prepare.py \
   --policy-dir analysis_outputs_restored/14n_policy_v1 \
   --output-dir data/corrdiff_14o_s8_v1 \
   > logs/14o_prepare_s8_v1.log 2>&1 &
@@ -198,7 +198,7 @@ cientificamente utilizável nem verifica um sampler de geração.
 Em um ambiente que já tenha essa API PhysicsNeMo disponível:
 
 ```bash
-python -u corrdiff_contract_14o/native_smoke.py \
+python -u pipelines/dataset_preparation/corrdiff_contract_14o/native_smoke.py \
   --data-dir data/corrdiff_14o_pilot_s8_v1 \
   --output-dir analysis_outputs_restored/14o_native_pilot_s8_v1 \
   --device cpu --steps 20 --batch-size 2
@@ -253,7 +253,7 @@ o contrato imutável foi alterado.
 Depois que o build antigo terminar, extraia esta revisão e crie um novo índice:
 
 ```bash
-nohup python -u corrdiff_contract_14o/reindex.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_contract_14o/reindex.py \
   --prepared-dir data/corrdiff_14o_v1 \
   --output-dir data/corrdiff_14o_s8_v1 \
   > logs/14o_reindex_s8_v1.log 2>&1 &

@@ -34,5 +34,5 @@ case "${1:-help}" in
   test)
     PYTHONPATH="$HERE${PYTHONPATH:+:$PYTHONPATH}" "$PYTHON" -m unittest discover -s "$HERE/tests" -v
     ;;
-  *) echo "Uso: bash corrdiff_radar_qc/run_qc.sh {scan|rebuild|audit|diagnostics|baselines|test}"; exit 2 ;;
+  *) echo "Uso: bash pipelines/dataset_preparation/corrdiff_radar_qc/run_qc.sh {scan|rebuild|audit|diagnostics|baselines|test}"; exit 2 ;;
 esac

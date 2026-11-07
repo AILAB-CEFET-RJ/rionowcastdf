@@ -27,9 +27,9 @@ Dois PNGs reais de exemplos anteriores foram decodificados com o código origina
 Os PNGs não são incluídos neste pacote. Hashes e resultados estão em
 `real_examples_validation.json`.
 
-- `2012_02_25_04_00.png`: cartografia, zero pixels de paleta; permanece em revisão
+- `examples/radar_sumare/2012_02_25_04_00.png`: cartografia, zero pixels de paleta; permanece em revisão
   por padrão. O SHA coincide com o exemplo conhecido.
-- `2012_12_11_17_00.png`: 17.578 pixels de paleta nativos; na grade geométrica,
+- `examples/radar_sumare/2012_12_11_17_00.png`: 17.578 pixels de paleta nativos; na grade geométrica,
   714 pontos com eco, 5.042 pontos sem eco e 124 desconhecidos. Suporte total:
   5.756 pontos de 5.880. Esses números usam a geometria provisória, não uma nova
   certificação da cobertura observacional.

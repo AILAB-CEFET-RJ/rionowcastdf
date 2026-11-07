@@ -16,8 +16,8 @@ Extraia o ZIP na raiz /home/vsantos/repositories/rionowcastdf. O ZIP contém a p
 cd /home/vsantos/repositories/rionowcastdf
 conda activate dataset
 unzip corrdiff_png_audit_14m.zip
-python -m pip install -r corrdiff_png_audit_14m/requirements.txt
-python corrdiff_png_audit_14m/test_audit.py
+python -m pip install -r pipelines/dataset_preparation/corrdiff_png_audit_14m/requirements.txt
+python pipelines/dataset_preparation/corrdiff_png_audit_14m/test_audit.py
 mkdir -p logs
 ```
 
@@ -26,7 +26,7 @@ mkdir -p logs
 Use uma pasta de saída NOVA. Não acrescente filtros de ano/minuto: a varredura completa é o padrão.
 
 ```bash
-nohup python -u corrdiff_png_audit_14m/audit_pngs.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_png_audit_14m/audit_pngs.py \
   --radar-dir /home/vsantos/data/radar_sumare \
   --output-dir analysis_outputs_restored/14m_full_png_audit_v1 \
   > logs/14m_full_png_audit_v1.log 2>&1 &
@@ -47,7 +47,7 @@ O programa registra progresso a cada 1000 arquivos. Não conhece o total antes d
 Depois de confirmar que a execução anterior encerrou, repita o MESMO comando e acrescente --resume. Não reinstale/atualize dependências entre execuções: configuração, código e versões NumPy/Pillow são conferidos. Não remova o banco ou o arquivo config.json.
 
 ```bash
-nohup python -u corrdiff_png_audit_14m/audit_pngs.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_png_audit_14m/audit_pngs.py \
   --radar-dir /home/vsantos/data/radar_sumare \
   --output-dir analysis_outputs_restored/14m_full_png_audit_v1 \
   --resume \

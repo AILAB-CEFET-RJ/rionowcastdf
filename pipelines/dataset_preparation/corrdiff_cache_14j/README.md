@@ -13,10 +13,10 @@ Extraia o ZIP na raiz de `/home/vsantos/repositories/rionowcastdf`.
 
 ```bash
 cd /home/vsantos/repositories/rionowcastdf
-python -m pip install -r corrdiff_cache_14j/requirements.txt
-python -m unittest discover -s corrdiff_cache_14j/tests -v
+python -m pip install -r pipelines/dataset_preparation/corrdiff_cache_14j/requirements.txt
+python -m unittest discover -s pipelines/dataset_preparation/corrdiff_cache_14j/tests -v
 mkdir -p logs
-python -u corrdiff_cache_14j/build_cache.py \
+python -u pipelines/dataset_preparation/corrdiff_cache_14j/build_cache.py \
   --radar-dir /home/vsantos/data/radar_sumare \
   --output-dir data/radar_intermediate_14j_check \
   --start-utc 2012-02-25T00:00:00Z \
@@ -29,7 +29,7 @@ A saída deve ser nova. Não há acesso ao ERA5 neste programa.
 ## Acervo horário de 2011–2024
 
 ```bash
-nohup python -u corrdiff_cache_14j/build_cache.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_cache_14j/build_cache.py \
   --radar-dir /home/vsantos/data/radar_sumare \
   --output-dir data/radar_intermediate_14j_v1 \
   --start-utc 2011-01-01T00:00:00Z \

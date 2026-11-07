@@ -19,7 +19,7 @@ Copie o ZIP para a raiz do repositório no CEFET e execute no ambiente dataset:
 ```bash
 cd /home/vsantos/repositories/rionowcastdf
 unzip corrdiff_pairing_14k.zip
-python -m pip install -r corrdiff_pairing_14k/requirements.txt
+python -m pip install -r pipelines/dataset_preparation/corrdiff_pairing_14k/requirements.txt
 mkdir -p logs
 ```
 
@@ -29,7 +29,7 @@ biblioteca padrão e foi preparado para Linux/WSL. Não modifica o builder de pr
 ## 1. Inventariar o ERA5 — pode começar agora
 
 ```bash
-nohup python -u corrdiff_pairing_14k/pair_inventory.py inventory \
+nohup python -u pipelines/dataset_preparation/corrdiff_pairing_14k/pair_inventory.py inventory \
   --single-dir /home/vsantos/data/reanalysis/cds/era5/single \
   --pressure-dir /home/vsantos/data/reanalysis/cds/era5/pressure \
   --output-dir analysis_outputs_restored/14k_era5_inventory \
@@ -94,7 +94,7 @@ para todo o processo Python. O inventário SQLite e as exportações também ocu
 ## 2. Parear depois de o inventário e o cache terminarem
 
 ```bash
-python -u corrdiff_pairing_14k/pair_inventory.py pair \
+python -u pipelines/dataset_preparation/corrdiff_pairing_14k/pair_inventory.py pair \
   --radar-cache-dir data/radar_intermediate_14j_v1 \
   --inventory-dir analysis_outputs_restored/14k_era5_inventory \
   --output-dir analysis_outputs_restored/14k_pairing_v1 \
@@ -247,7 +247,7 @@ preencher NaN com zero para satisfazer a interface nativa.
 ## Verificação do pacote
 
 ```bash
-python -m unittest discover -s corrdiff_pairing_14k/tests -v
+python -m unittest discover -s pipelines/dataset_preparation/corrdiff_pairing_14k/tests -v
 ```
 
 Veja VALIDACAO.md. Testes locais sintéticos não substituem a execução no acervo CEFET.

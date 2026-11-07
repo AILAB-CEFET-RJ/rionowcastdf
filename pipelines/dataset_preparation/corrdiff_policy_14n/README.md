@@ -129,19 +129,19 @@ No terminal Linux, dentro do repositório, após copiar e extrair o ZIP desta en
 cd /home/vsantos/repositories/rionowcastdf
 conda activate dataset
 unzip corrdiff_policy_14n.zip
-python -m pip install -r corrdiff_policy_14n/requirements.txt
-python -m unittest discover -s corrdiff_policy_14n/tests -v
+python -m pip install -r pipelines/dataset_preparation/corrdiff_policy_14n/requirements.txt
+python -m unittest discover -s pipelines/dataset_preparation/corrdiff_policy_14n/tests -v
 mkdir -p logs
 ```
 
 Aplicar a política (não precisa reler PNGs nem aguardar o fim do 14m):
 
 ```bash
-nohup python -u corrdiff_policy_14n/apply_policy.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_policy_14n/apply_policy.py \
   --radar-cache-dir data/radar_intermediate_14j_v1 \
   --pairing-dir analysis_outputs_restored/14k_pairing_v2 \
   --archive-start-local 2011-01-17 \
-  --map-review corrdiff_policy_14n/map_review_example.csv \
+  --map-review pipelines/dataset_preparation/corrdiff_policy_14n/map_review_example.csv \
   --output-dir analysis_outputs_restored/14n_policy_v1 \
   > logs/14n_policy_v1.log 2>&1 &
 echo "PID da política: $!"
@@ -172,7 +172,7 @@ nesses casos usar `14n_policy_v2` ou outro diretório novo.
 Depois de `complete=true` e `object_error_hours=0`:
 
 ```bash
-nohup python -u corrdiff_policy_14n/smoke_policy.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_policy_14n/smoke_policy.py \
   --policy-dir analysis_outputs_restored/14n_policy_v1 \
   --output-dir analysis_outputs_restored/14n_smoke_v1 \
   --max-timestamps 8 --steps 20 --batch-size 4 --device cpu \
@@ -238,7 +238,7 @@ fora do versionamento, e scripts/relatórios pequenos no Git.
 Gerar diagnóstico e acrescentar regras de ignore (sem apagar ou desversionar):
 
 ```bash
-python corrdiff_policy_14n/repository_report.py \
+python pipelines/dataset_preparation/corrdiff_policy_14n/repository_report.py \
   --repo-root /home/vsantos/repositories/rionowcastdf \
   --output-dir analysis_outputs_restored/14n_repository_review_v1 \
   --apply-gitignore

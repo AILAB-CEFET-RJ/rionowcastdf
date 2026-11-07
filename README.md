@@ -2,6 +2,8 @@
 
 Construção e avaliação de um dataset para downscaling meteorológico com CorrDiff.
 
+O código das análises e etapas 14g–14p está em [pipelines/dataset_preparation/](pipelines/dataset_preparation/README.md). Consulte o [mapa de migração](docs/MIGRACAO_ESTRUTURA.md) para atualizar comandos antigos.
+
 ## Fluxo de referência atual
 
 1. Preparar contratos e manifesto temporal: etapas 14j–14p, catalogadas em [docs/REPOSITORIO.md](docs/REPOSITORIO.md).

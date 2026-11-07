@@ -30,9 +30,9 @@ Denominador: horas dentro do acervo presentes no manifesto 14k, incluindo horas 
 
 ```bash
 cd /home/vsantos/repositories/rionowcastdf
-python -m pip install -r corrdiff_temporal_14p/requirements.txt
+python -m pip install -r pipelines/dataset_preparation/corrdiff_temporal_14p/requirements.txt
 mkdir -p logs
-nohup python -u corrdiff_temporal_14p/pipeline.py analyze \
+nohup python -u pipelines/dataset_preparation/corrdiff_temporal_14p/pipeline.py analyze \
   --audit-dir analysis_outputs_restored/14m_full_png_audit_v1 \
   --pairing-dir analysis_outputs_restored/14k_pairing_v2 \
   --radar-dir /home/vsantos/data/radar_sumare \
@@ -56,7 +56,7 @@ Enviar para análise: summary.json, decision_support.json, temporal_coverage.csv
 Após avaliar a comparação no treino, `freeze` registra a escolha explícita. Exemplo SOMENTE caso a decisão seja nearest2:
 
 ```bash
-python -u corrdiff_temporal_14p/pipeline.py freeze \
+python -u pipelines/dataset_preparation/corrdiff_temporal_14p/pipeline.py freeze \
   --analysis-dir analysis_outputs_restored/14p_temporal_v1 \
   --strategy nearest2 \
   --rationale 'PREENCHER com justificativa baseada no relatório de treino' \
@@ -90,7 +90,7 @@ Ignore não remove arquivos já rastreados. Não usar git add . sem conferir git
 ## Testes
 
 ```bash
-python -m unittest discover -s corrdiff_temporal_14p -p 'test_*.py' -v
+python -m unittest discover -s pipelines/dataset_preparation/corrdiff_temporal_14p -p 'test_*.py' -v
 ```
 
 Os testes usam banco sintético no formato 14m, pareamento Parquet e fluxos analyze/freeze. O acervo completo só pode ser executado no servidor onde audit.sqlite está disponível. production_ready permanece false: decisão temporal não certifica treinamento, validação meteorológica ou integração Zarr.

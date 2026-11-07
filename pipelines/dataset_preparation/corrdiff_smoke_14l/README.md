@@ -37,7 +37,7 @@ Se já existir uma instalação PyTorch funcional, preserve-a. CPU é o padrão;
 teste não requer GPU ou substituição da instalação CUDA existente.
 
 ```bash
-python -m pip install -r corrdiff_smoke_14l/requirements.txt
+python -m pip install -r pipelines/dataset_preparation/corrdiff_smoke_14l/requirements.txt
 mkdir -p logs
 ```
 
@@ -49,7 +49,7 @@ O pacote é autônomo; não precisa ser importado pelo builder original.
 O inventário ERA5 deve ter terminado sem erros. O cache radar pode continuar ativo:
 
 ```bash
-python -u corrdiff_pairing_14k/pair_inventory.py pair \
+python -u pipelines/dataset_preparation/corrdiff_pairing_14k/pair_inventory.py pair \
   --radar-cache-dir data/radar_intermediate_14j_v1 \
   --inventory-dir analysis_outputs_restored/14k_era5_inventory \
   --output-dir analysis_outputs_restored/14k_pairing_preview_01 \
@@ -73,7 +73,7 @@ novo diretório. As cópias SQLite são consistentes mesmo com o14j em execuçã
 ## 2. Executar o teste técnico agora
 
 ```bash
-python -u corrdiff_smoke_14l/smoke_test.py \
+python -u pipelines/dataset_preparation/corrdiff_smoke_14l/smoke_test.py \
   --pairing-dir analysis_outputs_restored/14k_pairing_preview_01 \
   --radar-cache-dir data/radar_intermediate_14j_v1 \
   --output-dir analysis_outputs_restored/14l_smoke_preview_01 \
@@ -106,7 +106,7 @@ Crie o pareamento final14k em um diretório novo, sem --allow-partial, conforme 
 segunda entrega. Então execute:
 
 ```bash
-python -u corrdiff_smoke_14l/smoke_test.py \
+python -u pipelines/dataset_preparation/corrdiff_smoke_14l/smoke_test.py \
   --pairing-dir analysis_outputs_restored/14k_pairing_v1 \
   --radar-cache-dir data/radar_intermediate_14j_v1 \
   --output-dir analysis_outputs_restored/14l_smoke_final_01 \
@@ -222,7 +222,7 @@ Para isso, use14k e a resposta do produtor sobre semântica/cobertura.
 ## Validação e continuidade
 
 ```bash
-python -m unittest discover -s corrdiff_smoke_14l/tests -v
+python -m unittest discover -s pipelines/dataset_preparation/corrdiff_smoke_14l/tests -v
 ```
 
 Os testes incluem interpolação de campo analítico, bloqueio de extrapolação,

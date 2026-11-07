@@ -17,7 +17,7 @@ alvos NPZ, cobrindo:
 Comando reproduzível:
 
 ```bash
-python -m unittest discover -s corrdiff_contract_14o/tests -v
+python -m unittest discover -s pipelines/dataset_preparation/corrdiff_contract_14o/tests -v
 ```
 
 Isso não equivale a executar o acervo do CEFET. A entrega não possui os

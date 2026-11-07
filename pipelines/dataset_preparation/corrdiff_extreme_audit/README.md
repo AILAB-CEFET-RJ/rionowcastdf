@@ -9,21 +9,21 @@ Uma hora seca ou uma lacuna termina o episódio.
 ## Instalação e execução
 
 Extraia este pacote na raiz do repositório `rionowcastdf` (a pasta
-`corrdiff_extreme_audit` permanece dentro da raiz). Use o ambiente Python do projeto.
+`pipelines/dataset_preparation/corrdiff_extreme_audit` permanece dentro da raiz). Use o ambiente Python do projeto.
 As dependências são NumPy, pandas, Zarr 2 e matplotlib. Se já instaladas, não é
 necessário reinstalar. Para um ambiente separado:
 
 ```bash
 python -m venv .venv-audit14b
 source .venv-audit14b/bin/activate
-python -m pip install -r corrdiff_extreme_audit/requirements.txt
+python -m pip install -r pipelines/dataset_preparation/corrdiff_extreme_audit/requirements.txt
 ```
 
 Execute a partir da raiz do repositório:
 
 ```bash
 mkdir -p logs
-nohup python -u corrdiff_extreme_audit/scripts/14b_audit_extreme_episodes.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_extreme_audit/scripts/14b_audit_extreme_episodes.py \
   --dataset-dir datasets/corrdiff_2011_2024_restored \
   --radar-cache-dir /home/vsantos/repositories/rionowcastdf/data/radar_cache \
   --output-dir analysis_outputs_restored/14b_extreme_episodes \
@@ -129,7 +129,7 @@ PDFs históricos nem implementa o split final.
 ## Testes
 
 ```bash
-python -m unittest discover -s corrdiff_extreme_audit/tests -v
+python -m unittest discover -s pipelines/dataset_preparation/corrdiff_extreme_audit/tests -v
 ```
 
 Cobrem sobreposição/deduplicação, conflitos, máscara, borda de limiar float32,

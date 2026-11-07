@@ -7,8 +7,8 @@ Implementação isolada e executável para comparar o processamento legado com o
 Extraia o ZIP na raiz de /home/vsantos/repositories/rionowcastdf. O ZIP já contém a pasta corrdiff_alignment_14i. Execute na raiz do repositório:
 
 ```bash
-python -m pip install -r corrdiff_alignment_14i/requirements.txt
-python -u corrdiff_alignment_14i/14i_alignment_pilot.py \
+python -m pip install -r pipelines/dataset_preparation/corrdiff_alignment_14i/requirements.txt
+python -u pipelines/dataset_preparation/corrdiff_alignment_14i/14i_alignment_pilot.py \
   --radar-dir /home/vsantos/data/radar_sumare \
   --output-dir analysis_outputs_restored/14i_alignment_pilot_v1
 ```
@@ -39,7 +39,7 @@ Para cada caso: -10,-8,-6,-4,-2,0,+2,+4,+6,+8,+10 minutos. As sequências são c
 Pode selecionar outros casos locais:
 
 ```bash
-python corrdiff_alignment_14i/14i_alignment_pilot.py \
+python pipelines/dataset_preparation/corrdiff_alignment_14i/14i_alignment_pilot.py \
   --radar-dir /home/vsantos/data/radar_sumare \
   --output-dir analysis_outputs_restored/14i_outros_casos \
   --local-cases 2012_02_25_03_00 2012_12_11_17_00 \
@@ -79,12 +79,12 @@ complete=true significa que todas as solicitações foram tentadas, mesmo com ar
 
 Nove testes unitários passam: hora local/UTC, horário de verão, mudança de data, horas inexistentes e repetidas, rejeição de UTC sem fuso, centro/orientação da projeção, domínio/grade, transparência/cartografia, paleta com alfa e dimensões.
 
-Também foi executado o fluxo completo nos três PNGs reais publicados na raiz do repositório. O arquivo de controle 2012_12_11_17_00.png teve 229 pontos da paleta na grade legada e 714 na corrigida. O PNG transparente permaneceu ambíguo; o cartográfico foi sinalizado para revisão. Esses três nomes são UTC-2 nas datas correspondentes. Testou-se também a ausência dos minutos adjacentes na cópia local: foram registrados como missing_png, sem preenchimento ou crash.
+Também foi executado o fluxo completo nos três PNGs reais publicados na raiz do repositório. O arquivo de controle examples/radar_sumare/2012_12_11_17_00.png teve 229 pontos da paleta na grade legada e 714 na corrigida. O PNG transparente permaneceu ambíguo; o cartográfico foi sinalizado para revisão. Esses três nomes são UTC-2 nas datas correspondentes. Testou-se também a ausência dos minutos adjacentes na cópia local: foram registrados como missing_png, sem preenchimento ou crash.
 
 Os arquivos reais adjacentes não estavam nesta cópia local: a inspeção das sequências completas depende da execução no CEFET. Os resultados locais estão em verificacao_local/ apenas para rastrear o teste; não representam a disponibilidade do acervo remoto.
 
 ```bash
-python -m unittest discover -s corrdiff_alignment_14i/tests -v
+python -m unittest discover -s pipelines/dataset_preparation/corrdiff_alignment_14i/tests -v
 ```
 
 ## Próximo resultado a revisar

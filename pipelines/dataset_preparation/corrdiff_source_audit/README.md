@@ -7,9 +7,9 @@ Requer os CSVs da auditoria 14b e o builder local que contém RadarCacheSourceDa
 ## Execução
 
 ```bash
-python -m pip install -r corrdiff_source_audit/requirements.txt
+python -m pip install -r pipelines/dataset_preparation/corrdiff_source_audit/requirements.txt
 mkdir -p logs
-nohup python -u corrdiff_source_audit/scripts/14c_audit_radar_sources.py \
+nohup python -u pipelines/dataset_preparation/corrdiff_source_audit/scripts/14c_audit_radar_sources.py \
   --dataset-dir datasets/corrdiff_2011_2024_restored \
   --audit14b-dir analysis_outputs_restored/14b_extreme_episodes \
   --radar-dir /home/vsantos/data/radar_sumare \

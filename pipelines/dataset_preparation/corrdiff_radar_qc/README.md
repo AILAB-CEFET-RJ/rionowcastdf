@@ -19,10 +19,10 @@ Extraia o ZIP na raiz do repositório, mantendo a pasta corrdiff_radar_qc.
 Use o ambiente Python do projeto: o arquivo de requisitos adiciona dependências deste pacote, não substitui as dependências do builder/ERA5.
 
 ```bash
-python -m pip install -r corrdiff_radar_qc/requirements.txt
-bash corrdiff_radar_qc/run_qc.sh test
+python -m pip install -r pipelines/dataset_preparation/corrdiff_radar_qc/requirements.txt
+bash pipelines/dataset_preparation/corrdiff_radar_qc/run_qc.sh test
 mkdir -p logs
-nohup bash corrdiff_radar_qc/run_qc.sh scan > logs/14d_qc_v2.log 2>&1 &
+nohup bash pipelines/dataset_preparation/corrdiff_radar_qc/run_qc.sh scan > logs/14d_qc_v2.log 2>&1 &
 ```
 
 O scan lê PNGs de /home/vsantos/data/radar_sumare e cria data/radar_cache_qc_v2.
@@ -43,7 +43,7 @@ Nem preto, branco, transparência, nem um frame inteiramente vazio devem ser aut
 Para documentar regras, gere uma cópia editável da política:
 
 ```bash
-PYTHONPATH=corrdiff_radar_qc python -c 'import json; from radar_qc import DEFAULT; print(json.dumps(DEFAULT, indent=2))' > radar_policy_reviewed.json
+PYTHONPATH=pipelines/dataset_preparation/corrdiff_radar_qc python -c 'import json; from radar_qc import DEFAULT; print(json.dumps(DEFAULT, indent=2))' > radar_policy_reviewed.json
 ```
 
 Só acrescente entradas RGBA em dry_rgba depois de confirmar sua semântica na fonte. Registre dry_evidence e source_contract_evidence.
@@ -54,7 +54,7 @@ Aceitar um frame não torna cores desconhecidas válidas: elas continuam mascara
 Rode novamente em OUTRA pasta, preservando a auditoria inicial:
 
 ```bash
-QC_CACHE=data/radar_cache_qc_v2_reviewed QC_POLICY=radar_policy_reviewed.json QC_REVIEWS=radar_source_reviews.csv bash corrdiff_radar_qc/run_qc.sh scan
+QC_CACHE=data/radar_cache_qc_v2_reviewed QC_POLICY=radar_policy_reviewed.json QC_REVIEWS=radar_source_reviews.csv bash pipelines/dataset_preparation/corrdiff_radar_qc/run_qc.sh scan
 ```
 
 Não há retomada automática de execução interrompida; use uma pasta nova. Se mudar QC_CACHE, mantenha a mesma variável nas etapas seguintes.
@@ -64,10 +64,10 @@ Não há retomada automática de execução interrompida; use uma pasta nova. Se
 Execute cada etapa apenas após a anterior terminar com sucesso:
 
 ```bash
-bash corrdiff_radar_qc/run_qc.sh rebuild
-bash corrdiff_radar_qc/run_qc.sh audit
-bash corrdiff_radar_qc/run_qc.sh diagnostics
-bash corrdiff_radar_qc/run_qc.sh baselines
+bash pipelines/dataset_preparation/corrdiff_radar_qc/run_qc.sh rebuild
+bash pipelines/dataset_preparation/corrdiff_radar_qc/run_qc.sh audit
+bash pipelines/dataset_preparation/corrdiff_radar_qc/run_qc.sh diagnostics
+bash pipelines/dataset_preparation/corrdiff_radar_qc/run_qc.sh baselines
 ```
 
 Para execução longa, aplique o mesmo padrão nohup e um log distinto por etapa.
