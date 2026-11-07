@@ -213,3 +213,6 @@ cython_debug/
 !/analysis_outputs_reference/**/summary.json
 !/analysis_outputs_reference/**/normalization.json
 !/analysis_outputs_reference/**/*.complete.json
+
+# Metadados de downloads do Windows
+*:Zone.Identifier*
