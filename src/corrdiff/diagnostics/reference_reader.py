@@ -73,6 +73,7 @@ class ReferenceReader:
         if any(v.shape != (70, 84) for v in (self.lat, self.lon, self.support)):
             raise ValueError('Unexpected grid shape')
         self._times = None
+        self._hours = None
 
     def __len__(self):
         return self.z['input'].shape[0]
@@ -124,7 +125,9 @@ class ReferenceReader:
             self._times = self.z['timestamps'][:]
             if np.any(np.diff(self._times) < 0):
                 raise ValueError('Patch timestamps must be ordered within each split')
-        return np.unique(self._times)
+        if self._hours is None:
+            self._hours = np.unique(self._times)
+        return self._hours.copy()
 
     def hour(self, timestamp_utc):
         """Reconstruct a Unix-second UTC hour without overlap weighting bias.
@@ -132,7 +135,8 @@ class ReferenceReader:
         NaN denotes uncovered input/invalid target_code. mask and patch_count
         distinguish valid no echo, invalid observations and uncovered positions.
         """
-        self.hours
+        if self._times is None:
+            self.hours
         timestamp_utc = operator.index(timestamp_utc)
         lo = np.searchsorted(self._times, timestamp_utc, side='left')
         hi = np.searchsorted(self._times, timestamp_utc, side='right')

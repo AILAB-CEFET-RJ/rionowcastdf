@@ -1,0 +1,28 @@
+{
+  "version": "reference-phases-v1",
+  "project_root": "..",
+  "dataset_dir": "datasets/corrdiff_reference_v1",
+  "output_dir": "analysis_outputs_reference/phases_v1",
+  "integrity_summary": "analysis_outputs_reference/integrity_full_v1/audit/summary.json",
+  "reader_summary": "analysis_outputs_reference/shared_reader_v2/summary.json",
+  "ablation_config_dir": "configs",
+  "archive_start_utc": "2011-01-17T02:00:00Z",
+  "archive_end_exclusive_utc": "2025-01-01T00:00:00Z",
+  "phase0_max_hours_per_split": 0,
+  "diagnostic_hours_per_split": 512,
+  "sample_pixels_per_hour": 256,
+  "lags_hours": [1, 3, 6, 12, 24],
+  "regime_clusters": 5,
+  "regime_fit_max_hours": 20000,
+  "baseline_train_hours": 512,
+  "baseline_eval_hours": 128,
+  "ridge_alpha": 0.01,
+  "seed": 42,
+  "experiment_seeds": [42, 43, 44],
+  "native": {
+    "corrdiff_dir": null,
+    "expected_commit": null,
+    "masked_loss_verified": false,
+    "command": null
+  }
+}

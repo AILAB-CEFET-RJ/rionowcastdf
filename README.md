@@ -374,3 +374,8 @@ Caches, Zarrs, bancos SQLite e grandes manifests não devem ser publicados no Gi
 ou padronizadas, alvo `code/50`, máscaras, metadados e reconstrução por hora sem
 contagem duplicada das sobreposições. Consulte
 [uso e verificação do leitor](docs/validation/LEITOR_COMPARTILHADO.md).
+
+### Automação das fases de referência
+
+Seleção, dependências e retomada: [guia de execução](docs/validation/AUTOMACAO_FASES_REFERENCIA.md).
+Fases 0–17 executáveis no novo contrato; fase 18 condicionada à integração nativa externa com máscaras.
