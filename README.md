@@ -367,3 +367,10 @@ O builder, seus módulos `contract_*.py`, as configurações e os artefatos cong
 - [Roteiro histórico de reconstrução](docs/history/README_RECONSTRUCAO_FASES_00_A_18.md): usa outro contrato, incluindo log1p e stride 16; não executar como roteiro do Zarr atual.
 
 Caches, Zarrs, bancos SQLite e grandes manifests não devem ser publicados no Git. Os READMEs internos dos módulos e os guias históricos permanecem disponíveis para consulta; somente este README concentra a orientação operacional da referência atual.
+
+### Leitor compartilhado para diagnósticos
+
+`src/corrdiff/diagnostics/reference_reader.py` fornece leitura em unidades físicas
+ou padronizadas, alvo `code/50`, máscaras, metadados e reconstrução por hora sem
+contagem duplicada das sobreposições. Consulte
+[uso e verificação do leitor](docs/validation/LEITOR_COMPARTILHADO.md).
