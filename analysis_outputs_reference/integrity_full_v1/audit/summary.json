@@ -1,0 +1,54 @@
+{
+  "all_patch_tensors_compared_to_staging": true,
+  "all_selected_png_contents_decoded": true,
+  "all_selected_png_paths_checked": true,
+  "all_selected_pngs_requested": true,
+  "all_targets_compared_to_cache": true,
+  "complete": true,
+  "coverage_state": "provisional_geometric_region",
+  "elapsed_seconds": 12234.42,
+  "era5_raw_hours_checked": 99098,
+  "era5_raw_recomputed": true,
+  "era5_recompute_requested": true,
+  "integrity_passed": true,
+  "normalization_recomputed": true,
+  "note": "Technical reproducibility under the frozen contract. Full PNG and ERA5 scopes are explicit in flags. Reuses contracted decoder/interpolator; physical coverage and meteorological correctness are not independently validated.",
+  "production_ready": false,
+  "raw_png_paths_checked": 99098,
+  "raw_png_samples": 75682,
+  "script_sha256": "44b73fa2581fdbf72486dd841d54465227e286a4680ed2f233e14c8ac56be79f",
+  "selected_hours": 99098,
+  "spatial_validity_confirmed": false,
+  "splits": {
+    "test_primary": {
+      "hours_selected": 4931,
+      "hours_with_patches": 4931,
+      "no_echo_pixels_with_overlap": 237656439,
+      "patches": 236688,
+      "supported_pixels_with_overlap": 241256446
+    },
+    "test_stress_ood": {
+      "hours_selected": 4423,
+      "hours_with_patches": 4423,
+      "no_echo_pixels_with_overlap": 213817680,
+      "patches": 212304,
+      "supported_pixels_with_overlap": 216798726
+    },
+    "train": {
+      "hours_selected": 75319,
+      "hours_with_patches": 75319,
+      "no_echo_pixels_with_overlap": 3642182368,
+      "patches": 3615312,
+      "supported_pixels_with_overlap": 3688332709
+    },
+    "validation": {
+      "hours_selected": 14425,
+      "hours_with_patches": 14425,
+      "no_echo_pixels_with_overlap": 696847647,
+      "patches": 692400,
+      "supported_pixels_with_overlap": 706116268
+    }
+  },
+  "unique_cache_objects_checked": 75682,
+  "version": "reference-integrity-v2"
+}

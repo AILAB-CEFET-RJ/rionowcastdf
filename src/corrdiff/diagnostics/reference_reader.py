@@ -38,8 +38,7 @@ class ReferenceReader:
             if digest != self.summary['artifact_sha256'][name]:
                 raise ValueError(f'Metadata hash mismatch: {name}')
         self.contract = _read(self.root / 'contract.json')
-        digest = hashlib.sha256(json.dumps(self.contract, sort_keys=True,
-            separators=(',', ':'), ensure_ascii=False, allow_nan=False).encode()).hexdigest()
+        digest = hashlib.sha256(json.dumps(self.contract, sort_keys=True, allow_nan=False).encode()).hexdigest()
         self.z = zarr.open_consolidated(str(self.root / f'{split}.zarr'), mode='r')
         a = self.z.attrs
         if (not a.get('complete') or a.get('version') != 'reference-zarr-v1'

@@ -1,0 +1,117 @@
+{
+  "version": "shared-reference-reader-v1",
+  "complete": true,
+  "reader_check_passed": true,
+  "production_ready": false,
+  "scope": "sampled hours; all overlapping patches of selected hours",
+  "splits": {
+    "train": {
+      "patches": 3615312,
+      "hours": 75319,
+      "checked": [
+        {
+          "timestamp_utc": 1295287200,
+          "valid_pixels": 5804,
+          "no_echo_pixels": 5414,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        },
+        {
+          "timestamp_utc": 1443319200,
+          "valid_pixels": 5880,
+          "no_echo_pixels": 5880,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        },
+        {
+          "timestamp_utc": 1609282800,
+          "valid_pixels": 5710,
+          "no_echo_pixels": 5220,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        }
+      ]
+    },
+    "validation": {
+      "patches": 692400,
+      "hours": 14425,
+      "checked": [
+        {
+          "timestamp_utc": 1609632000,
+          "valid_pixels": 5776,
+          "no_echo_pixels": 5462,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        },
+        {
+          "timestamp_utc": 1640448000,
+          "valid_pixels": 5880,
+          "no_echo_pixels": 5880,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        },
+        {
+          "timestamp_utc": 1672354800,
+          "valid_pixels": 5861,
+          "no_echo_pixels": 5764,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        }
+      ]
+    },
+    "test_primary": {
+      "patches": 236688,
+      "hours": 4931,
+      "checked": [
+        {
+          "timestamp_utc": 1672704000,
+          "valid_pixels": 5880,
+          "no_echo_pixels": 5866,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        },
+        {
+          "timestamp_utc": 1683640800,
+          "valid_pixels": 5880,
+          "no_echo_pixels": 5879,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        },
+        {
+          "timestamp_utc": 1696114800,
+          "valid_pixels": 5873,
+          "no_echo_pixels": 5830,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        }
+      ]
+    },
+    "test_stress_ood": {
+      "patches": 212304,
+      "hours": 4423,
+      "checked": [
+        {
+          "timestamp_utc": 1711929600,
+          "valid_pixels": 5880,
+          "no_echo_pixels": 5880,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        },
+        {
+          "timestamp_utc": 1726869600,
+          "valid_pixels": 5880,
+          "no_echo_pixels": 5880,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        },
+        {
+          "timestamp_utc": 1735686000,
+          "valid_pixels": 5878,
+          "no_echo_pixels": 5871,
+          "covered_grid_points": 5880,
+          "max_patch_overlap": 25
+        }
+      ]
+    }
+  }
+}

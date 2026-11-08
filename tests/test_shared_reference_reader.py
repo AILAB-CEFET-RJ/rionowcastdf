@@ -21,7 +21,7 @@ def make(root):
     (root/'summary.json').write_text(json.dumps(dict(complete=True, channels=['a','b'],
         artifact_sha256={name:hashlib.sha256((root/name).read_bytes()).hexdigest()
                         for name in ['contract.json','normalization.json']})))
-    digest = hashlib.sha256(json.dumps(contract, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    digest = hashlib.sha256(json.dumps(contract, sort_keys=True, allow_nan=False).encode()).hexdigest()
     z = zarr.open_group(str(root/'train.zarr'), mode='w')
     rows, cols = list(range(0,39,8))+[38], list(range(0,53,8))+[52]
     pos = [(r,c) for r in rows for c in cols]

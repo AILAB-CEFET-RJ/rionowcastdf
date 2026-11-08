@@ -1,0 +1,9 @@
+{
+  "version": "shared-reference-reader-v1",
+  "complete": false,
+  "reader_check_passed": false,
+  "production_ready": false,
+  "scope": "sampled hours; all overlapping patches of selected hours",
+  "splits": {},
+  "error": "ValueError: Unsupported or inconsistent Zarr contract"
+}
