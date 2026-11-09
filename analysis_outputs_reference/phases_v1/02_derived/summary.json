@@ -1,0 +1,17 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 2,
+  "name": "derived",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "train sampled unique grid hours",
+  "hours": 512,
+  "elapsed_seconds": 4.181,
+  "artifact_sha256": {
+    "derived_statistics.csv": "ba4d7776666f23d69780506bd3891d6ee0a9a80715cc86c35a61a60a7441a67f",
+    "definitions.json": "7c5200c7d6a608ebddc9cb07dc2b17b8d7e2222e8f994c37609fbf7ccc9e851d",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
