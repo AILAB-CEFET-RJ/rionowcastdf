@@ -1,0 +1,60 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 15,
+  "name": "split_audit",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "all manifest rows and all patch metadata",
+  "hours": 99098,
+  "same_content_across_splits_is_not_proof_of_leakage": true,
+  "split_counts": [
+    {
+      "split": "train",
+      "hours": 75319,
+      "patches": 3615312,
+      "min_patches": 48,
+      "max_patches": 48,
+      "first_utc": "2011-01-17 18:00:00+00:00",
+      "last_utc": "2020-12-29 23:00:00+00:00"
+    },
+    {
+      "split": "validation",
+      "hours": 14425,
+      "patches": 692400,
+      "min_patches": 48,
+      "max_patches": 48,
+      "first_utc": "2021-01-03 00:00:00+00:00",
+      "last_utc": "2022-12-29 23:00:00+00:00"
+    },
+    {
+      "split": "test_primary",
+      "hours": 4931,
+      "patches": 236688,
+      "min_patches": 48,
+      "max_patches": 48,
+      "first_utc": "2023-01-03 00:00:00+00:00",
+      "last_utc": "2023-09-30 23:00:00+00:00"
+    },
+    {
+      "split": "test_stress_ood",
+      "hours": 4423,
+      "patches": 212304,
+      "min_patches": 48,
+      "max_patches": 48,
+      "first_utc": "2024-04-01 00:00:00+00:00",
+      "last_utc": "2024-12-31 23:00:00+00:00"
+    }
+  ],
+  "purge_hours_each_side": 48,
+  "test_targets_read": false,
+  "elapsed_seconds": 227.612,
+  "artifact_sha256": {
+    "split_counts.csv": "ff5facb34bcc5be82702d92b5f8ff1213a6a67c2a293f61232e078d49a7326e2",
+    "cross_split_source_distance.csv": "c4b04271d05f038c23b2101f1bada95fdba67bdaadb4fe889c82996bfe6d0d67",
+    "hour_identity.parquet": "e58845c243beb46b60f99d11d44afc8009eec20b3fa29e0dab136c14b86aa9f4",
+    "execution.log": "d606f098283c95c554e4c353d6d1a038b6de90e31b9f9e203066fde0ab34cbe9",
+    "shared_content_hashes.csv": "62c9afe325e384a1a2c07a57ba749034eca19fc254c2270720617d69ae567bad"
+  }
+}

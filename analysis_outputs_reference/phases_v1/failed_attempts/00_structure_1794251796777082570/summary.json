@@ -1,0 +1,8 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 0,
+  "name": "structure",
+  "status": "running",
+  "complete": false,
+  "production_ready": false
+}
