@@ -1,0 +1,17 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 14,
+  "name": "distribution_shift",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "descriptive held-out distribution audit; no fitting or tuning on test",
+  "ks_pvalues_omitted_due_to_temporal_dependence": true,
+  "elapsed_seconds": 0.419,
+  "artifact_sha256": {
+    "predictor_shift.csv": "9afb192f01a9b3cf0204b3aee071ca6aeb880dafdaed48280af196f653477e7b",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regime_composition.csv": "97e903627c3221ba2a69bf9bc47d806368a49c410c3f4cb09e2eaa9628bf610f"
+  }
+}

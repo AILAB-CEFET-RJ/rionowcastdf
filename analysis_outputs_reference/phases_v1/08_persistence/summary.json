@@ -1,0 +1,15 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 8,
+  "name": "persistence",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "sampled train/validation exact-lag pairs; mask intersection; tests held out",
+  "elapsed_seconds": 176.889,
+  "artifact_sha256": {
+    "persistence_metrics.csv": "627690a3bd818a1938454e35eb8c230ff87dbf8cab315206bf2bed0db3b73087",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 11,
+  "name": "spatial_scales",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "nonoverlapping full-grid blocks, including smaller edge blocks; mask-weighted code averages",
+  "note": "Numerical code averages are not linear-Z reflectivity averages or rainfall estimates.",
+  "elapsed_seconds": 33.539,
+  "artifact_sha256": {
+    "scale_variance.csv": "f1f2816623291393a8b37cef4e6bafd176b14d5af1064910a93fb46d87887bfc",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

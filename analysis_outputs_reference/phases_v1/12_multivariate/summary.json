@@ -1,0 +1,18 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 12,
+  "name": "multivariate",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "PCA of train hourly predictor means; fit only train",
+  "hours": 75319,
+  "elapsed_seconds": 0.341,
+  "artifact_sha256": {
+    "pca_train_fit.npz": "b4cbb801b177956d06bc778f0270e561bf6e77cb9f1cec075731a1ffdc3fcf8a",
+    "pca_variance.csv": "ddac14f8b1b89aff723119ee13c4deb5e4097f2cfb3e2c02c3b40d53e2e4ecf9",
+    "pca_loadings.csv": "0a00d13f213236c51c658b33d38c3a581c2f531a96c8af420662f09c61d66dce",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
