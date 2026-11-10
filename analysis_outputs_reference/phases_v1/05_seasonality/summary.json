@@ -1,0 +1,16 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 5,
+  "name": "seasonality",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "observed unique hours, conditioned on availability; not unconditional climatology",
+  "local_timezone": null,
+  "elapsed_seconds": 0.112,
+  "artifact_sha256": {
+    "calendar_metrics.csv": "1373a19c9bf337271ceb00dee09a908f26c8b59d5f9a1180f072ada536b64c45",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

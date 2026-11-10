@@ -1,0 +1,16 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 6,
+  "name": "diurnal",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "observed unique hours, conditioned on availability; not unconditional climatology",
+  "local_timezone": "America/Sao_Paulo",
+  "elapsed_seconds": 0.446,
+  "artifact_sha256": {
+    "calendar_metrics.csv": "a0b962fd9e1da2af0a31c185edd44ff529a320548c3430cf496af109d14574d9",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
