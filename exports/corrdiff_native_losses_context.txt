@@ -1,0 +1,1137 @@
+PYTHON: /home/vsantos/miniconda3/envs/dataset/bin/python
+PHYSICSNEMO_FILE: /home/vsantos/miniconda3/envs/dataset/lib/python3.12/site-packages/physicsnemo/__init__.py
+PHYSICSNEMO_VERSION: 2.2.2
+
+================================================================================
+CLASS: RegressionLoss
+SOURCE: /home/vsantos/miniconda3/envs/dataset/lib/python3.12/site-packages/physicsnemo/diffusion/metrics/legacy_losses.py
+SIGNATURE: ()
+class RegressionLoss:
+    """
+    Regression loss function for the deterministic predictions.
+    Note: this loss does not apply any reduction.
+
+    Attributes
+    ----------
+    sigma_data: float
+        Standard deviation for data. Deprecated and ignored.
+
+    Note
+    ----
+    Reference: Mardani, M., Brenowitz, N., Cohen, Y., Pathak, J., Chen, C.Y.,
+    Liu, C.C.,Vahdat, A., Kashinath, K., Kautz, J. and Pritchard, M., 2023.
+    Generative Residual Diffusion Modeling for Km-scale Atmospheric Downscaling.
+    arXiv preprint arXiv:2309.15214.
+    """
+
+    def __init__(self):
+        """
+        Arguments
+        ----------
+        """
+        return
+
+    def __call__(
+        self,
+        net: torch.nn.Module,
+        img_clean: torch.Tensor,
+        img_lr: torch.Tensor,
+        augment_pipe: Optional[
+            Callable[[torch.Tensor], Tuple[torch.Tensor, Optional[torch.Tensor]]]
+        ] = None,
+        lead_time_label: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        """
+        Calculate and return the regression loss for
+        deterministic predictions.
+
+        Parameters
+        ----------
+        net : torch.nn.Module
+            The neural network model that will make predictions.
+            Expected signature: `net(x, img_lr,
+            augment_labels=augment_labels, force_fp32=False)`, where:
+                x (torch.Tensor): Tensor of shape (B, C_hr, H, W). Is zero-filled.
+                img_lr (torch.Tensor): Low-resolution input of shape (B, C_lr, H, W)
+                augment_labels (torch.Tensor, optional): Optional augmentation
+                labels, returned by `augment_pipe`.
+                force_fp32 (bool, optional): Whether to force the model to use
+                fp32, by default False.
+            Returns:
+                torch.Tensor: Predictions of shape (B, C_hr, H, W)
+
+        img_clean : torch.Tensor
+            High-resolution input images of shape (B, C_hr, H, W).
+            Used as ground truth and for data augmentation if 'augment_pipe' is provided.
+
+        img_lr : torch.Tensor
+            Low-resolution input images of shape (B, C_lr, H, W).
+            Used as input to the neural network.
+
+        augment_pipe : callable, optional
+            An optional data augmentation function.
+            Expected signature:
+                img_tot (torch.Tensor): Concatenated high and low resolution
+                    images of shape (B, C_hr+C_lr, H, W)
+            Returns:
+                Tuple[torch.Tensor, Optional[torch.Tensor]]:
+                    - Augmented images of shape (B, C_hr+C_lr, H, W)
+                    - Optional augmentation labels
+
+        lead_time_label : Optional[torch.Tensor], optional
+            Lead time labels for temporal predictions, by default None.
+            Shape can vary based on model requirements, typically (B,) or scalar.
+
+        Returns
+        -------
+        torch.Tensor
+            A tensor representing the per-sample element-wise squared
+            difference between the network's predictions and the high
+            resolution images `img_clean` (possibly data-augmented by
+            `augment_pipe`).
+            Shape: (B, C_hr, H, W), same as `img_clean`.
+        """
+        weight = (
+            1.0  # (sigma ** 2 + self.sigma_data ** 2) / (sigma * self.sigma_data) ** 2
+        )
+
+        img_tot = torch.cat((img_clean, img_lr), dim=1)
+        y_tot, augment_labels = (
+            augment_pipe(img_tot) if augment_pipe is not None else (img_tot, None)
+        )
+        y = y_tot[:, : img_clean.shape[1], :, :]
+        y_lr = y_tot[:, img_clean.shape[1] :, :, :]
+
+        zero_input = torch.zeros_like(y, device=img_clean.device)
+
+        if lead_time_label is not None:
+            D_yn = net(
+                zero_input,
+                y_lr,
+                force_fp32=False,
+                lead_time_label=lead_time_label,
+                augment_labels=augment_labels,
+            )
+        else:
+            D_yn = net(
+                zero_input,
+                y_lr,
+                force_fp32=False,
+                augment_labels=augment_labels,
+            )
+
+        loss = weight * ((D_yn - y) ** 2)
+
+        return loss
+
+
+================================================================================
+CLASS: ResidualLoss
+SOURCE: /home/vsantos/miniconda3/envs/dataset/lib/python3.12/site-packages/physicsnemo/diffusion/metrics/legacy_losses.py
+SIGNATURE: (regression_net: torch.nn.modules.module.Module, P_mean: float = 0.0, P_std: float = 1.2, sigma_data: float = 0.5, hr_mean_conditioning: bool = False)
+class ResidualLoss:
+    """
+    Mixture loss function for denoising score matching.
+
+    This class implements a loss function that combines deterministic
+    regression with denoising score matching. It uses a pre-trained regression
+    network to compute residuals before applying the diffusion process.
+
+    Parameters
+    ----------
+    regression_net : torch.nn.Module
+        The regression network used for computing residuals.
+    P_mean : float
+        Mean value for noise level computation.
+    P_std : float
+        Standard deviation for noise level computation.
+    sigma_data : float
+        Standard deviation for data weighting.
+    hr_mean_conditioning : bool
+        Flag indicating whether to use high-resolution mean for conditioning.
+
+    Note
+    ----
+    Reference: Mardani, M., Brenowitz, N., Cohen, Y., Pathak, J., Chen, C.Y.,
+    Liu, C.C., Vahdat, A., Kashinath, K., Kautz, J. and Pritchard, M., 2023.
+    Generative Residual Diffusion Modeling for Km-scale Atmospheric
+    Downscaling. arXiv preprint arXiv:2309.15214.
+    """
+
+    def __init__(
+        self,
+        regression_net: torch.nn.Module,
+        P_mean: float = 0.0,
+        P_std: float = 1.2,
+        sigma_data: float = 0.5,
+        hr_mean_conditioning: bool = False,
+    ):
+        """
+        Arguments
+        ----------
+        regression_net : torch.nn.Module
+            Pre-trained regression network used to compute residuals.
+            Expected signature: `net(zero_input, y_lr,
+            lead_time_label=lead_time_label, augment_labels=augment_labels)` or
+            `net(zero_input, y_lr, augment_labels=augment_labels)`, where:
+                zero_input (torch.Tensor): Zero tensor of shape (B, C_hr, H, W)
+                y_lr (torch.Tensor): Low-resolution input of shape (B, C_lr, H, W)
+                lead_time_label (torch.Tensor, optional): Optional lead time labels
+                augment_labels (torch.Tensor, optional): Optional augmentation labels
+            Returns:
+                torch.Tensor: Predictions of shape (B, C_hr, H, W)
+
+        P_mean : float, optional
+            Mean value for noise level computation, by default 0.0.
+
+        P_std : float, optional
+            Standard deviation for noise level computation, by default 1.2.
+
+        sigma_data : float, optional
+            Standard deviation for data weighting, by default 0.5.
+
+        hr_mean_conditioning : bool, optional
+            Whether to use high-resolution mean for conditioning predicted, by default False.
+            When True, the mean prediction from `regression_net` is channel-wise
+            concatenated with `img_lr` for conditioning.
+        """
+        self.regression_net = regression_net
+        self.P_mean = P_mean
+        self.P_std = P_std
+        self.sigma_data = sigma_data
+        self.hr_mean_conditioning = hr_mean_conditioning
+        self.y_mean = None
+
+    def get_noise_params(self, y: Tensor) -> Tensor:
+        """
+        Compute the noise parameters to apply denoising score matching.
+
+        Parameters
+        ----------
+        y : torch.Tensor
+            Latent state of shape :math:`(B, *)`. Only used to determine the shape of
+            the noise and create tensors on the same device.
+
+        Returns
+        -------
+        Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+            - Noise ``n`` of shape :math:`(B, *)` to be added to the latent state.
+            - Noise level ``sigma`` of shape :math:`(B, 1, 1, 1)`.
+            - Weight ``weight`` of shape :math:`(B, 1, 1, 1)` to multiply the loss.
+        """
+        # Sample noise level
+        rnd_normal = torch.randn([y.shape[0], 1, 1, 1], device=y.device)
+        sigma = (rnd_normal * self.P_std + self.P_mean).exp()
+        # Loss weight
+        weight = (sigma**2 + self.sigma_data**2) / (sigma * self.sigma_data) ** 2
+        # Sample noise
+        n = torch.randn_like(y) * sigma
+        return n, sigma, weight
+
+    def __call__(
+        self,
+        net: torch.nn.Module,
+        img_clean: Tensor,
+        img_lr: Tensor,
+        patching: Optional[RandomPatching2D] = None,
+        lead_time_label: Optional[Tensor] = None,
+        augment_pipe: Optional[
+            Callable[[Tensor], Tuple[Tensor, Optional[Tensor]]]
+        ] = None,
+        use_patch_grad_acc: bool = False,
+    ) -> Tensor:
+        """
+        Calculate and return the loss for denoising score matching.
+
+        This method computes a mixture loss that combines deterministic
+        regression with denoising score matching. It first computes residuals
+        using the regression network, then applies the diffusion process to
+        these residuals.
+
+        In addition to the standard denoising score matching loss, this method
+        also supports optional patching for multi-diffusion. In this case, the spatial
+        dimensions of the input are decomposed into `P` smaller patches of shape
+        (H_patch, W_patch), that are grouped along the batch dimension, and the
+        model is applied to each patch individually. In the following, if `patching`
+        is not provided, then the input is not patched and `P=1` and `(H_patch,
+        W_patch) = (H, W)`. When patching is used, the original non-patched conditioning is
+        interpolated onto a spatial grid of shape `(H_patch, W_patch)` and channel-wise
+        concatenated to the patched conditioning. This ensures that each patch
+        maintains global information from the entire domain.
+
+        The diffusion model `net` is expected to be conditioned on an input with
+        `C_cond` channels, which should be:
+            - `C_cond = C_lr` if `hr_mean_conditioning` is `False` and
+              `patching` is None.
+            - `C_cond = C_hr + C_lr` if `hr_mean_conditioning` is `True` and
+              `patching` is None.
+            - `C_cond = C_hr + 2*C_lr` if `hr_mean_conditioning` is `True` and
+              `patching` is not None.
+            - `C_cond = 2*C_lr` if `hr_mean_conditioning` is `False` and
+              `patching` is not None.
+        Additionally, `C_cond` should also include any embedding channels,
+        such as positional embeddings or time embeddings.
+
+        Note: this loss function does not apply any reduction.
+
+        Parameters
+        ----------
+        net : torch.nn.Module
+            The neural network model for the diffusion process.
+            Expected signature: `net(latent, y_lr, sigma,
+            embedding_selector=embedding_selector, lead_time_label=lead_time_label,
+            augment_labels=augment_labels)`, where:
+                latent (torch.Tensor): Noisy input of shape (B[*P], C_hr, H_patch, W_patch)
+                y_lr (torch.Tensor): Conditioning of shape (B[*P], C_cond, H_patch, W_patch)
+                sigma (torch.Tensor): Noise level of shape (B[*P], 1, 1, 1)
+                embedding_selector (callable, optional): Function to select
+                    positional embeddings. Only used if `patching` is provided.
+                lead_time_label (torch.Tensor, optional): Lead time labels.
+                augment_labels (torch.Tensor, optional): Augmentation labels
+            Returns:
+                torch.Tensor: Predictions of shape (B[*P], C_hr, H_patch, W_patch)
+
+        img_clean : torch.Tensor
+            High-resolution input images of shape (B, C_hr, H, W).
+            Used as ground truth and for data augmentation if 'augment_pipe' is provided.
+
+        img_lr : torch.Tensor
+            Low-resolution input images of shape (B, C_lr, H, W).
+            Used as input to the regression network and conditioning for the
+            diffusion process.
+
+        patching : Optional[RandomPatching2D], optional
+            Patching strategy for processing large images, by default None. See
+            :class:`physicsnemo.diffusion.multi_diffusion.RandomPatching2D` for details.
+            When provided, the patching strategy is used for both image patches
+            and positional embeddings selection in the diffusion model `net`.
+            Transforms tensors from shape (B, C, H, W) to (B*P, C, H_patch,
+            W_patch).
+
+        lead_time_label : Optional[torch.Tensor], optional
+            Labels for lead-time aware predictions, by default None.
+            Shape can vary based on model requirements, typically (B,) or scalar.
+
+        augment_pipe : Optional[Callable[[torch.Tensor], Tuple[torch.Tensor, Optional[torch.Tensor]]]]
+            Data augmentation function.
+            Expected signature:
+                img_tot (torch.Tensor): Concatenated high and low resolution images
+                    of shape (B, C_hr+C_lr, H, W)
+            Returns:
+                Tuple[torch.Tensor, Optional[torch.Tensor]]:
+                    - Augmented images of shape (B, C_hr+C_lr, H, W)
+                    - Optional augmentation labels
+        use_patch_grad_acc: bool, optional
+            A boolean flag indicating whether to enable multi-iterations of patching accumulations
+            for amortizing regression cost. Default False.
+
+        Returns
+        -------
+        torch.Tensor
+            If patching is not used:
+                A tensor of shape (B, C_hr, H, W) representing the per-sample loss.
+            If patching is used:
+                A tensor of shape (B*P, C_hr, H_patch, W_patch) representing
+                the per-patch loss.
+
+        Raises
+        ------
+        ValueError
+            If patching is provided but is not an instance of :class:`physicsnemo.diffusion.multi_diffusion.RandomPatching2D`.
+            If shapes of img_clean and img_lr are incompatible.
+        """
+
+        # Safety check: enforce patching object
+        if patching and not isinstance(patching, RandomPatching2D):
+            raise ValueError("patching must be a 'RandomPatching2D' object.")
+        # Safety check: enforce shapes
+        if (
+            img_clean.shape[0] != img_lr.shape[0]
+            or img_clean.shape[2:] != img_lr.shape[2:]
+        ):
+            raise ValueError(
+                f"Shape mismatch between img_clean {img_clean.shape} and "
+                f"img_lr {img_lr.shape}. "
+                f"Batch size, height and width must match."
+            )
+
+        # augment for conditional generation
+        img_tot = torch.cat((img_clean, img_lr), dim=1)
+        y_tot, augment_labels = (
+            augment_pipe(img_tot) if augment_pipe is not None else (img_tot, None)
+        )
+        y = y_tot[:, : img_clean.shape[1], :, :]
+        y_lr = y_tot[:, img_clean.shape[1] :, :, :]
+        y_lr_res = y_lr
+        batch_size = y.shape[0]
+
+        # if using multi-iterations of patching, switch to optimized version
+        if use_patch_grad_acc:
+            # form residual
+            if self.y_mean is None:
+                if lead_time_label is not None:
+                    y_mean = self.regression_net(
+                        torch.zeros_like(y, device=img_clean.device),
+                        y_lr_res,
+                        lead_time_label=lead_time_label,
+                        augment_labels=augment_labels,
+                    )
+                else:
+                    y_mean = self.regression_net(
+                        torch.zeros_like(y, device=img_clean.device),
+                        y_lr_res,
+                        augment_labels=augment_labels,
+                    )
+                self.y_mean = y_mean
+
+        # if on full domain, or if using patching without multi-iterations
+        else:
+            # form residual
+            if lead_time_label is not None:
+                y_mean = self.regression_net(
+                    torch.zeros_like(y, device=img_clean.device),
+                    y_lr_res,
+                    lead_time_label=lead_time_label,
+                    augment_labels=augment_labels,
+                )
+            else:
+                y_mean = self.regression_net(
+                    torch.zeros_like(y, device=img_clean.device),
+                    y_lr_res,
+                    augment_labels=augment_labels,
+                )
+
+            self.y_mean = y_mean
+
+        y = y - self.y_mean
+
+        if self.hr_mean_conditioning:
+            y_lr = torch.cat((self.y_mean, y_lr), dim=1)
+
+        # patchified training
+        # conditioning: cat(y_mean, y_lr, input_interp, pos_embd), 4+12+100+4
+        # removed patch_embedding_selector due to compilation issue with dynamo.
+        if patching:
+            # Patched residual
+            # (batch_size * patch_num, c_out, patch_shape_y, patch_shape_x)
+            y_patched = patching.apply(input=y)
+            # Patched conditioning on y_lr and interp(img_lr)
+            # (batch_size * patch_num, 2*c_in, patch_shape_y, patch_shape_x)
+            y_lr_patched = patching.apply(input=y_lr, additional_input=img_lr)
+
+            y = y_patched
+            y_lr = y_lr_patched
+
+        # Add noise to the latent state
+        n, sigma, weight = self.get_noise_params(y)
+
+        if lead_time_label is not None:
+            D_yn = net(
+                y + n,
+                y_lr,
+                sigma,
+                embedding_selector=None,
+                global_index=(
+                    patching.global_index(batch_size, img_clean.device)
+                    if patching is not None
+                    else None
+                ),
+                lead_time_label=lead_time_label,
+                augment_labels=augment_labels,
+            )
+        else:
+            D_yn = net(
+                y + n,
+                y_lr,
+                sigma,
+                embedding_selector=None,
+                global_index=(
+                    patching.global_index(batch_size, img_clean.device)
+                    if patching is not None
+                    else None
+                ),
+                augment_labels=augment_labels,
+            )
+        loss = weight * ((D_yn - y) ** 2)
+
+        return loss
+
+
+================================================================================
+CLASS: CorrDiffRegressionUNet
+SOURCE: /home/vsantos/miniconda3/envs/dataset/lib/python3.12/site-packages/physicsnemo/models/diffusion_unets/unet.py
+SIGNATURE: (img_resolution: Union[int, Tuple[int, int]], img_in_channels: int, img_out_channels: int, use_fp16: bool = False, model_type: Literal['SongUNetPosEmbd', 'SongUNetPosLtEmbd', 'SongUNet', 'DhariwalUNet'] = 'SongUNetPosEmbd', **model_kwargs: dict)
+class CorrDiffRegressionUNet(Module):  # TODO a lot of redundancy, need to clean up
+    r"""
+    This interface provides a U-Net wrapper for CorrDiff deterministic
+    regression model (and other deterministic downsampling models).
+    It supports the following architectures:
+
+    - :class:`~physicsnemo.models.diffusion_unets.SongUNet`
+
+    - :class:`~physicsnemo.models.diffusion_unets.SongUNetPosEmbd`
+
+    - :class:`~physicsnemo.models.diffusion_unets.SongUNetPosLtEmbd`
+
+    - :class:`~physicsnemo.models.diffusion_unets.DhariwalUNet`
+
+    It shares the same architeture as a conditional diffusion model. It does so
+    by concatenating a conditioning image to a zero-filled latent state, and by
+    setting the noise level and the class labels to zero.
+
+    Parameters
+    -----------
+    img_resolution : Union[int, Tuple[int, int]]
+        The resolution of the input/output image. If a single int is provided,
+        then the image is assumed to be square.
+    img_in_channels : int
+        Number of channels in the input image.
+    img_out_channels : int
+        Number of channels in the output image.
+    use_fp16: bool, optional, default=False
+        Execute the underlying model at FP16 precision.
+    model_type: Literal['SongUNet', 'SongUNetPosEmbd', 'SongUNetPosLtEmbd',
+    'DhariwalUNet'], default='SongUNetPosEmbd'
+        Class name of the underlying architecture. Must be one of the following:
+        'SongUNet', 'SongUNetPosEmbd', 'SongUNetPosLtEmbd', 'DhariwalUNet'.
+    **model_kwargs : dict
+        Keyword arguments passed to the underlying architecture `__init__` method.
+
+    Please refer to the documentation of these classes for details on how to call
+    and use these models directly.
+
+    Forward
+    -------
+    x : torch.Tensor
+        The input tensor, typically zero-filled, of shape :math:`(B, C_{in}, H_{in}, W_{in})`.
+    img_lr : torch.Tensor
+        Conditioning image of shape :math:`(B, C_{lr}, H_{in}, W_{in})`.
+    **model_kwargs : dict
+        Additional keyword arguments to pass to the underlying architecture
+        forward method.
+
+    Outputs
+    -------
+    torch.Tensor
+        Output tensor of shape :math:`(B, C_{out}, H_{in}, W_{in})` (same
+        spatial dimensions as the input).
+
+    Examples
+    --------
+    >>> import torch
+    >>> from physicsnemo.models.diffusion_unets import CorrDiffRegressionUNet
+    >>> model = CorrDiffRegressionUNet(
+    ...     img_resolution=16,
+    ...     img_in_channels=2,
+    ...     img_out_channels=3,
+    ...     model_type="SongUNet",
+    ... )
+    >>> x = torch.zeros(1, 2, 16, 16)
+    >>> img_lr = torch.randn(1, 3, 16, 16)
+    >>> output = model(x, img_lr)
+    >>> output.shape
+    torch.Size([1, 3, 16, 16])
+    """
+
+    __model_checkpoint_version__ = "0.2.0"
+    __supported_model_checkpoint_version__ = {
+        "0.1.0": "Loading CorrDiffRegressionUNet checkpoint from older version 0.1.0 (current version is 0.2.0). This version is still supported, but consider re-saving the model to upgrade to version 0.2.0 and remove this warning."
+    }
+
+    # Classes that can be wrapped by this UNet class.
+    _wrapped_classes: Set[str] = {
+        "SongUNetPosEmbd",
+        "SongUNetPosLtEmbd",
+        "SongUNet",
+        "DhariwalUNet",
+    }
+
+    # Arguments of the __init__ method that can be overridden with the
+    # ``Module.from_checkpoint`` method. Here, since we use splatted arguments
+    # for the wrapped model instance, we allow overriding of any overridable
+    # argument of the wrapped classes.
+    _overridable_args: Set[str] = set.union(
+        *(
+            getattr(getattr(network_module, cls_name), "_overridable_args", set())
+            for cls_name in _wrapped_classes
+        )
+    )
+
+    @classmethod
+    def _backward_compat_arg_mapper(
+        cls, version: str, args: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Map arguments from older versions to current version format.
+
+        Parameters
+        ----------
+        version : str
+            Version of the checkpoint being loaded
+        args : Dict[str, Any]
+            Arguments dictionary from the checkpoint
+
+        Returns
+        -------
+        Dict[str, Any]
+            Updated arguments dictionary compatible with current version
+        """
+        # Call parent class method first
+        args = super()._backward_compat_arg_mapper(version, args)
+
+        if version == "0.1.0":
+            # In version 0.1.0, img_channels was unused
+            if "img_channels" in args:
+                _ = args.pop("img_channels")
+
+            # Sigma parameters are also unused
+            if "sigma_min" in args:
+                _ = args.pop("sigma_min")
+            if "sigma_max" in args:
+                _ = args.pop("sigma_max")
+            if "sigma_data" in args:
+                _ = args.pop("sigma_data")
+
+        return args
+
+    def __init__(
+        self,
+        img_resolution: Union[int, Tuple[int, int]],
+        img_in_channels: int,
+        img_out_channels: int,
+        use_fp16: bool = False,
+        model_type: Literal[
+            "SongUNetPosEmbd", "SongUNetPosLtEmbd", "SongUNet", "DhariwalUNet"
+        ] = "SongUNetPosEmbd",
+        **model_kwargs: dict,
+    ):
+        super().__init__(meta=MetaData)
+
+        # Validation
+        if model_type not in self._wrapped_classes:
+            raise ValueError(
+                f"Model type '{model_type}' is not supported. "
+                f"Must be one of: {', '.join(self._wrapped_classes)}"
+            )
+
+        # for compatibility with older versions that took only 1 dimension
+        if isinstance(img_resolution, int):
+            self.img_shape_x = self.img_shape_y = img_resolution
+        else:
+            self.img_shape_y = img_resolution[0]
+            self.img_shape_x = img_resolution[1]
+
+        self.img_in_channels = img_in_channels
+        self.img_out_channels = img_out_channels
+
+        model_class = getattr(network_module, model_type)
+        self.model = model_class(
+            img_resolution=img_resolution,
+            in_channels=img_in_channels + img_out_channels,
+            out_channels=img_out_channels,
+            **model_kwargs,
+        )
+        self.use_fp16 = use_fp16
+
+    # Properties delegated to the wrapped model
+    amp_mode = _wrapped_property(
+        "amp_mode",
+        "model",
+        "Set to ``True`` when using automatic mixed precision.",
+    )
+    profile_mode = _wrapped_property(
+        "profile_mode",
+        "model",
+        "Set to ``True`` to enable profiling of the wrapped model.",
+    )
+
+    @property
+    def use_fp16(self):
+        """
+        bool: Whether the model uses float16 precision.
+
+        Returns
+        -------
+        bool
+            True if the model is in float16 mode, False otherwise.
+        """
+        return self._use_fp16
+
+    @use_fp16.setter
+    def use_fp16(self, value: bool):
+        """
+        Set whether the model should use float16 precision.
+
+        Parameters
+        ----------
+        value : bool
+            If True, moves the model to torch.float16. If False, moves to torch.float32.
+
+        Raises
+        ------
+        ValueError
+            If `value` is not a boolean.
+        """
+        # NOTE: allow 0/1 values for older checkpoints
+        if not (isinstance(value, bool) or value in [0, 1]):
+            raise ValueError(
+                f"`use_fp16` must be a boolean, but got {type(value).__name__}."
+            )
+        self._use_fp16 = value
+        if value:
+            self.to(torch.float16)
+        else:
+            self.to(torch.float32)
+
+    def forward(
+        self,
+        x: Float[torch.Tensor, "B C_in H_in W_in"],
+        img_lr: Float[torch.Tensor, "B C_lr H_in W_in"] | None = None,
+        force_fp32: bool = False,
+        **model_kwargs: dict,
+    ) -> Float[torch.Tensor, "B C_out H_in W_in"]:
+        # Input validation
+        if not torch.compiler.is_compiling():
+            if x.ndim != 4:
+                raise ValueError(
+                    f"Expected 'x' to be a 4D tensor (B, C, H, W), "
+                    f"got {x.ndim}D tensor with shape {tuple(x.shape)}"
+                )
+            if img_lr is not None:
+                if img_lr.ndim != 4:
+                    raise ValueError(
+                        f"Expected 'img_lr' to be a 4D tensor (B, C, H, W), "
+                        f"got {img_lr.ndim}D tensor with shape {tuple(img_lr.shape)}"
+                    )
+                if img_lr.shape[0] != x.shape[0] or img_lr.shape[2:] != x.shape[2:]:
+                    raise ValueError(
+                        f"Expected 'img_lr' spatial dimensions to match 'x': "
+                        f"x has shape {tuple(x.shape)}, "
+                        f"but img_lr has shape {tuple(img_lr.shape)}"
+                    )
+
+        # Concatenate conditioning image to input
+        if img_lr is not None:
+            x = torch.cat((x, img_lr), dim=1)
+
+        dtype = (
+            torch.float16
+            if (self.use_fp16 and not force_fp32 and x.device.type == "cuda")
+            else torch.float32
+        )
+
+        F_x = self.model(
+            x.to(dtype),
+            torch.zeros(x.shape[0], dtype=dtype, device=x.device),
+            class_labels=None,
+            **model_kwargs,
+        )
+
+        if (F_x.dtype != dtype) and not torch.is_autocast_enabled():
+            raise ValueError(
+                f"Expected the dtype to be {dtype}, but got {F_x.dtype} instead."
+            )
+
+        D_x = F_x.to(torch.float32)
+        return D_x
+
+    def round_sigma(self, sigma: Union[float, List, torch.Tensor]) -> torch.Tensor:
+        """
+        Convert a given sigma value(s) to a tensor representation.
+
+        Parameters
+        ----------
+        sigma : Union[float, List, torch.Tensor]
+            The sigma value(s) to convert.
+
+        Returns
+        -------
+        torch.Tensor
+            The tensor representation of the provided sigma value(s).
+        """
+        return torch.as_tensor(sigma)
+
+
+================================================================================
+CLASS: EDMPrecondSuperResolution
+SOURCE: /home/vsantos/miniconda3/envs/dataset/lib/python3.12/site-packages/physicsnemo/diffusion/preconditioners/legacy.py
+SIGNATURE: (img_resolution: Union[int, Tuple[int, int]], img_in_channels: int, img_out_channels: int, use_fp16: bool = False, model_type: Literal['SongUNetPosEmbd', 'SongUNetPosLtEmbd', 'SongUNet', 'DhariwalUNet'] = 'SongUNetPosEmbd', sigma_data: float = 0.5, sigma_min=0.0, sigma_max=inf, **model_kwargs: Any)
+class EDMPrecondSuperResolution(Module):
+    """
+    Improved preconditioning proposed in the paper "Elucidating the Design Space of
+    Diffusion-Based Generative Models" (EDM).
+
+    This is a variant of `EDMPrecond` that is specifically designed for super-resolution
+    tasks. It wraps a neural network that predicts the denoised high-resolution image
+    given a noisy high-resolution image, and additional conditioning that includes a
+    low-resolution image, and a noise level.
+
+    Parameters
+    ----------
+    img_resolution : Union[int, Tuple[int, int]]
+        Spatial resolution :math:`(H, W)` of the image. If a single int is provided,
+        the image is assumed to be square.
+    img_in_channels : int
+        Number of input channels in the low-resolution input image.
+    img_out_channels : int
+        Number of output channels in the high-resolution output image.
+    use_fp16 : bool, optional
+        Whether to use half-precision floating point (FP16) for model execution,
+        by default False.
+    model_type : str, optional
+        Class name of the underlying model. Must be one of the following:
+        'SongUNet', 'SongUNetPosEmbd', 'SongUNetPosLtEmbd', 'DhariwalUNet'.
+        Defaults to 'SongUNetPosEmbd'.
+    sigma_data : float, optional
+        Expected standard deviation of the training data, by default 0.5.
+    sigma_min : float, optional
+        Minimum supported noise level, by default 0.0.
+    sigma_max : float, optional
+        Maximum supported noise level, by default inf.
+    **model_kwargs : dict
+        Keyword arguments passed to the underlying model `__init__` method.
+
+    See Also
+    --------
+    For information on model types and their usage:
+    :class:`~physicsnemo.models.diffusion_unets.SongUNet`: Basic U-Net for diffusion models
+    :class:`~physicsnemo.models.diffusion_unets.SongUNetPosEmbd`: U-Net with positional embeddings
+    :class:`~physicsnemo.models.diffusion_unets.SongUNetPosLtEmbd`: U-Net with positional and lead-time embeddings
+
+    Please refer to the documentation of these classes for details on how to call
+    and use these models directly.
+
+    Note
+    ----
+    References:
+    - Karras, T., Aittala, M., Aila, T. and Laine, S., 2022. Elucidating the
+    design space of diffusion-based generative models. Advances in Neural Information
+    Processing Systems, 35, pp.26565-26577.
+    - Mardani, M., Brenowitz, N., Cohen, Y., Pathak, J., Chen, C.Y.,
+    Liu, C.C.,Vahdat, A., Kashinath, K., Kautz, J. and Pritchard, M., 2023.
+    Generative Residual Diffusion Modeling for Km-scale Atmospheric Downscaling.
+    arXiv preprint arXiv:2309.15214.
+    """
+
+    # Classes that can be wrapped by this UNet class.
+    _wrapped_classes = {
+        "SongUNetPosEmbd",
+        "SongUNetPosLtEmbd",
+        "SongUNet",
+        "DhariwalUNet",
+    }
+
+    # Arguments of the __init__ method that can be overridden with the
+    # ``Module.from_checkpoint`` method. Here, since we use splatted arguments
+    # for the wrapped model instance, we allow overriding of any overridable
+    # argument of the wrapped classes.
+    _overridable_args = set.union(
+        *(
+            getattr(getattr(network_module, cls_name), "_overridable_args", set())
+            for cls_name in _wrapped_classes
+        )
+    )
+
+    def __init__(
+        self,
+        img_resolution: Union[int, Tuple[int, int]],
+        img_in_channels: int,
+        img_out_channels: int,
+        use_fp16: bool = False,
+        model_type: Literal[
+            "SongUNetPosEmbd", "SongUNetPosLtEmbd", "SongUNet", "DhariwalUNet"
+        ] = "SongUNetPosEmbd",
+        sigma_data: float = 0.5,
+        sigma_min=0.0,
+        sigma_max=float("inf"),
+        **model_kwargs: Any,
+    ):
+        super().__init__(meta=EDMPrecondSuperResolutionMetaData)
+
+        # Validation
+        if model_type not in self._wrapped_classes:
+            raise ValueError(
+                f"Model type '{model_type}' is not supported. "
+                f"Must be one of: {', '.join(self._wrapped_classes)}"
+            )
+
+        self.img_resolution = img_resolution
+        self.img_in_channels = img_in_channels
+        self.img_out_channels = img_out_channels
+        self.sigma_data = sigma_data
+        self.sigma_min = sigma_min
+        self.sigma_max = sigma_max
+
+        model_class = getattr(network_module, model_type)
+        self.model = model_class(
+            img_resolution=img_resolution,
+            in_channels=img_in_channels + img_out_channels,
+            out_channels=img_out_channels,
+            **model_kwargs,
+        )  # TODO needs better handling
+        self.scaling_fn = self._scaling_fn
+        self.use_fp16 = use_fp16
+
+    @property
+    def use_fp16(self):
+        """
+        bool: Whether the model uses float16 precision.
+
+        Returns
+        -------
+        bool
+            True if the model is in float16 mode, False otherwise.
+        """
+        return self._use_fp16
+
+    @use_fp16.setter
+    def use_fp16(self, value: bool):
+        """
+        Set whether the model should use float16 precision.
+
+        Parameters
+        ----------
+        value : bool
+            If True, moves the model to torch.float16. If False, moves to torch.float32.
+
+        Raises
+        ------
+        ValueError
+            If `value` is not a boolean.
+        """
+        # NOTE: allow 0/1 values for older checkpoints
+        if not (isinstance(value, bool) or value in [0, 1]):
+            raise ValueError(
+                f"`use_fp16` must be a boolean, but got {type(value).__name__}."
+            )
+        self._use_fp16 = value
+        if value:
+            self.to(torch.float16)
+        else:
+            self.to(torch.float32)
+
+    @staticmethod
+    def _scaling_fn(
+        x: torch.Tensor, img_lr: torch.Tensor, c_in: torch.Tensor
+    ) -> torch.Tensor:
+        """
+        Scale input tensors by first scaling the high-resolution tensor and then
+        concatenating with the low-resolution tensor.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Noisy high-resolution image of shape (B, C_hr, H, W).
+        img_lr : torch.Tensor
+            Low-resolution image of shape (B, C_lr, H, W).
+        c_in : torch.Tensor
+            Scaling factor of shape (B, 1, 1, 1).
+
+        Returns
+        -------
+        torch.Tensor
+            Scaled and concatenated tensor of shape (B, C_in+C_out, H, W).
+        """
+        return torch.cat([c_in * x, img_lr.to(x.dtype)], dim=1)
+
+    # Properties delegated to the wrapped model
+    amp_mode = _wrapped_property(
+        "amp_mode",
+        "model",
+        "Set to ``True`` when using automatic mixed precision.",
+    )
+    profile_mode = _wrapped_property(
+        "profile_mode",
+        "model",
+        "Set to ``True`` to enable profiling of the wrapped model.",
+    )
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        img_lr: torch.Tensor,
+        sigma: torch.Tensor,
+        force_fp32: bool = False,
+        **model_kwargs: Any,
+    ) -> torch.Tensor:
+        """
+        Forward pass of the EDMPrecondSuperResolution model wrapper.
+
+        This method applies the EDM preconditioning to compute the denoised image
+        from a noisy high-resolution image and low-resolution conditioning image.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Noisy high-resolution image of shape (B, C_hr, H, W). The number of
+            channels `C_hr` should be equal to `img_out_channels`.
+        img_lr : torch.Tensor
+            Low-resolution conditioning image of shape (B, C_lr, H, W). The number
+            of channels `C_lr` should be equal to `img_in_channels`.
+        sigma : torch.Tensor
+            Noise level of shape (B) or (B, 1) or (B, 1, 1, 1).
+        force_fp32 : bool, optional
+            Whether to force FP32 precision regardless of the `use_fp16` attribute,
+            by default False.
+        **model_kwargs : dict
+            Additional keyword arguments to pass to the underlying model
+            `self.model` forward method.
+
+        Returns
+        -------
+        torch.Tensor
+            Denoised high-resolution image of shape (B, C_hr, H, W).
+
+        Raises
+        ------
+        ValueError
+            If the model output dtype doesn't match the expected dtype.
+        """
+        # Concatenate input channels
+        x = x.to(torch.float32)
+        sigma = sigma.to(torch.float32).reshape(-1, 1, 1, 1)
+        dtype = (
+            torch.float16
+            if (self.use_fp16 and not force_fp32 and x.device.type == "cuda")
+            else torch.float32
+        )
+
+        c_skip = self.sigma_data**2 / (sigma**2 + self.sigma_data**2)
+        c_out = sigma * self.sigma_data / (sigma**2 + self.sigma_data**2).sqrt()
+        c_in = 1 / (self.sigma_data**2 + sigma**2).sqrt()
+        c_noise = sigma.log() / 4
+
+        if img_lr is None:
+            arg = c_in * x
+        else:
+            arg = self.scaling_fn(x, img_lr, c_in)
+        arg = arg.to(dtype)
+
+        F_x = self.model(
+            arg,
+            c_noise.flatten(),
+            class_labels=None,
+            **model_kwargs,
+        )
+
+        if (F_x.dtype != dtype) and not torch.is_autocast_enabled():
+            raise ValueError(
+                f"Expected the dtype to be {dtype}, but got {F_x.dtype} instead."
+            )
+
+        D_x = c_skip * x + c_out * F_x.to(torch.float32)
+        return D_x
+
+    @staticmethod
+    def round_sigma(sigma: Union[float, List, torch.Tensor]) -> torch.Tensor:
+        """
+        Convert a given sigma value(s) to a tensor representation.
+
+        Parameters
+        ----------
+        sigma : Union[float, List, torch.Tensor]
+            Sigma value(s) to convert.
+
+        Returns
+        -------
+        torch.Tensor
+            Tensor representation of sigma values.
+
+        See Also
+        --------
+        EDMPrecond.round_sigma
+        """
+        return EDMPrecond.round_sigma(sigma)
+
+
+================================================================================
+FILE: /home/vsantos/repositories/physicsnemo/examples/weather/corrdiff/conf/base/model/regression.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES.
+# SPDX-FileCopyrightText: All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: regression
+# Model type.
+hr_mean_conditioning: false
+# No high-res conditioning for regression.
+
+# Default regression model parameters. Do not modify.
+model_args:
+  "N_grid_channels": 4
+  # Number of channels for positional grid embeddings
+  "embedding_type": "zero"
+  # Type of timestep embedding: 'positional' for DDPM++, 'fourier' for NCSN++,
+  # 'zero' for none
+================================================================================
+FILE: /home/vsantos/repositories/physicsnemo/examples/weather/corrdiff/conf/base/model/diffusion.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES.
+# SPDX-FileCopyrightText: All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: diffusion
+# Model type.
+hr_mean_conditioning: True
+# Recommended to use high-res conditioning for diffusion.
+
+# Standard model parameters.
+model_args:
+  gridtype: "sinusoidal"
+  # Type of positional grid to use: 'sinusoidal', 'learnable', 'linear'.
+  # Controls how positional information is encoded.
+  N_grid_channels: 4
+  # Number of channels for positional grid embeddings
+  embedding_type: "zero"
+  # Type of timestep embedding: 'positional' for DDPM++, 'fourier' for NCSN++,
+  # 'zero' for none
+
+================================================================================
+FILE: /home/vsantos/repositories/physicsnemo/examples/weather/corrdiff/conf/base/model_size/mini.yaml
+# @package _global_.model
+
+# SPDX-FileCopyrightText: Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES.
+# SPDX-FileCopyrightText: All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+model_args:
+  # Base multiplier for the number of channels across the network.
+  model_channels: 64
+  # Per-resolution multipliers for the number of channels.
+  channel_mult: [1, 2, 2]
+  # Resolutions at which self-attention layers are applied.
+  attn_resolutions: [16]
