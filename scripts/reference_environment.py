@@ -164,10 +164,55 @@ def pinned_requirements(text):
 
 def wheel_record(path):
     with zipfile.ZipFile(path) as z:
-        names=[n for n in z.namelist() if n.endswith('.dist-info/METADATA')]
+        # A wheel may vendor other distributions, including nested
+        # *.dist-info/METADATA files. Only the root distribution's
+        # dist-info directory is authoritative for this wheel.
+        names=[n for n in z.namelist()
+               if len(Path(n).parts)==2
+               and Path(n).parts[0].endswith('.dist-info')
+               and Path(n).parts[1]=='METADATA']
         if len(names)!=1: raise ValueError(f'Invalid wheel: {path}')
         meta=BytesParser().parsebytes(z.read(names[0]))
+        corrupt=z.testzip()
+        if corrupt is not None:
+            raise ValueError(f'Corrupt wheel member {corrupt}: {path}')
+    if not meta['Name'] or not meta['Version']:
+        raise ValueError(f'Missing wheel name/version metadata: {path}')
     return dict(file=path.name, name=meta['Name'],version=meta['Version'],sha256=digest(path))
+
+
+def normalized_name(name):
+    return re.sub(r'[-_.]+','-',name).lower()
+
+
+def finish_bundle(root, info, requirements, converted):
+    """Audit every completed wheel before writing the final manifest."""
+    wheels=root/'wheels'
+    records=[wheel_record(p) for p in sorted(wheels.glob('*.whl'))]
+    actual={}
+    for record in records:
+        name=normalized_name(record['name'])
+        if name in actual:
+            raise ValueError(f'Duplicate wheels for {name}')
+        actual[name]=record['version']
+    expected={normalized_name(line.split('==',1)[0]):line.split('==',1)[1]
+              for line in requirements}
+    # PhysicsNeMo is deliberately built from the audited checkout, not PyPI.
+    expected['nvidia-physicsnemo']=None
+    if set(actual)!=set(expected):
+        raise ValueError(f'Wheel coverage mismatch: missing={sorted(set(expected)-set(actual))}, '
+                         f'extra={sorted(set(actual)-set(expected))}')
+    for name,version in expected.items():
+        if version is not None and actual[name]!=version:
+            raise ValueError(f'Wheel version mismatch for {name}: expected {version}, got {actual[name]}')
+    lock=''.join(f"{r['name']}=={r['version']} --hash=sha256:{r['sha256']}\n" for r in records)
+    (root/'requirements.lock').write_text(lock)
+    manifest=dict(schema='reference-wheel-bundle-v1',host=host(),checkout=info,wheels=records,
+                  lock_sha256=digest(root/'requirements.lock'),
+                  local_origin_resolutions=converted,validated_install=False)
+    (root/'manifest.json').write_text(json.dumps(manifest,indent=2))
+    print(f'Bundle created: {root}. Installation and doctor verification are still required.')
+    return 0
 
 
 def bundle(args):
@@ -189,18 +234,26 @@ def bundle(args):
     # Ensure source did not change during packaging.
     after=checkout_info(args.physicsnemo_dir,args.expected_commit)
     if after['dirty']: raise ValueError('Checkout changed during build')
-    records=[wheel_record(p) for p in sorted(wheels.glob('*.whl'))]
-    names=[r['name'].lower().replace('_','-') for r in records]
-    if len(names)!=len(set(names)) or names.count('nvidia-physicsnemo')!=1:
-        raise ValueError('Duplicate wheels or absent PhysicsNeMo wheel')
-    lock=''.join(f"{r['name']}=={r['version']} --hash=sha256:{r['sha256']}\n" for r in records)
-    (root/'requirements.lock').write_text(lock)
-    manifest=dict(schema='reference-wheel-bundle-v1',host=host(),checkout=info,wheels=records,
-                  lock_sha256=digest(root/'requirements.lock'),
-                  local_origin_resolutions=converted,validated_install=False)
-    (root/'manifest.json').write_text(json.dumps(manifest,indent=2))
-    print(f'Bundle created: {root}. Installation and doctor verification are still required.')
-    return 0
+    return finish_bundle(root,after,requirements,converted)
+
+
+def finalize(args):
+    """Finish a prior bundle whose wheels exist but manifest was not written."""
+    root=Path(args.bundle).resolve()
+    if not root.is_dir() or (root/'manifest.json').exists() or (root/'requirements.lock').exists():
+        raise ValueError('Expected an unfinished bundle directory without a manifest or lock')
+    info=checkout_info(args.physicsnemo_dir,args.expected_commit)
+    if info['dirty']:
+        raise ValueError('Checkout has local changes; cannot finalize without stable provenance')
+    frozen=output([sys.executable,'-m','pip','freeze','--all'])
+    requirements,converted=pinned_requirements(frozen)
+    if (root/'source-freeze.txt').read_text()!=frozen+'\n':
+        raise ValueError('Environment differs from the interrupted bundle snapshot')
+    if (root/'dependencies.txt').read_text()!='\n'.join(requirements)+'\n':
+        raise ValueError('Dependency pins differ from the interrupted bundle')
+    if json.loads((root/'local-origin-resolutions.json').read_text())!=converted:
+        raise ValueError('Local-origin resolutions differ from the interrupted bundle')
+    return finish_bundle(root,info,requirements,converted)
 
 
 def verify_bundle(root):
@@ -241,9 +294,11 @@ def main():
     b=sub.add_parser('bundle'); b.add_argument('--physicsnemo-dir',required=True)
     b.add_argument('--expected-commit',default=EXPECTED_COMMIT); b.add_argument('--output',required=True)
     b.add_argument('--extra-index-url',action='append',default=[])
+    f=sub.add_parser('finalize'); f.add_argument('--bundle',required=True)
+    f.add_argument('--physicsnemo-dir',required=True); f.add_argument('--expected-commit',default=EXPECTED_COMMIT)
     i=sub.add_parser('install'); i.add_argument('--bundle',required=True); i.add_argument('--venv',required=True)
     args=p.parse_args()
-    try: return {'doctor':doctor,'bundle':bundle,'install':install}[args.command](args)
+    try: return {'doctor':doctor,'bundle':bundle,'finalize':finalize,'install':install}[args.command](args)
     except Exception as e:
         print(f'ERROR: {e}',file=sys.stderr); return 1
 
