@@ -1,0 +1,15 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 7,
+  "name": "temporal_lags",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "exact UTC time joins within each split; gaps never bridged",
+  "elapsed_seconds": 0.073,
+  "artifact_sha256": {
+    "lag_metrics.csv": "4cfa27d448300f23cfeb514084461a5e39cc4396ba4965aa0e7f25c3f77a42b5",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

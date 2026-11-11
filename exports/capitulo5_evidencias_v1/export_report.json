@@ -1,0 +1,174 @@
+{
+  "export_status": "phase_artifacts_verified",
+  "scientific_validation": false,
+  "created_utc": "20261111T001629544055Z",
+  "phases_directory": "/home/vsantos/repositories/rionowcastdf/analysis_outputs_reference/phases_v1",
+  "phase_status": [
+    {
+      "phase": 0,
+      "name": "structure",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "unique grid points per hour; predictor stats over all covered grid points"
+    },
+    {
+      "phase": 1,
+      "name": "univariate",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "train sampled unique hours and spatial points"
+    },
+    {
+      "phase": 2,
+      "name": "derived",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "train sampled unique grid hours"
+    },
+    {
+      "phase": 3,
+      "name": "joint",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "train hourly spatial means; descriptive associations, not causal or pixelwise"
+    },
+    {
+      "phase": 4,
+      "name": "extremes",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "unique hourly/pixel denominators; fixed palette thresholds"
+    },
+    {
+      "phase": 5,
+      "name": "seasonality",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "observed unique hours, conditioned on availability; not unconditional climatology"
+    },
+    {
+      "phase": 6,
+      "name": "diurnal",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "observed unique hours, conditioned on availability; not unconditional climatology"
+    },
+    {
+      "phase": 7,
+      "name": "temporal_lags",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "exact UTC time joins within each split; gaps never bridged"
+    },
+    {
+      "phase": 8,
+      "name": "persistence",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "sampled train/validation exact-lag pairs; mask intersection; tests held out"
+    },
+    {
+      "phase": 9,
+      "name": "spatial_structure",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "sampled train full fields; 4-neighbour components; masked pairwise variogram"
+    },
+    {
+      "phase": 10,
+      "name": "spatial_era5_radar",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "sampled train temporal correlations at each grid point; paired masks"
+    },
+    {
+      "phase": 11,
+      "name": "spatial_scales",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "nonoverlapping full-grid blocks, including smaller edge blocks; mask-weighted code averages"
+    },
+    {
+      "phase": 12,
+      "name": "multivariate",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "PCA of train hourly predictor means; fit only train"
+    },
+    {
+      "phase": 13,
+      "name": "regimes",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "train-fit KMeans on hourly ERA5 means, applied unchanged to all splits"
+    },
+    {
+      "phase": 14,
+      "name": "distribution_shift",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "descriptive held-out distribution audit; no fitting or tuning on test"
+    },
+    {
+      "phase": 15,
+      "name": "split_audit",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "all manifest rows and all patch metadata"
+    },
+    {
+      "phase": 16,
+      "name": "baselines",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "pixelwise baselines; sampled train fit and train/validation evaluation"
+    },
+    {
+      "phase": 17,
+      "name": "ablations",
+      "version": "reference-phases-v1",
+      "status": "completed",
+      "complete": true,
+      "passed": true,
+      "scope": "ablation planning only; original experiment definitions retained"
+    }
+  ],
+  "issues": [],
+  "notes": [],
+  "original_and_derived_files": 99,
+  "note": "Hashes conferem bytes com summaries locais; não autenticam uma execução por si sós. Contexto sem hash de execução é apenas snapshot. Não usar divergências como evidência final."
+}

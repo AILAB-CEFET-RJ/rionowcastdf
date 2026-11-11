@@ -1,0 +1,18 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 13,
+  "name": "regimes",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "train-fit KMeans on hourly ERA5 means, applied unchanged to all splits",
+  "clusters": 5,
+  "fit_hours": 20000,
+  "elapsed_seconds": 2.966,
+  "artifact_sha256": {
+    "train_regime_fit.npz": "1944f26f83c0e713c72dad0d7711ac0f5e4a46fb469a27cc115200ea72a3a282",
+    "regime_assignments.parquet": "6b6016db7a041ee9db3e6699019000f3b2f53549d2334301caacd21cfbf5c7f0",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

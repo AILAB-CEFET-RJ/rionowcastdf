@@ -1,0 +1,51 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 0,
+  "name": "structure",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "full_tensor_scan": true,
+  "scope": "unique grid points per hour; predictor stats over all covered grid points",
+  "hours_scanned": 99098,
+  "coverage_state": "provisional_geometric_region",
+  "spatial_validity_confirmed": false,
+  "raw_sources_rechecked": false,
+  "scan_scope": [
+    {
+      "split": "train",
+      "hours_available": 75319,
+      "hours_scanned": 75319
+    },
+    {
+      "split": "validation",
+      "hours_available": 14425,
+      "hours_scanned": 14425
+    },
+    {
+      "split": "test_primary",
+      "hours_available": 4931,
+      "hours_scanned": 4931
+    },
+    {
+      "split": "test_stress_ood",
+      "hours_available": 4423,
+      "hours_scanned": 4423
+    }
+  ],
+  "elapsed_seconds": 2656.06,
+  "artifact_sha256": {
+    "train_normalization_comparison.csv": "d01d00c0bbacd0155834dc434e550e92e4037a9960758e66a21dbdf88adbadad",
+    "monthly_coverage.csv": "c9c881c06fc3632604c5475c40f3f031e2a09285d1c575444aebdf0616d2c2c9",
+    "scan_scope.csv": "0d5ddcafff33af684dbd0bb6012764359318536b0b5a98ddfbe29809d6099497",
+    "input_statistics.csv": "7af486d80b74f1f894167477c987c66cfcf0e54329cdd6541203f100cc40bbb7",
+    "test_stress_ood_spatial_counts.npz": "ec8ed6a63fbc9cec5cab97f3d27862b4201d17764041fa46b4a5492c438e50dd",
+    "hour_metrics.parquet": "8b960e1f0b5bd22f914c97fc2eb60def08f49ee370c4212e40aa4fad518bf168",
+    "train_spatial_counts.npz": "5cfdac955c6939ca9c11b43016bdf193db6360acfb00ebe9ee4d8b14e25dc29c",
+    "validation_spatial_counts.npz": "c489601bd6d57848549cf336cfaa6d465026c6f9cc66f7801e6f79a2a3f3b130",
+    "target_counts.csv": "c32b186fc4ad45f42f48343a6b901b3f769ab29436c46f30282c96db7f215c29",
+    "execution.log": "d7463ce8390ac33df5a82b8131dcef83473218fd2ae38e4c343ee4c0f917a397",
+    "test_primary_spatial_counts.npz": "1b8485ff273d2df56617602c14f8eafc3c84b99dabf2b10b89d143d048d890ae"
+  }
+}

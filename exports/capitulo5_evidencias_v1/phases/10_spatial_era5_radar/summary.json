@@ -1,0 +1,16 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 10,
+  "name": "spatial_era5_radar",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "sampled train temporal correlations at each grid point; paired masks",
+  "hours": 512,
+  "elapsed_seconds": 3.696,
+  "artifact_sha256": {
+    "pixelwise_correlations.npz": "4e6e7b6db9c5c7895d553f920ee89fb7e40c5446eedd32f1f566c742fc4cf8b3",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

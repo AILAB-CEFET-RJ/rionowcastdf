@@ -1,0 +1,64 @@
+{
+  "config": {
+    "version": "reference-phases-v1",
+    "project_root": "..",
+    "dataset_dir": "/home/vsantos/repositories/rionowcastdf/datasets/corrdiff_reference_v1",
+    "output_dir": "/home/vsantos/repositories/rionowcastdf/analysis_outputs_reference/phases_v1",
+    "integrity_summary": "/home/vsantos/repositories/rionowcastdf/analysis_outputs_reference/integrity_full_v1/audit/summary.json",
+    "reader_summary": "/home/vsantos/repositories/rionowcastdf/analysis_outputs_reference/shared_reader_v2/summary.json",
+    "ablation_config_dir": "/home/vsantos/repositories/rionowcastdf/configs",
+    "archive_start_utc": "2011-01-17T02:00:00Z",
+    "archive_end_exclusive_utc": "2025-01-01T00:00:00Z",
+    "phase0_max_hours_per_split": 0,
+    "diagnostic_hours_per_split": 512,
+    "sample_pixels_per_hour": 256,
+    "lags_hours": [
+      1,
+      3,
+      6,
+      12,
+      24
+    ],
+    "regime_clusters": 5,
+    "regime_fit_max_hours": 20000,
+    "baseline_train_hours": 512,
+    "baseline_eval_hours": 128,
+    "ridge_alpha": 0.01,
+    "seed": 42,
+    "experiment_seeds": [
+      42,
+      43,
+      44
+    ],
+    "native": {
+      "corrdiff_dir": null,
+      "expected_commit": null,
+      "masked_loss_verified": false,
+      "command": null
+    }
+  },
+  "source_code": {
+    "common.py": "96247ebb3f07d6e975fa2e097b1232bf250098ed28d0fe07f73cd433f4a061eb",
+    "runner.py": "4a755111dd3751f61f82c56dc931a3f6df16679681b22a0a3d224dd5b71400dc",
+    "science.py": "c54c6f645df04a1f0c870def550a52f44b297c2dd734865ad21db16964516602",
+    "structure.py": "663abb31e2c0d21b0021dcb03e71488dae01bc44d74414bf2470b27ef4279f8e",
+    "training.py": "bff6ec6530db2afc273a0403d23c9dd98e57757e8490ed9fe0dc6a641a71c96e",
+    "reference_reader.py": "70eea299798d0995fbe279d42f5dde1170673082a394d58fe0c4a187f2486cba"
+  },
+  "dataset_summary": "084cbf636400c7203a3a1167a46ebf1f0368487b6c20f8c0d3563f9fae05d5a7",
+  "metadata": {
+    "contract.json": "b9f4f6e81b1e8d2f76987c6e44cd378525939fa305fe3477ae186886b67b8c58",
+    "era5_identity.json": "c54e695fcd162507b8ab37e91628dda175da16e5c7e5f544ab67382a8a09561c",
+    "normalization.json": "69052426bfb9482d5e2e78de6e2b3690e8ae64efd723ad055ebac01a386b0c69",
+    "normalization.npz": "41ef89e9c497dc5934de6a1e50955f9803f5d0a213a33871fd60a5e8f3e63439",
+    "selected_manifest.parquet": "5a939aff63b3f6199147b88d587bcdf7b1f033d71b7fd35dea544118819d895e"
+  },
+  "integrity_summary": "68f9364e2e16d255de3af186415b4177347487d0bff702413ca6ff03171a2b98",
+  "reader_summary": "d7e75d27914ef307cd02cde87eed191fc8a8f7a143248a933511b79d8fc3c8f8",
+  "ablation_configs": {
+    "phase17_experiments.json": "79db7c152c1b67bd58713edca6a2049017ec0c2977940b031444da75f0e2da0a",
+    "phase17_channel_catalog.json": "b47fd2a8b3b08d6ef98dbe356d8506f91fee509926574c974077104df574024f",
+    "phase17_ablation_contract.json": "87250eee4b11fc1917e2dfa4ad6604e1603289c1c2791362e7d440c02e3dcc47"
+  },
+  "note": "Audit evidence tied by metadata/counts, not an independent rescan of immutable Zarr chunks."
+}

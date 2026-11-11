@@ -1,0 +1,21 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 1,
+  "name": "univariate",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "train sampled unique hours and spatial points",
+  "hours": 512,
+  "points": 131072,
+  "target_zero_is_category": true,
+  "elapsed_seconds": 50.84,
+  "artifact_sha256": {
+    "input_distributions.csv": "d6f9c51d94934b73453a0c0325af312a4fb4724de74c8801cb8a54a69d2bf927",
+    "sampled_target_classes.csv": "4bf4b8f718b1bd9c393de2744680395d32df79c472ca081415d2c6e4f5d34871",
+    "train_point_sample.npz": "60dc3d33c31eb6a25167438fbaa4d01110d2bef0e05cc59fd6e47f0001de30c9",
+    "target_distribution.csv": "391cccc717f77f3392ba2a52faa3a5ec9ec33ca46bcc4a878345231adf842dd9",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

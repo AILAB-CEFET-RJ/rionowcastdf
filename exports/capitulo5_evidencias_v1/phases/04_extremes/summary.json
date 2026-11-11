@@ -1,0 +1,17 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 4,
+  "name": "extremes",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "unique hourly/pixel denominators; fixed palette thresholds",
+  "thresholds_fit_on_test": false,
+  "elapsed_seconds": 0.128,
+  "artifact_sha256": {
+    "train_extreme_smd.csv": "cb8ec4cc717ddf586f9125334f74db6de45a7fd2b884b9c10f98cbab359421a8",
+    "extreme_rates.csv": "da991685d331589ac6409e63d19572564be4ef88c3f935f89d85e33579e6b6b2",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

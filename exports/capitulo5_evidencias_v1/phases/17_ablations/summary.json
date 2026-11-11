@@ -1,0 +1,17 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 17,
+  "name": "ablations",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "ablation planning only; original experiment definitions retained",
+  "runs": 66,
+  "training_executed": false,
+  "elapsed_seconds": 0.002,
+  "artifact_sha256": {
+    "experiment_manifest.json": "a37cba4721594cf6ba8352d650e083efc88019c10c79bae876d77ddc3ea7062a",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

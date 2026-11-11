@@ -1,0 +1,17 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 9,
+  "name": "spatial_structure",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "sampled train full fields; 4-neighbour components; masked pairwise variogram",
+  "distance_unit": "grid points; angular grid is not square kilometres",
+  "elapsed_seconds": 3.9,
+  "artifact_sha256": {
+    "semivariogram.csv": "d841b3ed0d37d44ae5dbf6b5456660f4b27463babbcdbfc6f0e68791112f4b2c",
+    "morphology.csv": "d763c9ff2abb83c27505dd3f3f0134b8af6e277a81dc553d01576389b1823858",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

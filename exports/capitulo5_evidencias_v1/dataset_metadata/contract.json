@@ -1,0 +1,82 @@
+{
+  "channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "code_sha256": {
+    "contract_cache.py": "f1f269a1b75cae9f04cbf177c9208df7485929dd254088108fb57b4b5161f128",
+    "contract_common.py": "6b7a7194fd545841b1405ba7b331ecf74928023d1d488c73b67adac8706babdc",
+    "contract_dataset.py": "23b5cd0e0bbbf9614d677754284c2fa2b4cdd91d45217e63ecacb02d60a92857",
+    "contract_era5.py": "db3dc24d363eeca2d4e792f8e58e294d8bd9a305c6abf044228a18135f834588",
+    "contract_zarr.py": "ed5529c80e54f879ee0f5a40841c33ad84d3becf61cbcebeca90a91cff8abb7b",
+    "reference_geometry.py": "fd0c92b8693db9f257fd0aac2aef7ab5ce05f562f9c5a637653c039762008f41"
+  },
+  "coverage_sha256": "06216d64ba11b1f8a155f3e809c6d81951d1840c9a95b0e111097bfd91ba8ca9",
+  "coverage_state": "provisional_geometric_region",
+  "end_utc": null,
+  "era5_inventory_sha256": "e0a13697f81e74f13f25f9bf971c61baa007b31dfcf161f8ba9578ca2498baeb",
+  "geometry_sha256": "3772dfe0fd24283a6bc14bca2d7d701a3d3f87b07660cea4845a712b4b77272d",
+  "input_storage": "physical; normalize once in loader",
+  "inventory_config": {
+    "channels": [
+      "tcwv",
+      "t2m",
+      "u10",
+      "v10",
+      "t_850",
+      "r_850",
+      "u_850",
+      "v_850",
+      "t_500",
+      "r_500",
+      "u_500",
+      "v_500"
+    ],
+    "code_sha256": "6005678ae29161d13ed23eed537b54e87fee7ca28a1704e895d617b00adc8f70",
+    "end_utc": "2024-12-31T23:00:00+00:00",
+    "fingerprint": "size + mtime_ns (not content hash)",
+    "pressure_unit": "hPa",
+    "roots": {
+      "pressure": "/home/vsantos/data/reanalysis/cds/era5/pressure",
+      "single": "/home/vsantos/data/reanalysis/cds/era5/single"
+    },
+    "start_utc": "2011-01-01T00:00:00+00:00",
+    "version": "14k-pairing-v1"
+  },
+  "manifest_sha256": "3364f3ead925675ebd0ee4ff354907df9495d8962b83969a745c3c8e315e32a9",
+  "patch_size": 32,
+  "patch_stride": 8,
+  "radar_cache_index_sha256": "b1b0c363a9f6d5934bac5802cb9be25abc061ac774c187d8f4c6ebe98eb86b5a",
+  "spatial_contract_sha256": "9334110e6bfc81375ce4dde9f10e0e628b679082f7ea8c2cf89dbebca52cd473",
+  "spatial_validity_confirmed": false,
+  "start_utc": null,
+  "target_transform": "divide_by_50",
+  "temporal_contract": {
+    "aggregation": "none",
+    "created_at": "2026-11-06T16:24:05.020047+00:00",
+    "decision_scope": "train only",
+    "missing_policy": "exclude; never fill dry",
+    "no_echo_code": 0,
+    "no_echo_semantics": "no displayed echo, not measured 0 dBZ",
+    "rationale": "No treino, ±2 minutos recupera 5048 horas e 92,57% do ganho observado com ±5 minutos, preservando 93,30% dos pares no instante exato. Adotado para alinhamento contemporaneo, sem agregacao temporal.",
+    "source_analysis_sha256": "52b0ac030dfcfd9d29b70a7b4bec735c5c1f05deb02394cfcc5e90fa6623a63e",
+    "source_timezone": "America/Sao_Paulo",
+    "spatial_numeric_contract": "unchanged 14o; preserve unknown pixel masks",
+    "strategy": "nearest2",
+    "tie_break": "earlier UTC",
+    "timestamp_reference": "ERA5 UTC exact hour",
+    "tolerance_seconds": 120,
+    "version": "14p-temporal-policy-v1"
+  },
+  "version": "reference-zarr-v1"
+}

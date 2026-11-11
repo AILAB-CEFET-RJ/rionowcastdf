@@ -1,0 +1,24 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 16,
+  "name": "baselines",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "pixelwise baselines; sampled train fit and train/validation evaluation",
+  "train_points": 131072,
+  "target_units": "code / 50",
+  "ridge_prediction_clip": [
+    0,
+    1
+  ],
+  "native_corrdiff": false,
+  "test_evaluation": false,
+  "elapsed_seconds": 14.417,
+  "artifact_sha256": {
+    "ridge_train_fit.npz": "59ccaa65f47269c2b8c47a7822f1c5e6c7394b8fd03531337303eef05f1140d5",
+    "baseline_metrics.csv": "9d8c64687b9d6d1c5ad4c289fca0c45ee8fa30d1d9a851f85c71e4896c37be85",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "artifact_sha256": {
+    "contract.json": "b9f4f6e81b1e8d2f76987c6e44cd378525939fa305fe3477ae186886b67b8c58",
+    "era5_identity.json": "c54e695fcd162507b8ab37e91628dda175da16e5c7e5f544ab67382a8a09561c",
+    "normalization.json": "69052426bfb9482d5e2e78de6e2b3690e8ae64efd723ad055ebac01a386b0c69",
+    "normalization.npz": "41ef89e9c497dc5934de6a1e50955f9803f5d0a213a33871fd60a5e8f3e63439",
+    "selected_manifest.parquet": "5a939aff63b3f6199147b88d587bcdf7b1f033d71b7fd35dea544118819d895e"
+  },
+  "channels": [
+    "tcwv",
+    "t2m",
+    "u10",
+    "v10",
+    "t_850",
+    "r_850",
+    "u_850",
+    "v_850",
+    "t_500",
+    "r_500",
+    "u_500",
+    "v_500"
+  ],
+  "complete": true,
+  "corrdiff_native_tested": false,
+  "coverage_state": "provisional_geometric_region",
+  "diagnostics_0_18_rerun": false,
+  "elapsed_seconds": 16475.41,
+  "no_echo_rule_documented": true,
+  "note": "Reference tensors built and read back. Scientific diagnostics and native CorrDiff integration are separate gates.",
+  "production_ready": false,
+  "selected_hours": 99098,
+  "spatial_validity_confirmed": false,
+  "splits": {
+    "test_primary": {
+      "hours_selected": 4931,
+      "hours_with_patches": 4931,
+      "no_echo_pixels_with_overlap": 237656439,
+      "patches": 236688,
+      "supported_pixels_with_overlap": 241256446
+    },
+    "test_stress_ood": {
+      "hours_selected": 4423,
+      "hours_with_patches": 4423,
+      "no_echo_pixels_with_overlap": 213817680,
+      "patches": 212304,
+      "supported_pixels_with_overlap": 216798726
+    },
+    "train": {
+      "hours_selected": 75319,
+      "hours_with_patches": 75319,
+      "no_echo_pixels_with_overlap": 3642182368,
+      "patches": 3615312,
+      "supported_pixels_with_overlap": 3688332709
+    },
+    "validation": {
+      "hours_selected": 14425,
+      "hours_with_patches": 14425,
+      "no_echo_pixels_with_overlap": 696847647,
+      "patches": 692400,
+      "supported_pixels_with_overlap": 706116268
+    }
+  },
+  "target_transform": "target_code / 50",
+  "temporal_aggregation": "none",
+  "temporal_strategy": "nearest2",
+  "version": "reference-zarr-v1",
+  "zarr_created": true
+}

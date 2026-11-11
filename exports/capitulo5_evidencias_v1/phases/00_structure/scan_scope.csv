@@ -1,0 +1,5 @@
+split,hours_available,hours_scanned
+train,75319,75319
+validation,14425,14425
+test_primary,4931,4931
+test_stress_ood,4423,4423

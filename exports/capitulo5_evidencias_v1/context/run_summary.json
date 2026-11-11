@@ -1,0 +1,36 @@
+{
+  "version": "reference-phases-v1",
+  "selected_phases": [
+    15,
+    0,
+    16,
+    17
+  ],
+  "results": [
+    {
+      "phase": 15,
+      "status": "reused"
+    },
+    {
+      "phase": 0,
+      "status": "reused"
+    },
+    {
+      "phase": 16,
+      "status": "completed"
+    },
+    {
+      "phase": 17,
+      "status": "completed"
+    }
+  ],
+  "complete": true,
+  "exit_code": 0,
+  "production_ready": false,
+  "started_utc": "2026-11-10T19:38:44.339790+00:00",
+  "finished_utc": "2026-11-10T19:38:59.026664+00:00",
+  "python": "3.12.14 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:46:43) [GCC 14.3.0]",
+  "platform": "Linux-5.15.0-107-generic-x86_64-with-glibc2.35",
+  "phase0_max_hours_per_split": 0,
+  "diagnostic_hours_per_split": 512
+}

@@ -1,0 +1,15 @@
+{
+  "version": "reference-phases-v1",
+  "phase": 3,
+  "name": "joint",
+  "status": "completed",
+  "complete": true,
+  "production_ready": false,
+  "passed": true,
+  "scope": "train hourly spatial means; descriptive associations, not causal or pixelwise",
+  "elapsed_seconds": 1.754,
+  "artifact_sha256": {
+    "hourly_relationships.csv": "f8734c6e0ff0635547d57ea53d0f43f3876c318a864111011604c2c282e37d6d",
+    "execution.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

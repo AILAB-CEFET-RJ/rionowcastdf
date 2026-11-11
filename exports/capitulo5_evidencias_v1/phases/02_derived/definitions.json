@@ -1,0 +1,13 @@
+{
+  "note": "Wind differences are vector differences, not vertical shear per metre. Temperatures K; RH percentage points. No clipping.",
+  "variables": [
+    "wind_speed_10",
+    "wind_speed_850",
+    "wind_speed_500",
+    "delta_t_500_850",
+    "delta_t_850_surface",
+    "delta_r_500_850",
+    "bulk_wind_diff_10_850",
+    "bulk_wind_diff_850_500"
+  ]
+}
