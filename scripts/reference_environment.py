@@ -13,7 +13,6 @@ import sys
 import sysconfig
 import tempfile
 import zipfile
-from urllib.parse import unquote, urlsplit
 from email.parser import BytesParser
 
 EXPECTED_COMMIT = 'c15bd23eb56216c32bd3e30180593e5685be9bc2'
@@ -128,35 +127,39 @@ def doctor(args):
     return 0 if report['passed'] else 1
 
 
-def pinned_requirements(text, resolutions=None):
+def pinned_requirements(text):
+    """Resolve Conda build-directory references to installed, versioned wheel pins.
+
+    A local file:// origin is not portable. Only such origins may be replaced
+    using the installed distribution's metadata; remote URLs, VCS and editable
+    requirements remain rejected. The generated wheels and hashes, not the
+    original local paths, are the installable artifacts.
+    """
     result=[]
-    for line in text.splitlines():
-        line=line.strip()
+    converted=[]
+    for raw in text.splitlines():
+        line=raw.strip()
         if not line or line.startswith('#'): continue
-        direct=re.fullmatch(r'([A-Za-z0-9_.-]+) @ (file://\S+)',line)
-        if direct:
-            name, url = direct.groups()
-            parsed=urlsplit(url)
-            path=unquote(parsed.path)
-            # Conda build-machine references are not portable source locations.
-            # Resolve only this recognizable provenance, never arbitrary local code.
-            if (parsed.netloc or parsed.query or parsed.fragment
-                    or not re.match(r'^/(?:home|opt)/conda/feedstock_root/build_artifacts/[^/]+/work/?$',path)):
-                raise ValueError(f'Unverified local source requirement: {line}')
-            version=md.version(name)
-            if not re.fullmatch(r'[A-Za-z0-9_.+!-]+',version):
+        pinned=re.fullmatch(r'([A-Za-z0-9_.-]+)==([^\s;]+)',line)
+        local=re.fullmatch(r'([A-Za-z0-9_.-]+)\s*@\s*(file://\S+)',line)
+        if pinned:
+            name,version=pinned.groups()
+        elif local:
+            name,origin=local.groups()
+            try:
+                version=md.version(name)
+            except md.PackageNotFoundError as e:
+                raise ValueError(f'Installed metadata missing for local dependency: {name}') from e
+            if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.!+~-]*',version):
                 raise ValueError(f'Invalid installed version for {name}: {version}')
-            pinned=f'{name}=={version}'
-            if resolutions is not None:
-                resolutions.append(dict(original=line, resolved=pinned,
-                    reason='Conda build path replaced by installed distribution version; wheel origin may differ'))
-            line=pinned
-        if not re.fullmatch(r'[A-Za-z0-9_.-]+==[^\s;]+',line):
+            converted.append(dict(package=name,origin=origin,resolved_version=version))
+        else:
             raise ValueError(f'Cannot reproduce editable/direct/unpinned requirement: {line}')
-        name=line.split('==')[0].lower().replace('_','-')
-        if name != 'nvidia-physicsnemo': result.append(line)
+        normalized=name.lower().replace('_','-')
+        if normalized != 'nvidia-physicsnemo':
+            result.append(f'{name}=={version}')
     if not result: raise ValueError('Empty dependency snapshot')
-    return result
+    return result,converted
 
 
 def wheel_record(path):
@@ -173,13 +176,11 @@ def bundle(args):
     info=checkout_info(args.physicsnemo_dir,args.expected_commit)
     if info['dirty']: raise ValueError('Checkout has changes: preserve them in a commit and specify its SHA; do not discard files')
     frozen=output([sys.executable,'-m','pip','freeze','--all'])
-    resolutions=[]
-    requirements=pinned_requirements(frozen, resolutions)
+    requirements,converted=pinned_requirements(frozen)
     root.mkdir(parents=True); wheels=root/'wheels'; wheels.mkdir()
     (root/'source-freeze.txt').write_text(frozen+'\n')
-    (root/'requirement_resolutions.json').write_text(json.dumps(resolutions,indent=2))
-    for item in resolutions: print(f"Resolved Conda build reference: {item['resolved']}",flush=True)
     (root/'dependencies.txt').write_text('\n'.join(requirements)+'\n')
+    (root/'local-origin-resolutions.json').write_text(json.dumps(converted,indent=2)+'\n')
     indexes=[]
     for url in args.extra_index_url: indexes += ['--extra-index-url',url]
     run([sys.executable,'-m','pip','wheel','--no-deps','--wheel-dir',wheels,
@@ -195,7 +196,8 @@ def bundle(args):
     lock=''.join(f"{r['name']}=={r['version']} --hash=sha256:{r['sha256']}\n" for r in records)
     (root/'requirements.lock').write_text(lock)
     manifest=dict(schema='reference-wheel-bundle-v1',host=host(),checkout=info,wheels=records,
-                  lock_sha256=digest(root/'requirements.lock'),validated_install=False)
+                  lock_sha256=digest(root/'requirements.lock'),
+                  local_origin_resolutions=converted,validated_install=False)
     (root/'manifest.json').write_text(json.dumps(manifest,indent=2))
     print(f'Bundle created: {root}. Installation and doctor verification are still required.')
     return 0
@@ -246,3 +248,4 @@ def main():
         print(f'ERROR: {e}',file=sys.stderr); return 1
 
 if __name__=='__main__': raise SystemExit(main())
+
