@@ -38,6 +38,22 @@ class EnvironmentTests(unittest.TestCase):
     def test_unpinned_sources_rejected(self):
         for text in ('-e /tmp/source','foo @ file:///tmp/foo','foo>=1',''):
             with self.assertRaises(ValueError): env.pinned_requirements(text)
+    def test_conda_build_reference_uses_installed_version(self):
+        audit=[]
+        with patch.object(env.md,'version',return_value='3.0.0') as lookup:
+            req=env.pinned_requirements('asttokens @ file:///home/conda/feedstock_root/build_artifacts/asttokens_1783975656336/work',audit)
+        self.assertEqual(req,['asttokens==3.0.0'])
+        lookup.assert_called_once_with('asttokens')
+        self.assertEqual(audit[0]['resolved'],'asttokens==3.0.0')
+    def test_arbitrary_local_or_remote_references_still_rejected(self):
+        for requirement in ('foo @ file:///home/me/project',
+                            'foo @ file://server/home/conda/feedstock_root/build_artifacts/foo/work',
+                            'foo @ https://example.org/foo.whl', '-e /home/me/project'):
+            with self.assertRaises(ValueError): env.pinned_requirements(requirement)
+    def test_missing_conda_distribution_not_invented(self):
+        with patch.object(env.md,'version',side_effect=env.md.PackageNotFoundError('missing')):
+            with self.assertRaises(env.md.PackageNotFoundError):
+                env.pinned_requirements('missing @ file:///home/conda/feedstock_root/build_artifacts/missing_123/work')
     def test_existing_environment_untouched(self):
         class Args: pass
         args=Args(); args.bundle=self.root; args.venv=self.root/'existing'

@@ -13,6 +13,7 @@ import sys
 import sysconfig
 import tempfile
 import zipfile
+from urllib.parse import unquote, urlsplit
 from email.parser import BytesParser
 
 EXPECTED_COMMIT = 'c15bd23eb56216c32bd3e30180593e5685be9bc2'
@@ -127,11 +128,29 @@ def doctor(args):
     return 0 if report['passed'] else 1
 
 
-def pinned_requirements(text):
+def pinned_requirements(text, resolutions=None):
     result=[]
     for line in text.splitlines():
         line=line.strip()
         if not line or line.startswith('#'): continue
+        direct=re.fullmatch(r'([A-Za-z0-9_.-]+) @ (file://\S+)',line)
+        if direct:
+            name, url = direct.groups()
+            parsed=urlsplit(url)
+            path=unquote(parsed.path)
+            # Conda build-machine references are not portable source locations.
+            # Resolve only this recognizable provenance, never arbitrary local code.
+            if (parsed.netloc or parsed.query or parsed.fragment
+                    or not re.match(r'^/(?:home|opt)/conda/feedstock_root/build_artifacts/[^/]+/work/?$',path)):
+                raise ValueError(f'Unverified local source requirement: {line}')
+            version=md.version(name)
+            if not re.fullmatch(r'[A-Za-z0-9_.+!-]+',version):
+                raise ValueError(f'Invalid installed version for {name}: {version}')
+            pinned=f'{name}=={version}'
+            if resolutions is not None:
+                resolutions.append(dict(original=line, resolved=pinned,
+                    reason='Conda build path replaced by installed distribution version; wheel origin may differ'))
+            line=pinned
         if not re.fullmatch(r'[A-Za-z0-9_.-]+==[^\s;]+',line):
             raise ValueError(f'Cannot reproduce editable/direct/unpinned requirement: {line}')
         name=line.split('==')[0].lower().replace('_','-')
@@ -154,9 +173,12 @@ def bundle(args):
     info=checkout_info(args.physicsnemo_dir,args.expected_commit)
     if info['dirty']: raise ValueError('Checkout has changes: preserve them in a commit and specify its SHA; do not discard files')
     frozen=output([sys.executable,'-m','pip','freeze','--all'])
-    requirements=pinned_requirements(frozen)
+    resolutions=[]
+    requirements=pinned_requirements(frozen, resolutions)
     root.mkdir(parents=True); wheels=root/'wheels'; wheels.mkdir()
     (root/'source-freeze.txt').write_text(frozen+'\n')
+    (root/'requirement_resolutions.json').write_text(json.dumps(resolutions,indent=2))
+    for item in resolutions: print(f"Resolved Conda build reference: {item['resolved']}",flush=True)
     (root/'dependencies.txt').write_text('\n'.join(requirements)+'\n')
     indexes=[]
     for url in args.extra_index_url: indexes += ['--extra-index-url',url]
