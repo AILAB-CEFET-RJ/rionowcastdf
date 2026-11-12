@@ -216,3 +216,14 @@ cython_debug/
 
 # Metadados de downloads do Windows
 *:Zone.Identifier*
+
+# Backups transitórios de desenvolvimento
+/scripts/reference_environment.py.backup_*
+
+# ZIPs/exportações volumosas devem ficar fora do Git, após preservar cópia externa
+/exports/**/*.zip
+
+# Relatórios binários locais do novo ciclo experimental
+/checkpoints/
+/runs/
+/tensorboard/
