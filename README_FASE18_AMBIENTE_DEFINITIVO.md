@@ -1,130 +1,161 @@
-# CorrDiff — Fase 18: correção de mistura CUDA 12/13 (v6.3)
+# RioNowCastDF — Fase 18: ambiente CorrDiff de referência
 
-## Diagnóstico
+**Estado: bundle e instalação aprovados no CEFET em 12/11/2026; smoke nativo C00/C07 pendente.**
 
-O ambiente Python de origem contém dois pacotes que escrevem o mesmo caminho nativo:
+Este documento registra a história técnica da reprodução do ambiente PhysicsNeMo e o procedimento para reutilizar os artefatos definitivos. Substitui o roteiro transitório v6.3 que pressupunha o ambiente `corrdiff_reference_reproduced_cu129_v3`, já descartado após a validação da versão v4.
 
-- `nvidia-cudnn-cu12==9.20.0.48`
-- `nvidia-cudnn-cu13==9.24.0.43`
+## 1. Resultado alcançado
 
-Essa é a causa dos binários cuDNN 9.24 encontrados na instalação que declarava cuDNN 9.20. **Não desativar a auditoria de sobreposição** nem confiar apenas em `pip check`. A instalação da máquina de origem pode conter uma combinação funcional após reparo manual, mas o snapshot bruto não é reproduzível como instalação limpa.
+A instalação foi efetuada a partir de `reference_cu129_v6`, usando `--no-auto-repair` em uma nova virtualenv `corrdiff_reference_reproduced_cu129_v4`. A saída registrada foi:
 
-## Modificação v6.3
+```text
+No broken requirements found.
+Environment installed and native integrity PASS: /home/vsantos/corrdiff_reference_reproduced_cu129_v4/bin/python. Run doctor.
+```
 
-A opção explícita `--cuda-family cu12`, em `bundle` e `finalize`, cria uma **projeção auditável CUDA 12** do snapshot de origem. Exclui os pacotes cujos nomes indicam CUDA 13, como `nvidia-cudnn-cu13`, `nvidia-curand-cu13`, `cupy-cuda13x` e `nvidia-dali-cuda130`. O `source-freeze.txt` original permanece inalterado. A lista de exclusões é gravada em `cuda-target-exclusions.json` e no `manifest.json`.
+O Doctor retornou `passed: true`, com **11 verificações aprovadas**:
 
-O `finalize` de um bundle incompleto retira **somente do diretório `v6/wheels`** os wheels excluídos. Quando eram hardlinks dos arquivos do v5, o original continua intacto. O método verifica que o snapshot atual é o mesmo que iniciou o bundle, não apaga outros wheels e mantém a validação de colisões de binários nativos.
+```text
+checkout_clean                   True
+dependencies                    True
+native_imports                 True
+gpu_fp32                       True
+runtime                        True
+dataset_contract               True
+installed_commit_receipt       True
+native_wheel_integrity         True
+warp_cuda                      True
+test_reference_adapter.py      True
+test_reference_masked_losses.py True
+```
 
-Crucial: a projeção não substitui o resolvedor. Antes do manifesto final, o comando executa um preflight de instalação `--dry-run --ignore-installed --no-index --require-hashes`, com somente os wheels preservados. Se algum pacote restante exigir CUDA 13, **a conclusão falhará** e será necessário investigar quem o exige; não o force com `--no-deps`.
+Isso comprova consistência do ambiente Python/CUDA, integridade dos binários, leitura do contrato e testes de GPU, Warp, adaptador e funções de perda. **Não comprova treinamento nativo do CorrDiff, convergência de modelos nem validade física da região de cobertura radar.**
 
-O script inclui os controles anteriores: URL autorizada e hash do wheel Warp, suporte a extensões nativas na raiz do wheel, hashes de binários nativos pós-instalação e smoke test Warp no Doctor.
+## 2. Configuração de referência
 
-## Aplicação na máquina CEFET
+| Recurso | Versão/identidade |
+|---|---|
+| Bundle | `~/corrdiff_environment_bundles/reference_cu129_v6` |
+| Venv aprovado | `~/corrdiff_reference_reproduced_cu129_v4` |
+| Python | 3.12 |
+| PyTorch | `2.13.0+cu129` |
+| PhysicsNeMo | `2.3.0a0`, checkout `c15bd23eb56216c32bd3e30180593e5685be9bc2` |
+| cuDNN | `nvidia-cudnn-cu12==9.20.0.48` |
+| Warp | `1.19.0+cu12` |
+| Zarr (venv treinável) | `3.1.6` |
+| TensorDict | `0.15.5` |
+| GPUs | 2 × NVIDIA GeForce RTX 2080 Ti, 11 GiB por GPU, SM 7.5 |
 
-Transfira o ZIP e execute, na raiz de `rionowcastdf`:
+Não instalar dependências extras nesse venv congelado. Versões do driver devem ser confirmadas pelos registros do Doctor e pela máquina na ocasião de cada reprodução.
+
+## 3. Por que foi necessário criar o bundle v6?
+
+A configuração de origem gerou colisão nativa: `nvidia-cudnn-cu12==9.20.0.48` e `nvidia-cudnn-cu13==9.24.0.43` instalavam bibliotecas no mesmo caminho `nvidia/cudnn/lib/libcudnn.so.9`. Assim, metadados Python podiam indicar a versão 9.20 enquanto o runtime carregava binários 9.24.
+
+A implementação definitiva de `scripts/reference_environment.py` introduziu:
+
+- autorização explícita de wheel remoto por `--wheel-url`, incluindo verificação da origem e do fragmento SHA-256;
+- tratamento de extensões nativas Python válidas (por exemplo `_duckdb.cpython-312-...so`);
+- verificação de nomes nativos sobrepostos e integridade dos membros `.so` dos wheels;
+- projeção explícita `--cuda-family cu12` mantendo `source-freeze.txt` original e relatório de exclusões;
+- preflight offline com resolução e hashes, antes de aprovar o manifesto;
+- auditoria da instalação sem correção automática via `--no-auto-repair`;
+- Doctor com convolução/backpropagation nas duas GPUs e kernels Warp reais.
+
+O `finalize` da versão v6 reportou:
+
+```text
+No broken requirements found.
+CUDA target projection: excluded nvidia-cudnn-cu13, nvidia-cusparselt-cu13, nvidia-nccl-cu13, nvidia-nvshmem-cu13
+Unlinked 4 CUDA 13 wheel(s) from incomplete bundle only
+Bundle created and preflight passed: /home/vsantos/corrdiff_environment_bundles/reference_cu129_v6. Installation and doctor remain required.
+```
+
+O pacote v6 é a **projeção aprovada**, não um snapshot literal integral do ambiente de origem misto. Algumas distribuições de CUDA usam nomes sem sufixo `-cu13`; não classificar versões apenas pelo texto do nome. O bundle possui auditorias de colisão e o ambiente passou em execução real de GPU, mas outras ferramentas CUDA devem ser validadas conforme forem utilizadas.
+
+## 4. Evidências que devem ser preservadas
+
+```text
+~/corrdiff_environment_bundles/
+├── reference_cu129_v6/
+│   ├── manifest.json
+│   ├── requirements.lock
+│   ├── source-freeze.txt
+│   ├── preflight.log
+│   ├── cuda-target-exclusions.json
+│   └── wheels/
+├── reference_cu129_v6_finalize_cu12.log
+├── install_cu129_v4.log
+├── doctor_reproduced_cu129_v4.json
+├── doctor_reproduced_cu129_v4.log
+├── zarr2_reference_baseline.json
+├── zarr3_reference_comparison.json
+└── history/
+
+~/corrdiff_reference_reproduced_cu129_v4/
+├── bin/python
+├── reference_installation.json
+└── reference_native_audit.json
+```
+
+Não mover a pasta de venv esperando que seus caminhos absolutos continuem válidos. Para reconstrução, criar **novo** ambiente de destino a partir do bundle completo e refazer Doctor. Não excluir o bundle v6 após a limpeza de versões anteriores.
+
+## 5. Verificações de consulta (não destrutivas)
 
 ```bash
 cd "$HOME/repositories/rionowcastdf"
-cp -p scripts/reference_environment.py scripts/reference_environment.py.backup_v6_2
-unzip -o /CAMINHO/phase18_reference_environment_definitivo_v6_3.zip -d .
-
-SOURCE="$HOME/corrdiff_reference_reproduced_cu129_v3/bin/python"
-"$SOURCE" -m unittest discover -s tests -p 'test_reference_environment.py' -v
-```
-
-Confira que não há outra execução ativa do bundle:
-
-```bash
-pgrep -af '[r]eference_environment.py (bundle|finalize|install)'
-```
-
-## Recuperar o bundle v6, preservando espaço
-
-**Não execute novamente o `bundle`, não apague a pasta `v6` e não modifique o ambiente v3 que passou no Doctor.** A falha de colisão ocorreu antes da criação do manifesto final.
-
-```bash
-cd "$HOME/repositories/rionowcastdf"
-SOURCE="$HOME/corrdiff_reference_reproduced_cu129_v3/bin/python"
-BUNDLES="$HOME/corrdiff_environment_bundles"
-
-test -f "$BUNDLES/reference_cu129_v6/source-freeze.txt" || { echo 'Snapshot v6 não encontrado'; exit 1; }
-test ! -f "$BUNDLES/reference_cu129_v6/manifest.json" || { echo 'v6 já finalizado; não modificar'; exit 1; }
-
-nohup "$SOURCE" -u scripts/reference_environment.py finalize \
-  --physicsnemo-dir "$HOME/repositories/physicsnemo" \
-  --cuda-family cu12 \
-  --bundle "$BUNDLES/reference_cu129_v6" \
-  > "$BUNDLES/reference_cu129_v6_finalize_cu12.log" 2>&1 \
-  < /dev/null &
-echo "PID: $!"
-```
-
-Acompanhe:
-
-```bash
-tail -f "$HOME/corrdiff_environment_bundles/reference_cu129_v6_finalize_cu12.log"
-```
-
-**Critério de aprovação:** log termina em `Bundle created and preflight passed` e `v6/manifest.json` existe. É possível inspecionar as exclusões:
-
-```bash
-cat "$HOME/corrdiff_environment_bundles/reference_cu129_v6/cuda-target-exclusions.json"
-```
-
-Se o preflight reclamar de dependência `cu13` necessária a outro pacote, não instale o v6; investigue a exigência antes de alterar a projeção.
-
-## Se for preciso iniciar outro bundle a partir do zero
-
-Apenas se o `v6` não puder ser recuperado:
-
-```bash
-nohup "$SOURCE" -u scripts/reference_environment.py bundle \
-  --cuda-family cu12 \
-  --physicsnemo-dir "$HOME/repositories/physicsnemo" \
-  --reuse-bundle "$BUNDLES/reference_cu129_v5" \
-  --wheel-url 'warp-lang=https://github.com/NVIDIA/warp/releases/download/v1.19.0/warp_lang-1.19.0+cu12-py3-none-manylinux_2_28_x86_64.whl' \
-  --extra-index-url https://download.pytorch.org/whl/cu129 \
-  --output "$BUNDLES/reference_cu129_v7" \
-  > "$BUNDLES/reference_cu129_v7.log" 2>&1 < /dev/null &
-```
-
-## Instalação limpa após preflight PASS
-
-Uma instalação limpa **sem reparação automática** é a evidência mais forte de que o problema cuDNN foi resolvido na origem:
-
-```bash
-cd "$HOME/repositories/rionowcastdf"
-SOURCE="$HOME/corrdiff_reference_reproduced_cu129_v3/bin/python"
-BUNDLES="$HOME/corrdiff_environment_bundles"
-
-nohup "$SOURCE" -u scripts/reference_environment.py install \
-  --bundle "$BUNDLES/reference_cu129_v6" \
-  --venv "$HOME/corrdiff_reference_reproduced_cu129_v4" \
-  --no-auto-repair \
-  > "$BUNDLES/install_cu129_v4.log" 2>&1 < /dev/null &
-echo "PID: $!"
-```
-
-```bash
-tail -f "$HOME/corrdiff_environment_bundles/install_cu129_v4.log"
-```
-
-Se a pasta de destino já existir de tentativa anterior, **não reutilize**; escolha outro caminho. Somente após `Environment installed and native integrity PASS` e `reference_installation.json` criado siga para o Doctor.
-
-```bash
 PYTHON="$HOME/corrdiff_reference_reproduced_cu129_v4/bin/python"
+BUNDLES="$HOME/corrdiff_environment_bundles"
+
+"$PYTHON" -m pip check
+"$PYTHON" -m unittest discover -s tests -p 'test_reference_environment.py' -v
+
+python - <<'PY'
+import json
+from pathlib import Path
+p = Path.home()/'corrdiff_environment_bundles/doctor_reproduced_cu129_v4.json'
+r=json.loads(p.read_text())
+print('DOCTOR PASSED:',r.get('passed'))
+for name,passed in r.get('checks',{}).items():
+    print(f'{name}: {passed}')
+PY
+```
+
+Para reexecutar o Doctor sem substituir evidência anterior:
+
+```bash
 nohup "$PYTHON" -u scripts/reference_environment.py doctor \
   --project-dir "$HOME/repositories/rionowcastdf" \
   --physicsnemo-dir "$HOME/repositories/physicsnemo" \
   --gpus 0,1 \
-  --output "$BUNDLES/doctor_reproduced_cu129_v4.json" \
-  > "$BUNDLES/doctor_reproduced_cu129_v4.log" 2>&1 < /dev/null &
+  --output "$BUNDLES/doctor_recheck.json" \
+  > "$BUNDLES/doctor_recheck.log" 2>&1 < /dev/null &
 ```
 
-O `doctor` espera o dataset no caminho padrão `datasets/corrdiff_reference_v1`. Se estiver em outro local, informar `--dataset-dir /CAMINHO/REAL`.
+### Reconstrução a partir do bundle preservado
 
-Critérios: `passed: true`, `native_wheel_integrity: true`, `warp_cuda: true`, e `gpu_fp32: true` no campo `checks`, sem reparação automática no `install`.
+Usar um Python 3.12 compatível (por exemplo, o venv v4 **já aprovado**) como lançador; o destino precisa **não existir**. Não usar `/home/vsantos/corrdiff_reference_reproduced_cu129_v3`, que foi eliminado.
 
-## Escopo e limitações
+```bash
+cd "$HOME/repositories/rionowcastdf"
+SOURCE="$HOME/corrdiff_reference_reproduced_cu129_v4/bin/python"
+BUNDLES="$HOME/corrdiff_environment_bundles"
+DEST="$HOME/corrdiff_reference_reproduced_cu129_recheck"
+test ! -e "$DEST" || { echo "Destino já existe: $DEST"; exit 1; }
 
-O script e os testes unitários foram executados em ambiente local de desenvolvimento, sem os wheels reais do CEFET e sem suas GPUs. Nenhum teste nativo C00 ou C07 foi executado por esta alteração. A aprovação depende do preflight, da instalação limpa e do Doctor no servidor.
+nohup "$SOURCE" -u scripts/reference_environment.py install \
+  --bundle "$BUNDLES/reference_cu129_v6" \
+  --venv "$DEST" \
+  --no-auto-repair \
+  > "$BUNDLES/install_recheck.log" 2>&1 < /dev/null &
+```
+
+Só considere sucesso após integridade nativa aprovada e Doctor independente. Pacotes externos, checkout PhysicsNeMo e dados necessários ao leitor precisam permanecer disponíveis e identificados. **Não executar esse comando apenas por rotina; o v4 já está aprovado.**
+
+## 6. Limite atual da Fase 18
+
+O Doctor aprovado não executa `train.py` nativo. Antes dos smoke C00/C07, é obrigatório corrigir a divergência entre o Zarr de referência (`target=code/50`) e o contrato/entrypoints antigos da Fase 18 (`log1p`, dataset `corrdiff_2011_2024` e commit NVIDIA defasado). Essa atualização deve ser feita com testes e sem contaminar `test_primary` / `test_stress_ood`.
+
+Critério futuro de conclusão da Fase 18: evidências reprodutíveis de batches reais, máscaras, forward/backward, perdas finitas, checkpoint e configuração Hydra/seed para os estágios nativos de regressão e difusão. C00/C07 completos pertencem à campanha de treinamento posterior, não aos smoke tests.
+
+Veja também [`README.md`](README.md), [`configs/phase17_experiments.json`](configs/phase17_experiments.json) e [`docs/PLANO_LIMPEZA_REPOSITORIO_2026-11-12.md`](docs/PLANO_LIMPEZA_REPOSITORIO_2026-11-12.md).
