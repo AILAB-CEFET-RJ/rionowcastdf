@@ -13,6 +13,8 @@ import sys
 import sysconfig
 import tempfile
 import zipfile
+from urllib.parse import urlparse, unquote, urldefrag
+from pathlib import PurePosixPath
 from email.parser import BytesParser
 
 EXPECTED_COMMIT = 'c15bd23eb56216c32bd3e30180593e5685be9bc2'
@@ -47,7 +49,7 @@ def checkout_info(path, expected):
 
 
 def doctor(args):
-    report = dict(schema='reference-environment-v1', host=host(), python=sys.version,
+    report = dict(schema='reference-environment-v2', host=host(), python=sys.version,
                   executable=sys.executable, checks={}, native_training_tested=False, ready_for_training=False,
                   dataset_modified=False, test_splits_accessed=False)
     checks = report['checks']
@@ -85,6 +87,7 @@ def doctor(args):
                     report['gpus'].append(dict(logical_id=i,name=prop.name,memory_bytes=prop.total_memory,
                                                capability=list(torch.cuda.get_device_capability(i)),fp32_backward=True))
             checks['gpu_fp32']=True
+        checks['runtime']=True
         report['cuda_visible_devices']=os.environ.get('CUDA_VISIBLE_DEVICES')
     except Exception as e:
         checks['runtime']=False; report['runtime_error']=str(e)
@@ -103,8 +106,29 @@ def doctor(args):
         checks['dataset_contract']=False; report['dataset_error']=str(e)
     receipt=Path(sys.prefix)/'reference_installation.json'
     if receipt.is_file():
-        report['installation_receipt']=json.loads(receipt.read_text())
-        checks['installed_commit_receipt']=report['installation_receipt']['checkout']['commit']==args.expected_commit
+        try:
+            installed=json.loads(receipt.read_text())
+            report['installation_receipt']=installed
+            checks['installed_commit_receipt']=(installed['checkout']['commit']==args.expected_commit)
+            bundle_path=Path(installed['bundle_path'])
+            manifest=verify_bundle(bundle_path)
+            current=native_audit(bundle_path, manifest, sysconfig.get_path('purelib'))
+            report['native_wheel_audit']=current
+            checks['native_wheel_integrity']=current['passed']
+        except Exception as exc:
+            checks['native_wheel_integrity']=False
+            report['native_wheel_error']=str(exc)
+    if not args.cpu_only:
+        warp_script=Path(__file__).with_name('reference_warp_smoke.py')
+        if warp_script.is_file():
+            proc=subprocess.run([sys.executable, str(warp_script), '--gpus', args.gpus],
+                                text=True, capture_output=True)
+            report['warp_smoke']={ 'exit_code':proc.returncode,
+                                   'stdout':proc.stdout, 'stderr':proc.stderr }
+            checks['warp_cuda']=proc.returncode==0
+        else:
+            checks['warp_cuda']=False
+            report['warp_smoke_error']='Missing reference_warp_smoke.py alongside doctor'
 
     for pattern in ('test_reference_adapter.py','test_reference_masked_losses.py'):
         if not (repo/'tests'/pattern).is_file():
@@ -127,39 +151,147 @@ def doctor(args):
     return 0 if report['passed'] else 1
 
 
-def pinned_requirements(text):
-    """Resolve Conda build-directory references to installed, versioned wheel pins.
+def named_wheel_urls(values):
+    """Accept only explicitly named HTTPS wheel artifacts; never infer URLs."""
+    result = {}
+    for raw in values:
+        if '=' not in raw:
+            raise ValueError('--wheel-url expects PACKAGE=HTTPS_WHEEL_URL')
+        package, url = raw.split('=', 1)
+        name = normalized_name(package)
+        parsed = urlparse(url)
+        filename = unquote(parsed.path.rsplit('/', 1)[-1])
+        if (not re.fullmatch(r'[a-z0-9-]+', name)
+                or parsed.scheme != 'https' or not parsed.hostname
+                or parsed.username or parsed.password or parsed.query or parsed.fragment
+                or not filename.lower().endswith('.whl')):
+            raise ValueError(f'Unsafe or invalid wheel URL for {package}: {url}')
+        if name in result:
+            raise ValueError(f'Duplicate --wheel-url for {name}')
+        result[name] = url
+    return result
 
-    A local file:// origin is not portable. Only such origins may be replaced
-    using the installed distribution's metadata; remote URLs, VCS and editable
-    requirements remain rejected. The generated wheels and hashes, not the
-    original local paths, are the installable artifacts.
+
+def pinned_requirements(text, wheel_urls=None):
+    """Pin installed distributions, recording Conda and explicitly approved URLs.
+
+    Remote direct dependencies require the same explicitly approved base URL
+    as --wheel-url. A #sha256=<64 hex> fragment in pip freeze is allowed,
+    recorded and checked against the downloaded wheel. Other fragments,
+    editable/VCS requirements and unpinned dependencies are rejected.
     """
-    result=[]
-    converted=[]
+    wheel_urls = wheel_urls or {}
+    result, converted = [], []
+    seen = set()
     for raw in text.splitlines():
-        line=raw.strip()
-        if not line or line.startswith('#'): continue
-        pinned=re.fullmatch(r'([A-Za-z0-9_.-]+)==([^\s;]+)',line)
-        local=re.fullmatch(r'([A-Za-z0-9_.-]+)\s*@\s*(file://\S+)',line)
+        line = raw.strip()
+        if not line or line.startswith('#'):
+            continue
+        pinned = re.fullmatch(r'([A-Za-z0-9_.-]+)==([^\s;]+)', line)
+        direct = re.fullmatch(r'([A-Za-z0-9_.-]+)\s*@\s*(\S+)', line)
         if pinned:
-            name,version=pinned.groups()
-        elif local:
-            name,origin=local.groups()
+            name, version = pinned.groups()
+        elif direct:
+            name, origin = direct.groups()
+            norm = normalized_name(name)
+            source_sha256 = None
+            if origin.startswith('file://'):
+                pass
+            elif origin.startswith('https://'):
+                # pip freeze reconstructs direct references using PEP 610
+                # metadata and can append #sha256=... even when the approved
+                # --wheel-url itself has no fragment. Match *only* the exact
+                # approved base URL, and retain the expected content hash.
+                base_url, fragment = urldefrag(origin)
+                if wheel_urls.get(norm) != base_url:
+                    raise ValueError('Remote/editable/unapproved origin: ' + line +
+                                     '; use explicit --wheel-url PACKAGE=HTTPS_WHEEL_URL')
+                if fragment:
+                    match = re.fullmatch(r'sha256=([0-9A-Fa-f]{64})', fragment)
+                    if not match:
+                        raise ValueError(f'Unsupported direct URL fragment for {name}: {fragment}')
+                    source_sha256 = match.group(1).lower()
+            else:
+                raise ValueError('Remote/editable/unapproved origin: ' + line +
+                                 '; use explicit --wheel-url PACKAGE=HTTPS_WHEEL_URL')
             try:
-                version=md.version(name)
-            except md.PackageNotFoundError as e:
-                raise ValueError(f'Installed metadata missing for local dependency: {name}') from e
-            if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.!+~-]*',version):
+                version = md.version(name)
+            except md.PackageNotFoundError as exc:
+                raise ValueError(f'Missing installed metadata for {name}') from exc
+            if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.!+~-]*', version):
                 raise ValueError(f'Invalid installed version for {name}: {version}')
-            converted.append(dict(package=name,origin=origin,resolved_version=version))
+            conversion = dict(package=name, origin=origin, resolved_version=version)
+            if source_sha256 is not None:
+                conversion['source_sha256'] = source_sha256
+            converted.append(conversion)
         else:
             raise ValueError(f'Cannot reproduce editable/direct/unpinned requirement: {line}')
-        normalized=name.lower().replace('_','-')
-        if normalized != 'nvidia-physicsnemo':
+        norm = normalized_name(name)
+        if norm in seen:
+            raise ValueError(f'Duplicate frozen requirement for {name}')
+        seen.add(norm)
+        if norm != 'nvidia-physicsnemo':
             result.append(f'{name}=={version}')
-    if not result: raise ValueError('Empty dependency snapshot')
-    return result,converted
+    if not result:
+        raise ValueError('Empty dependency snapshot')
+    return result, converted
+
+
+def cuda12_projection(requirements, family=None):
+    """Create an explicit, auditable CUDA 12 *target* from a pip freeze.
+
+    CUDA 13 and CUDA 12 distributions can share import/library paths.
+    Their coexistence in a pip freeze does not make a reproducible venv.
+    Never silently discard them: explicit --cuda-family cu12 is required.
+    This does not alter the source environment; offline pip resolution still
+    must prove that every retained package's dependencies are satisfied.
+    """
+    foreign = re.compile(r'(?:-cu13x?|-cuda13(?:[0-9]+|x)?)$')
+    excluded, projected = [], []
+    for pin in requirements:
+        name, version = pin.split('==', 1)
+        normalized = normalized_name(name)
+        if foreign.search(normalized):
+            excluded.append(dict(package=name, version=version,
+                                 reason='excluded from explicitly selected CUDA 12 target'))
+        else:
+            projected.append(pin)
+    if excluded and family != 'cu12':
+        names = ', '.join(row['package'] for row in excluded)
+        raise ValueError('CUDA 13 distributions coexist in source snapshot: ' + names +
+                         '. To create a CUDA 12-only target, specify --cuda-family cu12; '
+                         'source environment is not modified.')
+    if family not in (None, 'cu12'):
+        raise ValueError('Unsupported CUDA family: ' + str(family))
+    if not projected:
+        raise ValueError('Empty CUDA target snapshot')
+    if family == 'cu12':
+        for pin in projected:
+            name, version = pin.split('==', 1)
+            if (normalized_name(name) == 'torch' and '+cu13' in version):
+                raise ValueError('Cannot create CUDA 12 target with CUDA 13 PyTorch')
+            if (normalized_name(name) == 'warp-lang' and '+cu13' in version):
+                raise ValueError('Cannot create CUDA 12 target with CUDA 13 Warp')
+    return projected, excluded
+
+
+def remove_excluded_wheels(root, excluded):
+    """Unlink excluded wheels only in an UNFINISHED bundle, preserving reuse source.
+
+    Never delete unrelated wheels.  A hardlinked file in another bundle remains
+    intact when this bundle's directory entry is unlinked.
+    """
+    names = {normalized_name(row['package']): row['version'] for row in excluded}
+    removed = []
+    for path in sorted((root / 'wheels').glob('*.whl')):
+        rec = wheel_record(path)
+        pkg = normalized_name(rec['name'])
+        if pkg in names:
+            if rec['version'] != names[pkg]:
+                raise ValueError(f'Unexpected version for excluded wheel {pkg}: {rec["version"]}')
+            removed.append(dict(file=path.name, sha256=rec['sha256']))
+            path.unlink()
+    return removed
 
 
 def wheel_record(path):
@@ -185,122 +317,421 @@ def normalized_name(name):
     return re.sub(r'[-_.]+','-',name).lower()
 
 
-def finish_bundle(root, info, requirements, converted):
-    """Audit every completed wheel before writing the final manifest."""
-    wheels=root/'wheels'
-    records=[wheel_record(p) for p in sorted(wheels.glob('*.whl'))]
-    actual={}
+def expected_versions(requirements):
+    result = {}
+    for line in requirements:
+        name, version = line.split('==', 1)
+        norm = normalized_name(name)
+        if norm in result:
+            raise ValueError(f'Duplicate expected package: {name}')
+        result[norm] = version
+    result['nvidia-physicsnemo'] = None
+    return result
+
+
+def native_member(name):
+    basename = name.rsplit('/', 1)[-1].lower()
+    return (bool(re.search(r'\.so(?:\.[0-9]+)*$', basename))
+            or basename.endswith(('.dll', '.pyd', '.dylib')))
+
+
+def wheel_native_members(root, manifest):
+    """Check wheel ownership; path collisions may alter native runtimes."""
+    paths = {}
+    for wheel in manifest['wheels']:
+        with zipfile.ZipFile(root / 'wheels' / wheel['file']) as archive:
+            for member in archive.namelist():
+                if not native_member(member):
+                    continue
+                # CPython extension modules are often stored at the wheel root,
+                # e.g. ``_duckdb.cpython-312-x86_64-linux-gnu.so``.  Such
+                # members install directly into site-packages and are safe.
+                # Reject non-canonical, escaping, and non-site-packages paths.
+                parts = PurePosixPath(member).parts
+                if (not parts or member.startswith('/') or '\\' in member
+                        or '..' in parts or PurePosixPath(member).as_posix() != member
+                        or ':' in parts[0] or parts[0].endswith('.data')):
+                    raise ValueError(f'Unsupported/unsafe native wheel member: {member}')
+                owner = paths.get(member)
+                if owner:
+                    raise ValueError(f'Overlapping native library {member} in '
+                                     f'{owner} and {wheel["file"]}')
+                paths[member] = wheel['file']
+    return paths
+
+
+def preflight(root):
+    log = root / 'preflight.log'
+    argv = [sys.executable, '-m', 'pip', 'install', '--dry-run', '--ignore-installed',
+            '--no-index', '--find-links', root / 'wheels', '--require-hashes',
+            '-r', root / 'requirements.lock']
+    proc = subprocess.run([str(x) for x in argv], text=True,
+                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    log.write_text(proc.stdout)
+    if proc.returncode:
+        raise ValueError('Offline dependency preflight failed; inspect ' + str(log) +
+                         '\n' + '\n'.join(proc.stdout.splitlines()[-12:]))
+
+
+def finish_bundle(root, info, requirements, converted, wheel_urls=None, reused_from=None,
+                  cuda_family=None, excluded_packages=None):
+    """Audit completeness, native path collisions and offline resolution."""
+    records = [wheel_record(p) for p in sorted((root / 'wheels').glob('*.whl'))]
+    actual = {}
     for record in records:
-        name=normalized_name(record['name'])
+        name = normalized_name(record['name'])
         if name in actual:
             raise ValueError(f'Duplicate wheels for {name}')
-        actual[name]=record['version']
-    expected={normalized_name(line.split('==',1)[0]):line.split('==',1)[1]
-              for line in requirements}
-    # PhysicsNeMo is deliberately built from the audited checkout, not PyPI.
-    expected['nvidia-physicsnemo']=None
-    if set(actual)!=set(expected):
+        actual[name] = record['version']
+    expected = expected_versions(requirements)
+    if set(actual) != set(expected):
         raise ValueError(f'Wheel coverage mismatch: missing={sorted(set(expected)-set(actual))}, '
                          f'extra={sorted(set(actual)-set(expected))}')
-    for name,version in expected.items():
-        if version is not None and actual[name]!=version:
+    for name, version in expected.items():
+        if version is not None and actual[name] != version:
             raise ValueError(f'Wheel version mismatch for {name}: expected {version}, got {actual[name]}')
-    lock=''.join(f"{r['name']}=={r['version']} --hash=sha256:{r['sha256']}\n" for r in records)
-    (root/'requirements.lock').write_text(lock)
-    manifest=dict(schema='reference-wheel-bundle-v1',host=host(),checkout=info,wheels=records,
-                  lock_sha256=digest(root/'requirements.lock'),
-                  local_origin_resolutions=converted,validated_install=False)
-    (root/'manifest.json').write_text(json.dumps(manifest,indent=2))
-    print(f'Bundle created: {root}. Installation and doctor verification are still required.')
+    # An approved direct wheel's origin SHA, when reported by pip freeze,
+    # must match the bytes included in the bundle; a version pin alone is
+    # insufficient to verify a direct reference's original artifact.
+    records_by_name = {normalized_name(r['name']): r for r in records}
+    for conversion in converted:
+        source_hash = conversion.get('source_sha256')
+        if source_hash:
+            name = normalized_name(conversion['package'])
+            if records_by_name[name]['sha256'] != source_hash:
+                raise ValueError(f'Direct wheel SHA256 mismatch for {name}: '
+                                 f'installed origin {source_hash}, '
+                                 f'wheel {records_by_name[name]["sha256"]}')
+    if 'warp-lang' in (wheel_urls or {}) and actual.get('warp-lang') != md.version('warp-lang'):
+        raise ValueError('Warp wheel does not match installed Warp version')
+    provisional = dict(wheels=records)
+    native_paths = wheel_native_members(root, provisional)
+    lock = ''.join(f"{r['name']}=={r['version']} --hash=sha256:{r['sha256']}\n"
+                   for r in records)
+    (root / 'requirements.lock').write_text(lock)
+    preflight(root)
+    manifest = dict(schema='reference-wheel-bundle-v2', host=host(), checkout=info,
+                    wheels=records, lock_sha256=digest(root / 'requirements.lock'),
+                    frozen_sha256=digest(root / 'source-freeze.txt'),
+                    dependencies_sha256=digest(root / 'dependencies.txt'),
+                    local_origin_resolutions=converted,
+                    explicit_wheel_urls=wheel_urls or {},
+                    reused_from=reused_from,
+                    cuda_family=cuda_family,
+                    excluded_packages=excluded_packages or [],
+                    native_library_count=len(native_paths),
+                    preflight_passed=True, validated_install=False)
+    (root / 'manifest.json').write_text(json.dumps(manifest, indent=2))
+    print(f'Bundle created and preflight passed: {root}. Installation and doctor remain required.')
     return 0
 
 
+def reuse_wheels(previous, dest, expected, source_commit):
+    """Hardlink matching wheels, copying only when hardlinks are unavailable."""
+    previous = Path(previous).resolve()
+    manifest = verify_bundle(previous)
+    if manifest['checkout']['commit'] != source_commit:
+        raise ValueError('Reused bundle has a different PhysicsNeMo commit')
+    reused = {}
+    for record in manifest['wheels']:
+        name = normalized_name(record['name'])
+        if name not in expected:
+            continue
+        version = expected[name]
+        if version is not None and version != record['version']:
+            continue
+        src = previous / 'wheels' / record['file']
+        target = dest / record['file']
+        if src.resolve() == target.resolve():
+            raise ValueError('Cannot reuse wheel into itself')
+        try:
+            os.link(src, target)
+            mode = 'hardlink'
+        except OSError:
+            shutil.copy2(src, target)
+            mode = 'copy'
+        reused[name] = mode
+    return reused
+
+
 def bundle(args):
-    root=Path(args.output).resolve()
-    if root.exists(): raise ValueError('Output must be a new directory')
-    info=checkout_info(args.physicsnemo_dir,args.expected_commit)
-    if info['dirty']: raise ValueError('Checkout has changes: preserve them in a commit and specify its SHA; do not discard files')
-    frozen=output([sys.executable,'-m','pip','freeze','--all'])
-    requirements,converted=pinned_requirements(frozen)
-    root.mkdir(parents=True); wheels=root/'wheels'; wheels.mkdir()
-    (root/'source-freeze.txt').write_text(frozen+'\n')
-    (root/'dependencies.txt').write_text('\n'.join(requirements)+'\n')
-    (root/'local-origin-resolutions.json').write_text(json.dumps(converted,indent=2)+'\n')
-    indexes=[]
-    for url in args.extra_index_url: indexes += ['--extra-index-url',url]
-    run([sys.executable,'-m','pip','wheel','--no-deps','--wheel-dir',wheels,
-         '-r',root/'dependencies.txt',*indexes])
-    run([sys.executable,'-m','pip','wheel','--no-deps','--wheel-dir',wheels,info['path'],*indexes])
-    # Ensure source did not change during packaging.
-    after=checkout_info(args.physicsnemo_dir,args.expected_commit)
-    if after['dirty']: raise ValueError('Checkout changed during build')
-    return finish_bundle(root,after,requirements,converted)
+    root = Path(args.output).resolve()
+    if root.exists():
+        raise ValueError('Output must be a new directory')
+    info = checkout_info(args.physicsnemo_dir, args.expected_commit)
+    if info['dirty']:
+        raise ValueError('Checkout has changes; commit them before bundling')
+    # Prevent obvious inconsistencies before downloading any wheel.
+    run([sys.executable, '-m', 'pip', 'check'])
+    wheel_urls = named_wheel_urls(args.wheel_url)
+    frozen = output([sys.executable, '-m', 'pip', 'freeze', '--all'])
+    raw_requirements, converted = pinned_requirements(frozen, wheel_urls)
+    requirements, excluded = cuda12_projection(raw_requirements, args.cuda_family)
+    expected = expected_versions(requirements)
+    for name in wheel_urls:
+        if name not in expected or name == 'nvidia-physicsnemo':
+            raise ValueError(f'Wheel URL does not correspond to a frozen dependency: {name}')
+    if expected.get('warp-lang', '').endswith('+cu12') and 'warp-lang' not in wheel_urls:
+        raise ValueError('Warp CUDA 12 variant requires --wheel-url warp-lang=HTTPS_WHEEL_URL')
+    root.mkdir(parents=True)
+    wheels = root / 'wheels'
+    wheels.mkdir()
+    (root / 'source-freeze.txt').write_text(frozen + '\n')
+    (root / 'dependencies.txt').write_text('\n'.join(requirements) + '\n')
+    (root / 'local-origin-resolutions.json').write_text(json.dumps(converted, indent=2) + '\n')
+    (root / 'cuda-target-exclusions.json').write_text(json.dumps(excluded, indent=2) + '\n')
+    (root / 'explicit-wheel-urls.json').write_text(json.dumps(wheel_urls, indent=2) + '\n')
+    reused = reuse_wheels(args.reuse_bundle, wheels, expected, info['commit']) if args.reuse_bundle else {}
+    indexes = []
+    for url in args.extra_index_url:
+        indexes += ['--extra-index-url', url]
+    to_resolve = [line for line in requirements
+                  if normalized_name(line.split('==', 1)[0]) not in reused
+                  and normalized_name(line.split('==', 1)[0]) not in wheel_urls]
+    if to_resolve:
+        with tempfile.NamedTemporaryFile('w', suffix='.txt', delete=False) as f:
+            f.write('\n'.join(to_resolve) + '\n')
+            temporary_requirements = Path(f.name)
+        try:
+            run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--wheel-dir', wheels,
+                 '-r', temporary_requirements, *indexes])
+        finally:
+            temporary_requirements.unlink(missing_ok=True)
+    for name, url in wheel_urls.items():
+        if name not in reused:
+            run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--wheel-dir', wheels,
+                 url, *indexes])
+    if 'nvidia-physicsnemo' not in reused:
+        run([sys.executable, '-m', 'pip', 'wheel', '--no-deps', '--wheel-dir', wheels,
+             info['path'], *indexes])
+    after = checkout_info(args.physicsnemo_dir, args.expected_commit)
+    if after['dirty']:
+        raise ValueError('Checkout changed during build')
+    return finish_bundle(root, after, requirements, converted, wheel_urls,
+                         reused_from=dict(path=str(args.reuse_bundle), wheels=reused)
+                         if args.reuse_bundle else None,
+                         cuda_family=args.cuda_family, excluded_packages=excluded)
 
 
 def finalize(args):
-    """Finish a prior bundle whose wheels exist but manifest was not written."""
-    root=Path(args.bundle).resolve()
-    if not root.is_dir() or (root/'manifest.json').exists() or (root/'requirements.lock').exists():
-        raise ValueError('Expected an unfinished bundle directory without a manifest or lock')
-    info=checkout_info(args.physicsnemo_dir,args.expected_commit)
+    """Finish an interrupted bundle from the already-downloaded wheels."""
+    root = Path(args.bundle).resolve()
+    if not root.is_dir() or (root / 'manifest.json').exists():
+        raise ValueError('Expected an unfinished bundle directory without a manifest')
+    info = checkout_info(args.physicsnemo_dir, args.expected_commit)
     if info['dirty']:
-        raise ValueError('Checkout has local changes; cannot finalize without stable provenance')
-    frozen=output([sys.executable,'-m','pip','freeze','--all'])
-    requirements,converted=pinned_requirements(frozen)
-    if (root/'source-freeze.txt').read_text()!=frozen+'\n':
-        raise ValueError('Environment differs from the interrupted bundle snapshot')
-    if (root/'dependencies.txt').read_text()!='\n'.join(requirements)+'\n':
-        raise ValueError('Dependency pins differ from the interrupted bundle')
-    if json.loads((root/'local-origin-resolutions.json').read_text())!=converted:
-        raise ValueError('Local-origin resolutions differ from the interrupted bundle')
-    return finish_bundle(root,info,requirements,converted)
+        raise ValueError('Checkout has local changes')
+    run([sys.executable, '-m', 'pip', 'check'])
+    frozen = output([sys.executable, '-m', 'pip', 'freeze', '--all'])
+    urls_file = root / 'explicit-wheel-urls.json'
+    wheel_urls = json.loads(urls_file.read_text()) if urls_file.is_file() else {}
+    raw_requirements, converted = pinned_requirements(frozen, wheel_urls)
+    requirements, excluded = cuda12_projection(raw_requirements, args.cuda_family)
+    if (root / 'source-freeze.txt').read_text() != frozen + '\n':
+        raise ValueError('Environment differs from interrupted bundle snapshot')
+    existing_pins = (root / 'dependencies.txt').read_text()
+    original_pins = '\n'.join(raw_requirements) + '\n'
+    target_pins = '\n'.join(requirements) + '\n'
+    if existing_pins not in (original_pins, target_pins):
+        raise ValueError('Pins differ from interrupted bundle snapshot')
+    if json.loads((root / 'local-origin-resolutions.json').read_text()) != converted:
+        raise ValueError('Local origins differ from interrupted bundle')
+    # Never try to make a mixed CUDA 12/CUDA 13 wheel set installable by
+    # disregarding overlaps. Explicitly derive and audit a CUDA 12-only target.
+    previous_exclusions = root / 'cuda-target-exclusions.json'
+    if previous_exclusions.is_file():
+        saved = json.loads(previous_exclusions.read_text())
+        if saved and saved != excluded:
+            raise ValueError('CUDA exclusion set changed since bundle creation')
+    if excluded:
+        removed = remove_excluded_wheels(root, excluded)
+        print('CUDA target projection: excluded ' + ', '.join(row['package'] for row in excluded))
+        print(f'Unlinked {len(removed)} CUDA 13 wheel(s) from incomplete bundle only')
+    (root / 'dependencies.txt').write_text(target_pins)
+    previous_exclusions.write_text(json.dumps(excluded, indent=2) + '\n')
+    return finish_bundle(root, info, requirements, converted, wheel_urls,
+                         cuda_family=args.cuda_family, excluded_packages=excluded)
 
 
 def verify_bundle(root):
-    root=Path(root).resolve(); m=json.loads((root/'manifest.json').read_text())
-    if m['schema']!='reference-wheel-bundle-v1' or m['host']!=host():
-        raise ValueError('Bundle requires the same Python minor, OS and machine architecture')
-    if digest(root/'requirements.lock')!=m['lock_sha256']: raise ValueError('Lock hash mismatch')
-    if not m['wheels']: raise ValueError('Empty wheel manifest')
-    for w in m['wheels']:
-        name=w['file']
-        if Path(name).name!=name or not name.endswith('.whl'): raise ValueError('Unsafe wheel path')
-        if digest(root/'wheels'/name)!=w['sha256']: raise ValueError(f'Wheel hash mismatch: {name}')
-    return m
+    root = Path(root).resolve()
+    manifest = json.loads((root / 'manifest.json').read_text())
+    if manifest['schema'] not in ('reference-wheel-bundle-v1', 'reference-wheel-bundle-v2'):
+        raise ValueError('Unsupported bundle schema')
+    if manifest['host'] != host():
+        raise ValueError('Bundle requires the same Python minor, OS, architecture')
+    if digest(root / 'requirements.lock') != manifest['lock_sha256']:
+        raise ValueError('Lock hash mismatch')
+    if not manifest['wheels']:
+        raise ValueError('Empty wheel manifest')
+    seen = set()
+    for wheel in manifest['wheels']:
+        name = wheel['file']
+        if Path(name).name != name or not name.endswith('.whl') or name in seen:
+            raise ValueError('Invalid/duplicate wheel name')
+        seen.add(name)
+        if digest(root / 'wheels' / name) != wheel['sha256']:
+            raise ValueError(f'Wheel hash mismatch: {name}')
+    if manifest['schema'] == 'reference-wheel-bundle-v2':
+        if not manifest.get('preflight_passed'):
+            raise ValueError('Dependency preflight missing')
+        for filename, key in (('source-freeze.txt', 'frozen_sha256'),
+                              ('dependencies.txt', 'dependencies_sha256')):
+            if digest(root / filename) != manifest[key]:
+                raise ValueError(f'{filename} hash mismatch')
+    return manifest
+
+
+def hash_stream(file_obj):
+    h = hashlib.sha256()
+    for chunk in iter(lambda: file_obj.read(1024 * 1024), b''):
+        h.update(chunk)
+    return h.hexdigest()
+
+
+def native_audit(root, manifest, site_packages):
+    """Compare native binaries to exact wheels; identify stray cuDNN files.
+
+    Streaming and wheel-by-wheel processing avoid caching giant CUDA binaries.
+    """
+    root = Path(root).resolve()
+    site_packages = Path(site_packages).resolve()
+    problems, expected_cudnn = [], set()
+    checked = 0
+    # Independently prove no overlapping binary paths in the bundle.
+    wheel_native_members(root, manifest)
+    for wheel in manifest['wheels']:
+        package = normalized_name(wheel['name'])
+        with zipfile.ZipFile(root / 'wheels' / wheel['file']) as archive:
+            for member in archive.namelist():
+                if not native_member(member):
+                    continue
+                installed = site_packages.joinpath(*PurePosixPath(member).parts)
+                if member.startswith('nvidia/cudnn/lib/libcudnn'):
+                    expected_cudnn.add(installed)
+                if not installed.is_file():
+                    problems.append(dict(package=package, type='missing', path=str(installed)))
+                else:
+                    with archive.open(member) as stream:
+                        expected_hash = hash_stream(stream)
+                    if digest(installed) != expected_hash:
+                        problems.append(dict(package=package, type='mismatch', path=str(installed)))
+                checked += 1
+    cudnn_dir = site_packages / 'nvidia' / 'cudnn' / 'lib'
+    if expected_cudnn and cudnn_dir.is_dir():
+        for candidate in cudnn_dir.glob('libcudnn*.so*'):
+            if candidate not in expected_cudnn:
+                problems.append(dict(package='nvidia-cudnn-cu12', type='orphan',
+                                     path=str(candidate)))
+    return dict(passed=not problems, native_files_checked=checked, problems=problems)
+
+
+def repair_native_from_bundle(root, manifest, python, site_packages, report):
+    """Deterministic local repair. Never rely on remote packages or delete data."""
+    by_name = {normalized_name(w['name']): w for w in manifest['wheels']}
+    repairs = []
+    packages = sorted({x['package'] for x in report['problems']
+                       if x['type'] in ('mismatch', 'missing')})
+    for package in packages:
+        wheel = by_name[package]
+        run([python, '-m', 'pip', 'install', '--force-reinstall', '--no-deps',
+             '--no-index', root / 'wheels' / wheel['file']])
+        repairs.append(dict(action='reinstall_from_locked_wheel', package=package,
+                            sha256=wheel['sha256']))
+    # Extra native cuDNN libraries may be left by another installation.
+    # Quarantine rather than unlink, while preserving their original names.
+    for issue in report['problems']:
+        if issue['type'] != 'orphan':
+            continue
+        path = Path(issue['path'])
+        relative = path.relative_to(site_packages)
+        target = Path(python).resolve().parent.parent / 'reference_native_quarantine' / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.exists():
+            raise ValueError(f'Quarantine target exists: {target}')
+        path.rename(target)
+        repairs.append(dict(action='quarantine_unowned_native_library',
+                            original=str(path), quarantine=str(target)))
+    return repairs
 
 
 def install(args):
-    root=Path(args.bundle).resolve(); m=verify_bundle(root)
-    dest=Path(args.venv).resolve()
-    if dest.exists(): raise ValueError('Refusing to modify an existing environment; choose a new venv path')
-    run([sys.executable,'-m','venv',dest])
-    python=dest/('Scripts/python.exe' if os.name=='nt' else 'bin/python')
-    run([python,'-m','pip','install','--no-index','--find-links',root/'wheels',
-         '--require-hashes','-r',root/'requirements.lock'])
-    run([python,'-m','pip','check'])
-    run([python,'-c','from physicsnemo.models.diffusion_unets import CorrDiffRegressionUNet; from physicsnemo.diffusion.preconditioners import EDMPrecondSuperResolution'])
-    receipt=dict(bundle_manifest_sha256=digest(root/'manifest.json'),checkout=m['checkout'],
-                 installed_packages=output([python,'-m','pip','freeze','--all']),gpu_verified=False)
-    (dest/'reference_installation.json').write_text(json.dumps(receipt,indent=2))
-    print(f'Environment installed: {python}. Run doctor with this Python before training.')
+    root = Path(args.bundle).resolve()
+    manifest = verify_bundle(root)
+    dest = Path(args.venv).resolve()
+    if dest.exists():
+        raise ValueError('Refusing to modify an existing environment; choose a new venv')
+    run([sys.executable, '-m', 'venv', dest])
+    python = dest / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
+    run([python, '-m', 'pip', 'install', '--no-index', '--find-links', root / 'wheels',
+         '--require-hashes', '-r', root / 'requirements.lock'])
+    site_packages = Path(output([python, '-c',
+                                'import sysconfig; print(sysconfig.get_path("purelib"))']))
+    audited = native_audit(root, manifest, site_packages)
+    initial = audited
+    repairs = []
+    if not audited['passed'] and not args.no_auto_repair:
+        print('Native wheel mismatch detected: repairing from exact bundle wheels', flush=True)
+        repairs = repair_native_from_bundle(root, manifest, python, site_packages, audited)
+        audited = native_audit(root, manifest, site_packages)
+    audit_report = dict(initial=initial, final=audited, repairs=repairs)
+    (dest / 'reference_native_audit.json').write_text(json.dumps(audit_report, indent=2))
+    if not audited['passed']:
+        raise ValueError('Installed native libraries differ from bundle; see ' +
+                         str(dest / 'reference_native_audit.json'))
+    run([python, '-m', 'pip', 'check'])
+    run([python, '-c', 'from physicsnemo.models.diffusion_unets import CorrDiffRegressionUNet; '
+                      'from physicsnemo.diffusion.preconditioners import EDMPrecondSuperResolution'])
+    receipt = dict(bundle_manifest_sha256=digest(root / 'manifest.json'),
+                   bundle_path=str(root), checkout=manifest['checkout'],
+                   installed_packages=output([python, '-m', 'pip', 'freeze', '--all']),
+                   native_integrity_passed=True, native_repairs=repairs,
+                   gpu_verified=False)
+    (dest / 'reference_installation.json').write_text(json.dumps(receipt, indent=2))
+    print(f'Environment installed and native integrity PASS: {python}. Run doctor.')
     return 0
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__); sub=p.add_subparsers(dest='command',required=True)
-    d=sub.add_parser('doctor'); d.add_argument('--project-dir',default='.')
-    d.add_argument('--physicsnemo-dir',required=True); d.add_argument('--expected-commit',default=EXPECTED_COMMIT)
-    d.add_argument('--dataset-dir',default='datasets/corrdiff_reference_v1'); d.add_argument('--gpus',default='0'); d.add_argument('--cpu-only',action='store_true'); d.add_argument('--output',required=True)
-    b=sub.add_parser('bundle'); b.add_argument('--physicsnemo-dir',required=True)
-    b.add_argument('--expected-commit',default=EXPECTED_COMMIT); b.add_argument('--output',required=True)
-    b.add_argument('--extra-index-url',action='append',default=[])
-    f=sub.add_parser('finalize'); f.add_argument('--bundle',required=True)
-    f.add_argument('--physicsnemo-dir',required=True); f.add_argument('--expected-commit',default=EXPECTED_COMMIT)
-    i=sub.add_parser('install'); i.add_argument('--bundle',required=True); i.add_argument('--venv',required=True)
-    args=p.parse_args()
-    try: return {'doctor':doctor,'bundle':bundle,'finalize':finalize,'install':install}[args.command](args)
-    except Exception as e:
-        print(f'ERROR: {e}',file=sys.stderr); return 1
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest='command', required=True)
+    d = commands.add_parser('doctor')
+    d.add_argument('--project-dir', default='.')
+    d.add_argument('--physicsnemo-dir', required=True)
+    d.add_argument('--expected-commit', default=EXPECTED_COMMIT)
+    d.add_argument('--dataset-dir', default='datasets/corrdiff_reference_v1')
+    d.add_argument('--gpus', default='0')
+    d.add_argument('--cpu-only', action='store_true')
+    d.add_argument('--output', required=True)
+    b = commands.add_parser('bundle')
+    b.add_argument('--physicsnemo-dir', required=True)
+    b.add_argument('--expected-commit', default=EXPECTED_COMMIT)
+    b.add_argument('--output', required=True)
+    b.add_argument('--extra-index-url', action='append', default=[])
+    b.add_argument('--wheel-url', action='append', default=[],
+                   help='Explicit official direct wheel: PACKAGE=HTTPS_WHEEL_URL')
+    b.add_argument('--reuse-bundle', help='Reuse verified matching wheels via hardlinks')
+    b.add_argument('--cuda-family', choices=['cu12'], default=None,
+                   help='Explicitly derive a CUDA 12-only bundle; exclude CUDA 13 distributions')
+    f = commands.add_parser('finalize')
+    f.add_argument('--bundle', required=True)
+    f.add_argument('--physicsnemo-dir', required=True)
+    f.add_argument('--expected-commit', default=EXPECTED_COMMIT)
+    f.add_argument('--cuda-family', choices=['cu12'], default=None,
+                   help='Exclude incompatible CUDA 13 wheels from unfinished bundle')
+    i = commands.add_parser('install')
+    i.add_argument('--bundle', required=True)
+    i.add_argument('--venv', required=True)
+    i.add_argument('--no-auto-repair', action='store_true',
+                   help='Fail rather than restore mismatched native files from local wheels')
+    args = parser.parse_args()
+    try:
+        return {'doctor': doctor, 'bundle': bundle, 'finalize': finalize,
+                'install': install}[args.command](args)
+    except Exception as exc:
+        print(f'ERROR: {exc}', file=sys.stderr)
+        return 1
 
-if __name__=='__main__': raise SystemExit(main())
 
+if __name__ == '__main__':
+    raise SystemExit(main())
