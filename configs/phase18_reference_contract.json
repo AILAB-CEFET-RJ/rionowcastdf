@@ -1,0 +1,20 @@
+{
+  "schema": "phase18-reference-model-smoke-v1",
+  "dataset_dir": "datasets/corrdiff_reference_v1",
+  "dataset_version": "reference-zarr-v1",
+  "raw_channels": 12,
+  "derived_channels_C07": 8,
+  "target_transform": "target_code / 50",
+  "target_classes": [0, 20, 25, 30, 35, 40, 45, 50],
+  "mask_policy": "masked_loss_required; do not drop invalid pixels or silently fill targets",
+  "patch_size": 32,
+  "patches_per_hour": 48,
+  "allowed_training_splits": ["train", "validation"],
+  "locked_splits": ["test_primary", "test_stress_ood"],
+  "physicsnemo_commit": "c15bd23eb56216c32bd3e30180593e5685be9bc2",
+  "experiment_ids": ["C00", "C07"],
+  "native_legacy_train_py_compatible": false,
+  "model_smoke_is_full_training": false,
+  "phase18_ready": false,
+  "notes": "New mask-aware model-level GPU smoke. Does not certify stock train.py, native checkpoints, or completed Phase 18. Supersedes neither the frozen dataset nor prior contracts."
+}
