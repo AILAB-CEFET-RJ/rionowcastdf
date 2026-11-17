@@ -1,0 +1,93 @@
+\begin{figure}[htbp]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  x=1cm, y=1cm,
+  font=\sffamily,
+  every node/.style={text=fluxTexto, align=center, inner sep=2pt},
+  caixa/.style={rounded corners=6pt, line width=0.9pt},
+  titulo/.style={font=\sffamily\large\bfseries},
+  seta/.style={
+    -{Latex[length=3mm, width=2.3mm]},
+    line width=1pt, draw=fluxCinza,
+    shorten <=1pt, shorten >=2pt
+  }
+]
+
+% Blocos principais
+\draw[caixa, draw=fluxAzul, fill=fluxAzul!8]
+  (0,0) rectangle (4.4,3.6);
+\draw[caixa, draw=fluxVerde, fill=fluxVerde!9]
+  (5.75,0) rectangle (10.85,3.6);
+\draw[caixa, draw=fluxRoxo, fill=fluxRoxo!8]
+  (12.2,0) rectangle (19.2,3.6);
+\draw[caixa, draw=fluxOcre, fill=fluxOcre!8]
+  (0,-4.55) rectangle (6.5,-1.95);
+\draw[caixa, draw=fluxCinza, fill=fluxCinza!7]
+  (10.95,-4.55) rectangle (19.2,-1.95);
+
+% Condicionamento ERA5
+\node[titulo, text width=4cm] at (2.2,2.99)
+  {Condicionamento\\ERA5};
+\node[text=fluxAzul, font=\sffamily\LARGE] at (2.2,2.02)
+  {$X_t$};
+\node[font=\sffamily\small, text width=4cm] at (2.2,0.96)
+  {Temperatura \textbullet{} Umidade\\
+   Vento \textbullet{} Vapor na coluna\\
+   12 canais meteorológicos};
+
+% Geração condicional
+\node[caixa, draw=fluxVerde, fill=white,
+  inner sep=5pt, minimum height=8.5mm]
+  (ruido) at (8.3,4.37) {Ruído de amostragem \(z\)};
+\node[titulo, text width=4.7cm] at (8.3,2.95)
+  {Geração condicional};
+\node[font=\sffamily\LARGE\bfseries, text=fluxVerde]
+  at (8.3,2.16) {CorrDiff};
+\node[font=\sffamily\LARGE] at (8.3,1.07)
+  {$p_{\theta}\bigl(Y_{s(t)} \mid X_t\bigr)$};
+
+% Conjunto de realizações
+\node[titulo, text width=6.6cm] at (15.7,3.0)
+  {Conjunto de realizações};
+\foreach \indice/\posicao in {1/13.68,2/15.70,3/17.72} {
+  \node[caixa, draw=fluxRoxo, fill=white, text=fluxRoxo,
+    minimum width=1.72cm, minimum height=1.24cm,
+    font=\sffamily\LARGE]
+    at (\posicao,1.75) {$\widehat{Y}_{s(t)}^{(\indice)}$};
+}
+\node[text width=6.6cm] at (15.7,0.53)
+  {Amostras do modelo sob\\o mesmo condicionamento};
+
+% Referência observada
+\node[titulo, text width=6.1cm] at (3.25,-2.50)
+  {Referência observada};
+\node[font=\sffamily\large, text width=6.1cm] at (3.25,-3.25)
+  {Radar \(Y_{s(t)}\) e máscara \(M_{s(t)}\)};
+\node[text width=6.1cm] at (3.25,-4.04)
+  {Pareamento: \(\lvert s(t)-t\rvert \leq 120\,\mathrm{s}\)};
+
+% Treinamento e avaliação
+\node[titulo, text width=7.8cm] at (15.075,-2.50)
+  {Treinamento e avaliação};
+\node[text width=7.8cm] at (15.075,-3.63)
+  {Supervisão nas posições válidas\\[2pt]
+   Intensidade \textbullet{} Estrutura espacial\\
+   Qualidade probabilística};
+
+% Setas e rótulos
+\draw[seta] (4.4,1.8) -- (5.75,1.8);
+\draw[seta, draw=fluxVerde] (ruido.south) -- (8.3,3.6);
+\draw[seta] (10.85,1.8) -- (12.2,1.8);
+\draw[seta] (15.7,0) -- (15.7,-1.95)
+  node[midway, right=3pt] {Comparação};
+\draw[seta] (6.5,-3.25) -- (10.95,-3.25);
+\draw[seta, dashed, draw=fluxOcre] (6.5,-2.15) -- (7.38,0);
+\node[anchor=west, align=left, text=fluxOcre] at (7.75,-1.28)
+  {Supervisão\\no treinamento};
+
+\end{tikzpicture}%
+}
+    \caption{Geração contemporânea condicionada ERA5–radar}
+    \label{geracao-condicional}
+\end{figure}
